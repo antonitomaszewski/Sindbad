@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { users } from '../data/users';
-import { User } from '../types/index';
-// import { User } from '../types';
+import { User } from '../types';
 
 export const registerUser = (req: Request, res: Response) => {
     const { email, password } = req.body;
