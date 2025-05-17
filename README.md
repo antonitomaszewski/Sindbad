@@ -76,3 +76,15 @@ npm install --save-dev @types/express
 
 npx ts-node src/app.ts
 http://localhost:3000/ping
+
+w pliku app.ts ustawiamy wszsytkie ROutes i w sumie to tyle
+w types/index.js definiujesz swoje typy
+
+
+### Testy
+
+curl -X POST http://localhost:3000/api/users/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"tajnehaslo"}'
+
+  
