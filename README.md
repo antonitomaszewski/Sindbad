@@ -52,3 +52,27 @@ Giełda sportów wodnych. Do łączenia ludzi z wydarzeniami
 + Po każdym kroku testujemy działanie (np. przez Postmana lub testy automatyczne).
 + Dokumentujemy postęp i decyzje.
 + Zaczynamy od najprostszej wersji, potem rozbudowujemy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Instalacje
+
+npm init -y
+npm install --save-dev typescript @types/node
+npx tsc --init
+npm install express
+npm install --save-dev @types/express
+
+npx ts-node src/app.ts
+http://localhost:3000/ping
