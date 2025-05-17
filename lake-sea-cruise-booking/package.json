@@ -1,0 +1,37 @@
+{
+  "name": "lake-sea-cruise-booking",
+  "version": "1.0.0",
+  "description": "A web application for booking cruises on lakes and seas, connecting users with available offers.",
+  "main": "src/app.ts",
+  "scripts": {
+    "start": "ts-node src/app.ts",
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.9",
+    "stripe": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^4.17.8",
+    "@types/jest": "^26.0.0",
+    "@types/node": "^14.14.6",
+    "jest": "^26.6.3",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.2"
+  },
+  "keywords": [
+    "cruise",
+    "booking",
+    "lake",
+    "sea",
+    "reservation"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
