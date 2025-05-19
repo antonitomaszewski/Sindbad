@@ -24,3 +24,5 @@ app.use('/api/bookings', bookingRoutes);
 app.listen(PORT, () => {
     console.log(`Serwer działa na porcie ${PORT}`);
 });
+
+export { app };
