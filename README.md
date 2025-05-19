@@ -104,3 +104,8 @@ curl -X POST http://localhost:3000/api/users/register \
   curl -X POST http://localhost:3000/api/cruises \
   -H "Content-Type: application/json" \
   -d '{"name":"Mazury Tour","description":"Rejs po Mazurach","date":"2025-07-01T10:00:00Z","location":"Mazury","availableSeats":10,"organizerEmail":"org@example.com"}'
+
+
+  curl -X POST http://localhost:3000/api/bookings \
+  -H "Content-Type: application/json" \
+  -d '{"cruiseId":"<ID_REJSU>","userEmail":"test@example.com","seats":2}'

@@ -11,3 +11,11 @@ export interface Cruise {
     availableSeats: number;
     organizerEmail: string;
 }
+
+export interface Booking {
+    id: string;
+    cruiseId: string;
+    userEmail: string;
+    seats: number;
+    createdAt: string; // ISO string
+}
