@@ -80,6 +80,8 @@ http://localhost:3000/ping
 w pliku app.ts ustawiamy wszsytkie ROutes i w sumie to tyle
 w types/index.js definiujesz swoje typy
 
+npm install uuid
+npm install --save-dev @types/uuid
 
 ### Testy
 
@@ -87,4 +89,6 @@ curl -X POST http://localhost:3000/api/users/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"tajnehaslo"}'
 
-  
+  curl -X POST http://localhost:3000/api/cruises \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Mazury Tour","description":"Rejs po Mazurach","date":"2025-07-01T10:00:00Z","location":"Mazury","availableSeats":10,"organizerEmail":"org@example.com"}'
