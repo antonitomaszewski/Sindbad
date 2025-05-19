@@ -9,6 +9,18 @@ Giełda sportów wodnych. Do łączenia ludzi z wydarzeniami
 3. git config user.email "moj@email.com"
 4. npx tsc
 
+
+Warto mieć układ gałęzi sensowny:
+master:
++ week_1
+   + Dzień 1 tydzień 1
+   + day_1_week_1
++ week_2
+
+itd
+dzięki temu jestem w stanie domergowywać mniejsze zmiany, tworzę takie drzewko mergowania
+
+
 ### Sindbad Plan
 
 1. Ustalenie podstawowych założeń
