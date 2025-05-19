@@ -3,6 +3,7 @@ import { booking } from '../data/booking';
 import { cruise } from '../data/cruise';
 import { Booking } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { sendEmail } from '../utils/emailService';
 
 export const createBooking = (req: Request, res: Response) => {
     const { cruiseId, userEmail, seats } = req.body;
@@ -34,5 +35,12 @@ export const createBooking = (req: Request, res: Response) => {
     };
 
     booking.push(newBooking);
+
+    sendEmail(
+        userEmail,
+        'Potwierdzenie rezerwacji',
+        `Twoja rezerwacja na rejs ${_cruise.name} została przyjęta.`
+    );
+
     res.status(201).json({ message: 'Rezerwacja utworzona.', booking: newBooking });
 };

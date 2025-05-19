@@ -1,6 +1,47 @@
 import request from 'supertest';
 import { app } from '../../src/app';
 
+jest.mock('../../src/utils/emailService', () => ({
+  sendEmail: jest.fn(),
+}));
+
+import { sendEmail } from '../../src/utils/emailService';
+
+describe('Booking email notification', () => {
+  let cruiseId: string;
+
+  beforeAll(async () => {
+    // Tworzymy rejs do testu
+    const cruiseRes = await request(app)
+      .post('/api/cruises')
+      .send({
+        name: 'Testowy rejs do powiadomień',
+        description: 'Opis',
+        date: '2025-10-01T12:00:00Z',
+        location: 'Mazury',
+        availableSeats: 5,
+        organizerEmail: 'org@example.com'
+      });
+    cruiseId = cruiseRes.body.cruise.id;
+  });
+
+  it('powinien wywołać sendEmail po utworzeniu rezerwacji', async () => {
+    await request(app)
+      .post('/api/bookings')
+      .send({
+        cruiseId,
+        userEmail: 'test@example.com',
+        seats: 1
+      });
+
+    expect(sendEmail).toHaveBeenCalledWith(
+      'test@example.com',
+      'Potwierdzenie rezerwacji',
+      expect.stringContaining('Twoja rezerwacja na rejs')
+    );
+  });
+});
+
 describe('Booking endpoints', () => {
   let cruiseId: string;
 
