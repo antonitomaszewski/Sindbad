@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { cruises } from '../data/cruises';
+import { cruise } from '../data/cruise';
 import { Cruise } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -22,11 +22,11 @@ export const addCruise = (req: Request, res: Response) => {
         organizerEmail,
     };
 
-    cruises.push(newCruise);
+    cruise.push(newCruise);
     res.status(201).json({ message: 'Rejs dodany pomyślnie.', cruise: newCruise });
 };
 
 // Pobieranie wszystkich rejsów
 export const getCruises = (_req: Request, res: Response) => {
-    res.status(200).json(cruises);
+    res.status(200).json(cruise);
 };

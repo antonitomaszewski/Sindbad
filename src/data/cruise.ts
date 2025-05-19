@@ -1,3 +1,3 @@
 import { Cruise } from '../types';
 
-export const cruises: Cruise[] = [];
+export const cruise: Cruise[] = [];
