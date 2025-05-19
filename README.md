@@ -95,6 +95,9 @@ w types/index.js definiujesz swoje typy
 npm install uuid
 npm install --save-dev @types/uuid
 
+npm install --save-dev jest ts-jest @types/jest supertest
+npx ts-jest config:init
+
 ### Testy
 
 curl -X POST http://localhost:3000/api/users/register \
