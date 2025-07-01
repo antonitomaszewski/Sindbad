@@ -3,7 +3,7 @@ CREATE TABLE users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text UNIQUE NOT NULL,
   name text,
-  created_at timestamp DEFAULT now()
+  created timestamp DEFAULT now()
 );
 
 -- offers
@@ -16,6 +16,6 @@ CREATE TABLE offers (
   location text,
   organizer_id uuid REFERENCES users(id),
   contact text,
-  created_at timestamp DEFAULT now(),
-  updated_at timestamp DEFAULT now()
+  created timestamp DEFAULT now(),
+  updated timestamp DEFAULT now()
 );

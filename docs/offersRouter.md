@@ -1,50 +1,41 @@
-import { publicProcedure, router } from '../trpc';
+import pb from './pocketbase';
+import { Offer } from '../types/offer';
 
-export const offersRouter = router({
-  // Pobierz listę ofert (z filtrami)
-  getOffers: publicProcedure
-    .input(z.object({ filter: z.string().optional() }))
-    .query(async ({ input, ctx }) => {
-      // Pobierz z bazy z filtrami
-    }),
+export async function getOffers(): Promise<Offer[]> {
+  const result = await pb.collection('offers').getFullList();
+  return result as Offer[];
+}
 
-  // Pobierz szczegóły oferty
-  getOfferById: publicProcedure
-    .input(z.object({ id: z.string().uuid() }))
-    .query(async ({ input, ctx }) => {
-      // Pobierz ofertę po ID
-    }),
+export async function createOffer(data: Partial<Offer>) {
+  return await pb.collection('offers').create(data);
+}
 
-  // Dodaj ofertę
-  createOffer: publicProcedure
-    .input(z.object({
-      title: z.string(),
-      description: z.string().optional(),
-      date_from: z.date(),
-      date_to: z.date(),
-      location: z.string(),
-      contact: z.string(),
-    }))
-    .mutation(async ({ input, ctx }) => {
-      // Dodaj ofertę do bazy, organizer_id z kontekstu użytkownika
-    }),
+// Pobierz szczegóły oferty po ID
+export async function getOfferById(id: string): Promise<Offer | null> {
+  try {
+    const record = await pb.collection('offers').getOne(id);
+    return record as Offer;
+  } catch (error) {
+    return null;
+  }
+}
 
-  // Edytuj ofertę (organizator)
-  updateOffer: publicProcedure
-    .input(z.object({
-      id: z.string().uuid(),
-      title: z.string().optional(),
-      description: z.string().optional(),
-      // inne pola...
-    }))
-    .mutation(async ({ input, ctx }) => {
-      // Sprawdź czy użytkownik = organizer_id, zaktualizuj ofertę
-    }),
+// Edytuj ofertę (organizator)
+export async function updateOffer(id: string, data: Partial<Offer>): Promise<Offer | null> {
+  try {
+    const record = await pb.collection('offers').update(id, data);
+    return record as Offer;
+  } catch (error) {
+    return null;
+  }
+}
 
-  // Usuń ofertę (organizator)
-  deleteOffer: publicProcedure
-    .input(z.object({ id: z.string().uuid() }))
-    .mutation(async ({ input, ctx }) => {
-      // Sprawdź czy użytkownik = organizer_id, usuń ofertę
-    }),
-});
+// Usuń ofertę (organizator)
+export async function deleteOffer(id: string): Promise<boolean> {
+  try {
+    await pb.collection('offers').delete(id);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}

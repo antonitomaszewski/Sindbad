@@ -1,10 +1,12 @@
-import { publicProcedure, router } from '../trpc';
+import pb from './pocketbase';
+import { User } from '../types/user';
 
-export const usersRouter = router({
-  // Pobierz dane użytkownika (np. do profilu)
-  getUser: publicProcedure
-    .input(z.object({ id: z.string().uuid() }))
-    .query(async ({ input, ctx }) => {
-      // Pobierz dane usera po ID
-    }),
-});
+// Pobierz dane usera po ID
+export async function getUser(id: string): Promise<User | null> {
+  try {
+    const record = await pb.collection('users').getOne(id);
+    return record as User;
+  } catch (error) {
+    return null;
+  }
+}

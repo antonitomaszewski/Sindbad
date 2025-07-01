@@ -1,4 +1,4 @@
-/src
+/look
   /app
     /page.tsx            # Strona główna (home)
     /offers
@@ -23,17 +23,16 @@
       Meta.tsx
       ThemeProvider.tsx
 
-  /server
-    /trpc
-      trpc.ts            # Konfiguracja tRPC
-      routers/
-        offersRouter.ts
-        usersRouter.ts
+  /styles        # Jeden plik Tailwind config, ewentualnie globalne CSS
+    tailwind.config.js
 
+/logic
   /lib
-    supabaseClient.ts    # Klient Supabase
+    pocketbase.ts  # Inicjalizacja klienta Pocketbase
+    offers.ts # api dla Offer
+    users.ts # api dla User
     emailClient.ts       # Resend/EmailJS integracja
-
+    
   /types
     offer.ts
     user.ts
