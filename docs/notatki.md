@@ -10,3 +10,6 @@ xattr -d com.apple.quarantine pocketbase
 testy logic user
 npx ts-node logic/tests/users.ts
 node logic/tests/users.ts
+
+testy wszystkie (dodany skrypt do package.json)
+npm test

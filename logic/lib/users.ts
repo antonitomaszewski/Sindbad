@@ -1,5 +1,6 @@
 import pb from './pocketbase';
 import { User } from '../types/user';
+import { ERRORS } from "./messages";
 
 // Pobierz dane usera po ID
 export async function getUser(id: string): Promise<User | null> {
@@ -17,7 +18,7 @@ export async function loginUser(email: string, password: string) {
     const authData = await pb.collection('users').authWithPassword(email, password);
     return authData;
   } catch (error) {
-    throw new Error('Invalid credentials');
+    throw new Error(ERRORS.LOGIN_FAILED);
   }
 }
 
@@ -33,7 +34,7 @@ export async function registerUser(email: string, password: string, passwordConf
     const user = await pb.collection('users').create(data);
     return user as unknown as User;
   } catch (error) {
-    throw new Error('Registration failed');
+    throw new Error(ERRORS.REGISTRATION_FAILED);
   }
 }
 
@@ -53,6 +54,6 @@ export async function updateUser(id: string, newData: Partial<User>) {
     const user = await pb.collection('users').update(id, newData);
     return user as unknown as User;
   } catch (error) {
-    throw new Error('Update failed');
+    throw new Error(ERRORS.UPDATE_FAILED);
   }
 }
