@@ -1,0 +1,31 @@
+{
+  "name": "sindbad",
+  "version": "1.0.0",
+  "description": "Giełda sportów wodnych. Do łączenia ludzi z wydarzeniami",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antonitomaszewski/Sindbad.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/antonitomaszewski/Sindbad/issues"
+  },
+  "homepage": "https://github.com/antonitomaszewski/Sindbad#readme",
+  "dependencies": {
+    "pocketbase": "^0.26.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.8",
+    "typescript": "^5.8.3"
+  }
+}
