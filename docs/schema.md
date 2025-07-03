@@ -20,3 +20,15 @@ CREATE TABLE offers (
   created timestamp DEFAULT now(),
   updated timestamp DEFAULT now()
 );
+
+
+| Metoda PocketBase SDK                      | Dotyczy API Rule  | Opis działania metody                                      |
+|--------------------------------------------|-------------------|------------------------------------------------------------|
+| pb.collection('nazwa').getList(...)        | List              | Pobieranie listy rekordów (z paginacją)                    |
+| pb.collection('nazwa').getFullList(...)    | List              | Pobieranie wszystkich rekordów (bez paginacji)             |
+| pb.collection('nazwa').getOne(id)          | View              | Pobieranie 1 rekordu po id                                 |
+| pb.collection('nazwa').create(data)        | Create            | Tworzenie nowego rekordu                                   |
+| pb.collection('nazwa').update(id, data)    | Update            | Aktualizacja rekordu po id                                 |
+| pb.collection('nazwa').delete(id)          | Delete            | Usuwanie rekordu po id                                     |
+| pb.collection('nazwa').authWithPassword()  | ---               | Rejestracja/logowanie użytkownika (nie dotyczy rules)      |
+| pb.collection('nazwa').requestVerification() | ---             | Żądanie weryfikacji e-mail (nie dotyczy rules)             |

@@ -10,18 +10,21 @@
     /profile/[id]/page.tsx # Profil użytkownika
 
   /components
-    OfferCard.tsx
-    OfferList.tsx
-    OfferForm.tsx
-    UserProfile.tsx
-    SearchFilters.tsx
-    MapView.tsx
+    /ui
+      OfferCard.tsx
+      OfferList.tsx
+      OfferForm.tsx
+      UserProfile.tsx
+      SearchFilters.tsx
+      MapView.tsx
     /layout
       Layout.tsx (Navbar, Meta, ThemeProvider, Footer)
       Navbar.tsx
       Footer.tsx
       Meta.tsx
       ThemeProvider.tsx
+  
+  /constants
 
   /styles        # Jeden plik Tailwind config, ewentualnie globalne CSS
     tailwind.config.js
