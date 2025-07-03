@@ -9,6 +9,8 @@ xattr -d com.apple.quarantine pocketbase
 
 testy logic user
 npx ts-node logic/tests/users.ts
+po zmianie z commonjs na esnext (zainstalowaniu next) nalezy puszczać:
+npx vitest logic/tests/offers.test.ts
 node logic/tests/users.ts
 
 testy wszystkie (dodany skrypt do package.json)
