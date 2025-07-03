@@ -13,3 +13,6 @@ node logic/tests/users.ts
 
 testy wszystkie (dodany skrypt do package.json)
 npm test
+
+obecnie wszystkie testy zapisują się bezpośrednio w bazie, nie jest to najbardziej eleganckie rozwiązanie, ale trudno
+Inna kwestia jest taka, ze brakuje nam w API metody do weryfikacji maila, to musimy jeszcze obsłuzyć

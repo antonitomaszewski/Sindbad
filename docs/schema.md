@@ -1,4 +1,4 @@
--- users (Supabase Auth, ale możesz mieć własną tabelę na rozszerzone dane)
+-- users (Pocketbase)
 CREATE TABLE users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text UNIQUE NOT NULL,
