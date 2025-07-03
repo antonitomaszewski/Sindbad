@@ -1,3 +1,14 @@
+/app -- cały ten folder to lukier syntaktyczny dla look/app
+  /page.tsx
+  /offers
+    /[id]/page.tsx
+    /new/page.tsx
+    /edit/[id].tsx
+  /search/page.tsx
+  /map/page.tsx
+  /profile/[id]/page.tsx
+
+
 /look
   /app
     /page.tsx            # Strona główna (home)

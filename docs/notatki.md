@@ -18,3 +18,9 @@ npm test
 
 obecnie wszystkie testy zapisują się bezpośrednio w bazie, nie jest to najbardziej eleganckie rozwiązanie, ale trudno
 Inna kwestia jest taka, ze brakuje nam w API metody do weryfikacji maila, to musimy jeszcze obsłuzyć
+
+przydatny artykuł, w którym mozna przeczytać o strukturze projektu:
+https://nextjs.org/docs/app/getting-started/project-structure
+
+
+nie jesteśmy w stanie zamieścić nasz folder look/app jako katalog ściezek, potrzebujemy więc zrobić obejście: app to będzie lukier syntaktyczny dla look/app
