@@ -24,3 +24,7 @@ https://nextjs.org/docs/app/getting-started/project-structure
 
 
 nie jesteśmy w stanie zamieścić nasz folder look/app jako katalog ściezek, potrzebujemy więc zrobić obejście: app to będzie lukier syntaktyczny dla look/app
+
+
+przekierowywania: jeśli klik i zawsze wynikiem jest A to uzywamy next/Link
+gdy klik i moze się wydarzyć A lub B lub C to uzywamy useRouter

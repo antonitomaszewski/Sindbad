@@ -1,0 +1,25 @@
+:root {
+  /* Podstawowe kolory */
+  --white: #ffffff;
+  --black: #000000;
+  --gray: #6b7280;        /* do tekstu pomocniczego, granic */
+  
+  /* Zielone akcenty */
+  --green-main: #059669;   /* główny zielony */
+}
+
+/* Utility classes */
+.text-white { color: var(--white); }
+.text-black { color: var(--black); }
+.text-gray { color: var(--gray); }
+.text-main { color: var(--green-main); }
+
+.bg-white { background-color: var(--white); }
+.bg-black { background-color: var(--black); }
+.bg-main { background-color: var(--green-main); }
+
+.border-gray { border-color: var(--gray); }
+.border-main { border-color: var(--green-main); }
+
+/* Hover states */
+.hover-text-main:hover { color: var(--green-main); }
