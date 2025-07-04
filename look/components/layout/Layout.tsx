@@ -1,15 +1,20 @@
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import "@/styles/layout.css";
+import "@/look/styles/layout.css";
+import { DEFAULT_LOCALE } from "@/look/constants";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="layout-root">
-      <Navbar />
-      <main className="layout-main">
-        {children}
-      </main>
-      <Footer />
-    </div>
+    <html lang={DEFAULT_LOCALE}>
+      <body>
+        <div className="layout-root">
+          <Navbar />
+          <main className="layout-main">
+            {children}
+          </main>
+          <Footer />
+        </div>
+      </body>
+    </html>
   );
 }

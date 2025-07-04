@@ -1,0 +1,1 @@
+export { default } from '@/look/components/layout/Layout';
