@@ -2,8 +2,13 @@
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import { useState } from 'react';
+import EventModal from '@/look/components/ui/EventModal';
 
 export default function KalendarzPage() {
+    const [selectedEvent, setSelectedEvent] = useState<any>(null);
+    const [showModal, setShowModal] = useState<boolean>(false);
+
     const events = [
     {
       id: '1',
@@ -27,6 +32,17 @@ export default function KalendarzPage() {
       borderColor: 'var(--green-main)',
     }
   ];
+
+  const handleEventClick = (info: any) => {
+    setSelectedEvent(info.event);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedEvent(null);
+  };
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold text-main mb-6">Kalendarz wydarzeń</h1>
@@ -41,11 +57,15 @@ export default function KalendarzPage() {
             center: 'title',
             right: 'dayGridMonth'
           }}
-          eventClick={(info) => {
-            alert(`Kliknąłeś: ${info.event.title}`);
-          }}
+          eventClick={handleEventClick}
         />
       </div>
+
+      <EventModal 
+        event={selectedEvent}
+        isOpen={showModal}
+        onClose={closeModal}
+      />
     </div>
   );
 }
