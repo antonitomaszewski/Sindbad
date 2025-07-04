@@ -26,6 +26,9 @@
   },
   "homepage": "https://github.com/antonitomaszewski/Sindbad#readme",
   "dependencies": {
+    "@fullcalendar/core": "^6.1.18",
+    "@fullcalendar/daygrid": "^6.1.18",
+    "@fullcalendar/react": "^6.1.18",
     "next": "15.3.4",
     "pocketbase": "^0.26.1",
     "react": "^19.0.0",
