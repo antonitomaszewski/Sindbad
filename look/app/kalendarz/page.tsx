@@ -2,36 +2,39 @@
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import EventModal from '@/look/components/ui/EventModal';
+import { getOffers } from '@/logic/lib/offers';
 
 export default function KalendarzPage() {
-    const [selectedEvent, setSelectedEvent] = useState<any>(null);
-    const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
-    const events = [
-    {
-      id: '1',
-      title: 'Wycieczka górska',
-      date: '2025-07-15',
-      backgroundColor: 'var(--green-main)',
-      borderColor: 'var(--green-main)',
-    },
-    {
-      id: '2', 
-      title: 'Kurs wspinaczki',
-      date: '2025-07-20',
-      backgroundColor: 'var(--green-main)',
-      borderColor: 'var(--green-main)',
-    },
-    {
-      id: '3',
-      title: 'Spływ kajakowy',
-      date: '2025-07-25',
-      backgroundColor: 'var(--green-main)',
-      borderColor: 'var(--green-main)',
-    }
-  ];
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const offers = await getOffers();
+        const calendarEvents = offers.map((offer: any) => ({
+          id: offer.id,
+          title: offer.title,
+          date: offer.date_from,
+          allDay: true,
+          backgroundColor: 'var(--green-main)',
+          borderColor: 'var(--green-main)',
+        }));
+        setEvents(calendarEvents);
+        setLoading(false);
+      } catch (error) {
+        console.error('Błąd pobierania ofert:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchOffers();
+  }, []);
 
   const handleEventClick = (info: any) => {
     setSelectedEvent(info.event);
