@@ -5,6 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import EventModal from '@/look/components/ui/EventModal';
 import { useOffers } from '@/look/hooks/useOffers';
 import { useEventModal } from '@/look/hooks/useEventModal';
+import { CALENDAR_TEXTS, CALENDAR_CONFIG } from '@/look/constants/calendar';
 
 export default function KalendarzPage() {
   const { events, loading } = useOffers();
@@ -17,9 +18,9 @@ export default function KalendarzPage() {
   if (loading) {
     return (
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-main mb-6">Kalendarz wydarzeń</h1>
+        <h1 className="text-3xl font-bold text-main mb-6">{CALENDAR_TEXTS.PAGE_TITLE}</h1>
         <div className="flex justify-center items-center h-64">
-          <p className="text-gray">Ładowanie wydarzeń...</p>
+          <p className="text-gray">{CALENDAR_TEXTS.LOADING_MESSAGE}</p>
         </div>
       </div>
     );
@@ -27,18 +28,14 @@ export default function KalendarzPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold text-main mb-6">Kalendarz wydarzeń</h1>
+      <h1 className="text-3xl font-bold text-main mb-6">{CALENDAR_TEXTS.PAGE_TITLE}</h1>
       <div className="bg-white rounded-lg shadow-sm border border-gray p-6">
         <FullCalendar
           plugins={[dayGridPlugin]}
-          initialView="dayGridMonth"
-          height="auto"
+          initialView={CALENDAR_CONFIG.INITIAL_VIEW}
+          height={CALENDAR_CONFIG.HEIGHT}
           events={events}
-          headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth'
-          }}
+          headerToolbar={CALENDAR_CONFIG.HEADER_TOOLBAR}
           eventClick={handleEventClick}
         />
       </div>

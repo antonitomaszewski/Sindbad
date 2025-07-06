@@ -1,28 +1,21 @@
-// look/hooks/useOffers.ts
 import { useState, useEffect } from 'react';
 import { getOffers } from '@/logic/lib/offers';
+import { mapOffersToCalendarEvents } from '@/look/utils/eventMapper';
+import { CALENDAR_TEXTS } from '@/look/constants/calendar';
+import { CalendarEvent } from '@/look/types/calendar';
 
 export function useOffers() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchOffers = async () => {
       try {
         const offers = await getOffers();
-        const calendarEvents = offers.map((offer: any) => ({
-          id: offer.id,
-          title: offer.title,
-          // date: offer.date_from,
-          start: offer.date_from,    // ← Data początkowa
-          end: offer.date_to,  
-          allDay: true,
-          backgroundColor: 'var(--green-main)',
-          borderColor: 'var(--green-main)',
-        }));
+        const calendarEvents = mapOffersToCalendarEvents(offers);
         setEvents(calendarEvents);
       } catch (error) {
-        console.error('Błąd pobierania ofert:', error);
+        console.error(CALENDAR_TEXTS.ERROR_LOADING, error);
       } finally {
         setLoading(false);
       }
