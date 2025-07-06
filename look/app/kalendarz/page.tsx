@@ -2,49 +2,28 @@
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import { useState, useEffect } from 'react';
 import EventModal from '@/look/components/ui/EventModal';
-import { getOffers } from '@/logic/lib/offers';
+import { useOffers } from '@/look/hooks/useOffers';
+import { useEventModal } from '@/look/hooks/useEventModal';
 
 export default function KalendarzPage() {
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [showModal, setShowModal] = useState<boolean>(false);
-
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-    const fetchOffers = async () => {
-      try {
-        const offers = await getOffers();
-        const calendarEvents = offers.map((offer: any) => ({
-          id: offer.id,
-          title: offer.title,
-          date: offer.date_from,
-          allDay: true,
-          backgroundColor: 'var(--green-main)',
-          borderColor: 'var(--green-main)',
-        }));
-        setEvents(calendarEvents);
-        setLoading(false);
-      } catch (error) {
-        console.error('Błąd pobierania ofert:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchOffers();
-  }, []);
+  const { events, loading } = useOffers();
+  const { selectedEvent, showModal, openModal, closeModal } = useEventModal();
 
   const handleEventClick = (info: any) => {
-    setSelectedEvent(info.event);
-    setShowModal(true);
+    openModal(info.event);
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedEvent(null);
-  };
+  if (loading) {
+    return (
+      <div className="p-8">
+        <h1 className="text-3xl font-bold text-main mb-6">Kalendarz wydarzeń</h1>
+        <div className="flex justify-center items-center h-64">
+          <p className="text-gray">Ładowanie wydarzeń...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">

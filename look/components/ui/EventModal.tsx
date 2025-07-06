@@ -18,7 +18,7 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
           </button>
         </div>
         <div className="space-y-2 text-sm text-gray">
-          <p><strong>Data:</strong> {event.start?.toLocaleDateString()}</p>
+          <p><strong>Termin:</strong>{event.start?.toLocaleDateString()} - {event.end?.toLocaleDateString()}</p>
           <p><strong>Opis:</strong> Szczegółowe informacje o wydarzeniu</p>
         </div>
         <button 
