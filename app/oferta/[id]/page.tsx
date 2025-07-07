@@ -1,0 +1,1 @@
+export { default } from '@/look/app/oferta/[id]/page'
