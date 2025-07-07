@@ -1,18 +1,45 @@
 'use client';
+import { useOffer } from '@/look/hooks/useOffer';
+import { useUser } from '@/look/hooks/useUser';
+import { use } from 'react';
+import Link from 'next/link';
 
-export default function OfertaPage({ params }: { params: { id: string } }) {
-  // Hardcoded dane (jak w kalendarzu)
-  const offer = {
-    id: params.id,
-    title: "Rejs Chorwacja",
-    description: "Piękny rejs po Adriatyku z przepięknymi widokami na wyspy i krystalicznie czystą wodę. Idealna przygoda dla miłośników żeglarstwa.",
-    date_from: "2025-07-12",
-    date_to: "2025-07-19",
-    price: "1200 zł",
-    location: "Split, Chorwacja",
-    organizer: "Żeglarskie Przygody Sp. z o.o."
-  };
+export default function OfertaPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { offer, loading, error } = useOffer(id);
+  const { user: organizer, loading: organizerLoading } = useUser(offer?.organizer_id);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto p-8">
+          <div className="flex justify-center items-center h-64">
+            <p className="text-gray">Ładowanie oferty...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !offer) {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto p-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray mb-4">404</h1>
+          <h2 className="text-2xl font-bold text-main mb-4">Oferta nie została znaleziona</h2>
+          <p className="text-gray mb-6">Sprawdź czy adres jest poprawny lub wybierz inną ofertę z kalendarza.</p>
+          <button 
+            onClick={() => window.location.href = '/kalendarz'}
+            className="bg-main text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-dark transition-colors"
+          >
+            Powrót do kalendarza
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-8">
@@ -33,7 +60,7 @@ export default function OfertaPage({ params }: { params: { id: string } }) {
           {/* Daty */}
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <h3 className="font-semibold text-gray mb-2">Termin:</h3>
-            <p className="text-main font-medium">{offer.date_from} - {offer.date_to}</p>
+            <p className="text-main font-medium">{new Date(offer.date_from).toLocaleDateString()} - {new Date(offer.date_to).toLocaleDateString()}</p>
           </div>
         </div>
 
@@ -46,7 +73,19 @@ export default function OfertaPage({ params }: { params: { id: string } }) {
         {/* Organizator */}
         <div className="bg-white rounded-lg shadow-sm border border-gray p-6 mb-6">
           <h2 className="text-xl font-bold text-main mb-4">Organizator</h2>
-          <p className="text-gray">{offer.organizer}</p>
+          {organizerLoading ? (
+            <p className="text-gray">Ładowanie danych organizatora...</p>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-gray font-medium">{organizer?.name || 'Ładowanie...'}</p>
+              <Link 
+                href={`/organizator/${offer.organizer_id}`}
+                className="text-main hover:text-green-dark font-medium text-sm"
+              >
+                → Przejdź do profilu organizatora
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Akcje */}
@@ -54,13 +93,13 @@ export default function OfertaPage({ params }: { params: { id: string } }) {
           <div className="flex gap-4">
             <button 
               onClick={() => alert('Rezerwacja!')}
-              className="flex-1 bg-main text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-dark transition-colors"
+              className="flex-1 bg-main text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-dark transition-colors cursor-pointer"
             >
               Wyślij rezerwację
             </button>
             <button 
               onClick={() => alert('Kontakt!')}
-              className="flex-1 bg-gray text-white py-3 px-6 rounded-lg font-semibold hover:bg-black transition-colors"
+              className="flex-1 bg-white border-2 border-gray text-gray py-3 px-6 rounded-lg font-semibold hover:bg-gray hover:text-white transition-colors cursor-pointer"
             >
               Zadaj pytanie
             </button>
@@ -69,12 +108,12 @@ export default function OfertaPage({ params }: { params: { id: string } }) {
 
         {/* Powrót do kalendarza */}
         <div className="mt-6 text-center">
-          <button 
-            onClick={() => window.location.href = '/kalendarz'}
+          <Link 
+            href="/kalendarz"
             className="text-main hover:text-green-dark font-medium"
           >
             ← Powrót do kalendarza
-          </button>
+          </Link>
         </div>
 
       </div>
