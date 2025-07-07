@@ -5,7 +5,7 @@ export const CALENDAR_TEXTS = {
   ERROR_LOADING: "Błąd pobierania ofert:",
   DATE_LABEL: "Termin: ",
   DESCRIPTION_LABEL: "Opis: ",
-  DESCRIPTION_PLACEHOLDER: "Szczegółowe informacje o wydarzeniu",
+  NO_DESCRIPTION: "Brak opisu",
   DETAILS_BUTTON: "Zobacz szczegóły oferty",
   CLOSE_BUTTON: "×"
 } as const;

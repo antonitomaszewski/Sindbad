@@ -6,6 +6,7 @@ export function mapOffersToCalendarEvents(offers: any[]) {
     title: offer.title,
     start: offer.date_from,
     end: offer.date_to,
+    description: offer.description,
     allDay: true,
     backgroundColor: CALENDAR_CONFIG.EVENT_COLORS.BACKGROUND,
     borderColor: CALENDAR_CONFIG.EVENT_COLORS.BORDER,

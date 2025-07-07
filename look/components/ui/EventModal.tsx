@@ -1,5 +1,6 @@
 import { EventModalProps } from '@/look/types/calendar';
 import { CALENDAR_TEXTS } from '@/look/constants/calendar';
+import { formatDateRange } from '@/look/utils/dateFormatter';
 
 export default function EventModal({ event, isOpen, onClose }: EventModalProps) {
   if (!isOpen || !event) return null;
@@ -16,8 +17,8 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
           </button>
         </div>
         <div className="space-y-2 text-sm text-gray">
-          <p><strong>{CALENDAR_TEXTS.DATE_LABEL}</strong>{event.start?.toLocaleDateString()} - {event.end?.toLocaleDateString()}</p>
-          <p><strong>{CALENDAR_TEXTS.DESCRIPTION_LABEL}</strong>{CALENDAR_TEXTS.DESCRIPTION_PLACEHOLDER}</p>
+          <p><strong>{CALENDAR_TEXTS.DATE_LABEL}</strong>{formatDateRange(event.start, event.end)}</p>
+          <p><strong>{CALENDAR_TEXTS.DESCRIPTION_LABEL}</strong>{event.extendedProps?.description || CALENDAR_TEXTS.NO_DESCRIPTION}</p>
         </div>
         <button 
           onClick={() => window.location.href = `/oferta/${event.id}`}
