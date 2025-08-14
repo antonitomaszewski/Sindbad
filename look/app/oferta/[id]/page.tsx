@@ -7,6 +7,7 @@ import { OfferHeader } from '@/look/components/offer/OfferHeader';
 import { OfferDescription } from '@/look/components/offer/OfferDescription';
 import { OfferOrganizer } from '@/look/components/offer/OfferOrganizer';
 import { OfferActions } from '@/look/components/offer/OfferActions';
+import { OfferGallery } from '@/look/components/offer/OfferGallery';
 import { LoadingState } from '@/look/components/common/LoadingState';
 import { NotFoundState } from '@/look/components/common/NotFoundState';
 import { OFFER_MESSAGES } from '@/look/constants/offer';
@@ -56,6 +57,8 @@ export default function OfertaPage({ params }: OfferPageProps) {
         />
 
         <OfferDescription description={offer.description} />
+
+        <OfferGallery offerId={offer.id} />
 
         <OfferOrganizer
           organizerId={offer.organizer_id}
