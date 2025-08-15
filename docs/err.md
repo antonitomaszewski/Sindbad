@@ -5,6 +5,7 @@ Unknown at rule @apply
 
 ## Images
 
+W pocketbase nie ma price, dlatego nie wyświetla się cena rejsu
 Brak Ikonek rejsu na modalu w kalendarzu
 
 Brakuje profilu organizatora
