@@ -4,7 +4,6 @@ export interface OfferImage {
   image: string;           // PocketBase file field
   alt_text?: string;
   order: number;
-  is_primary: boolean;
   created: string;
   updated: string;
 }
@@ -14,5 +13,4 @@ export interface CreateOfferImageData {
   image: File;             // For uploads
   alt_text?: string;
   order?: number;
-  is_primary?: boolean;
 }

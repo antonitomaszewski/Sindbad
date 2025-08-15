@@ -15,18 +15,6 @@ export async function getOfferImages(offerId: string): Promise<OfferImage[]> {
   }
 }
 
-export async function getOfferPrimaryImage(offerId: string): Promise<OfferImage | null> {
-  try {
-    const image = await pb.collection('images').getFirstListItem<OfferImage>(
-      `offer_id = "${offerId}" && is_primary = true`
-    );
-    return image;
-  } catch (error) {
-    const images = await getOfferImages(offerId);
-    return images[0] || null;
-  }
-}
-
 export async function createOfferImage(data: CreateOfferImageData): Promise<OfferImage | null> {
   try {
         // 1. Walidacja rozmiaru
@@ -44,7 +32,6 @@ export async function createOfferImage(data: CreateOfferImageData): Promise<Offe
     formData.append('image', data.image);
     if (data.alt_text) formData.append('alt_text', data.alt_text);
     formData.append('order', String(data.order || 0));
-    formData.append('is_primary', String(data.is_primary || false));
 
     const image = await pb.collection('images').create<OfferImage>(formData);
     return image;
@@ -74,23 +61,6 @@ export async function updateImageOrder(imageId: string, newOrder: number): Promi
     return true;
   } catch (error) {
     console.error('Błąd aktualizacji kolejności:', error);
-    return false;
-  }
-}
-
-export async function setImageAsPrimary(imageId: string, offerId: string): Promise<boolean> {
-  try {
-    const allImages = await getOfferImages(offerId);
-    await Promise.all(
-      allImages.map(img => 
-        pb.collection('images').update(img.id, { is_primary: false })
-      )
-    );
-    
-    await pb.collection('images').update(imageId, { is_primary: true });
-    return true;
-  } catch (error) {
-    console.error('Błąd ustawiania głównego zdjęcia:', error);
     return false;
   }
 }

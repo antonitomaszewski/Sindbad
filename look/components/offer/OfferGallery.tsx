@@ -49,13 +49,7 @@ export function OfferGallery({ offerId }: OfferGalleryProps) {
     );
   }
 
-  const sortedImages = images.sort((a, b) => {
-    if (a.is_primary && !b.is_primary) return -1;
-    if (!a.is_primary && b.is_primary) return 1;
-    return a.order - b.order;
-  });
-
-  const lightboxSlides = sortedImages.map(img => ({
+  const lightboxSlides = images.map(img => ({
     src: getImageUrl(img),
     alt: img.alt_text || 'Zdjęcie oferty'
   }));
@@ -72,11 +66,11 @@ export function OfferGallery({ offerId }: OfferGalleryProps) {
       </h2>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sortedImages.map((image, index) => (
+        {images.map((image, index) => (
           <div 
             key={image.id}
             className={`relative cursor-pointer hover:opacity-80 transition-opacity ${
-              image.is_primary ? 'ring-2 ring-main rounded' : ''
+              image.order == 0 ? 'ring-2 ring-main rounded' : ''
             }`}
             onClick={() => handleImageClick(index)}
           >
