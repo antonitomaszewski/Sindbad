@@ -9,4 +9,7 @@ export interface User {
   avatar?: string;
   created: string;
   updated: string;
+  // optional / new fields used by profile UI
+  bio?: string;
+  certifications?: string[];
 }

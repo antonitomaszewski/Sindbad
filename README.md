@@ -14,3 +14,5 @@ Robimy MVP, staramy się korzystać z najbardziej wysokopoziomowych struktur, w
 Do maili: resend
 do api: trpc
 do bazy i autentykacji: supabase
+
+1.02.2026 - nadal żyję
