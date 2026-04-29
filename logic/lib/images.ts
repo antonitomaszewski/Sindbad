@@ -1,6 +1,6 @@
 import pb from './pocketbase';
 import { OfferImage, CreateOfferImageData } from '../types/image';
-import { IMAGE_CONFIG } from '@/look/constants/image';
+import { IMAGE_CONFIG } from '../../look/constants/image';
 
 export async function getOfferImages(offerId: string): Promise<OfferImage[]> {
   try {
@@ -76,4 +76,19 @@ export function getImageUrl(image: OfferImage, options?: { thumb?: string }): st
 
 export function getImageThumbnailUrl(image: OfferImage, dimensions: string = '300x200'): string {
   return getImageUrl(image, { thumb: dimensions });
+}
+
+export function buildFileUrl(collection: string, recordId: string, filename?: string | null): string | null {
+  if (!filename) return null;
+  const f = String(filename);
+
+  // jeśli już jest pełny url -> zwróć
+  if (/^https?:\/\//.test(f)) return f;
+
+  // jeśli to ścieżka zaczynająca od slash -> traktuj jako public path w app
+  if (f.startsWith('/')) return f;
+
+  // normalnie: pliki PocketBase (collection, recordId, filename)
+  const base = String(pb.baseURL).replace(/\/$/, '');
+  return `${base}/api/files/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}/${encodeURIComponent(f)}`;
 }

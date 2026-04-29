@@ -20,6 +20,49 @@ export async function getOfferById(id: string): Promise<Offer | null> {
   }
 }
 
+const DEFAULT_PAGE = 1;
+const DEFAULT_PER_PAGE = 200;
+
+function mapOfferToTrip(t: any) {
+  return {
+    id: t.id,
+    title: t.title ?? t.name ?? 'Rejs',
+    date: t.date_from ?? t.date_to ?? undefined,
+  } as { id: string; title?: string; date?: string };
+}
+
+// Bezpieczny helper do pobierania listy (obsługuje perPage i zwraca [] na błąd)
+async function safeGetFullList(collection: string, query: any = {}, perPage = DEFAULT_PER_PAGE) {
+  try {
+    // pb.collection(...).getFullList(options, perPage)
+    const records: any[] = await (pb.collection(collection) as any).getFullList(query, perPage);
+    return Array.isArray(records) ? records : [];
+  } catch (err) {
+    console.warn(`safeGetFullList ${collection} failed`, err);
+    return [];
+  }
+}
+
+export async function getTripsByOrganizer(organizerId: string) {
+  const records = await safeGetFullList('offers', { filter: `organizer_id = "${organizerId}"`, sort: '-date_from' });
+  return records.map(mapOfferToTrip);
+}
+
+export async function getTripsByParticipant(userId: string) {
+  // najpierw spróbuj serwerowego filtra
+  const serverRecords = await safeGetFullList('offers', { filter: `participants = "${userId}"`, sort: '-date_from' });
+  if (serverRecords.length) return serverRecords.map(mapOfferToTrip);
+
+  // fallback: pobierz wszystkie i filtruj lokalnie (bezpieczne)
+  const all = await safeGetFullList('offers');
+  const filtered = all.filter((t: any) => {
+    if (Array.isArray(t.participants)) return t.participants.map(String).includes(String(userId));
+    if (Array.isArray(t.expand?.participants)) return t.expand.participants.map((p: any) => String(p.id)).includes(String(userId));
+    return false;
+  });
+  return filtered.map(mapOfferToTrip);
+}
+
 // Edytuj ofertę (organizator)
 export async function updateOffer(id: string, data: Partial<Offer>): Promise<Offer | null> {
   try {
