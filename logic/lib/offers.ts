@@ -1,5 +1,5 @@
 import pb from './pocketbase';
-import { Offer } from '../types/offer';
+import type { Offer } from '../types/offer';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
@@ -10,7 +10,6 @@ export async function createOffer(data: Partial<Offer>) {
   return await pb.collection('offers').create(data);
 }
 
-// Pobierz szczegóły oferty po ID
 export async function getOfferById(id: string): Promise<Offer | null> {
   try {
     const record = await pb.collection('offers').getOne(id);
@@ -20,9 +19,7 @@ export async function getOfferById(id: string): Promise<Offer | null> {
   }
 }
 
-const DEFAULT_PAGE = 1;
-const DEFAULT_PER_PAGE = 200;
-
+// Helper do mapowania oferty na trip (dla kompatybilności z master)
 function mapOfferToTrip(t: any) {
   return {
     id: t.id,
@@ -31,39 +28,117 @@ function mapOfferToTrip(t: any) {
   } as { id: string; title?: string; date?: string };
 }
 
-// Bezpieczny helper do pobierania listy (obsługuje perPage i zwraca [] na błąd)
-async function safeGetFullList(collection: string, query: any = {}, perPage = DEFAULT_PER_PAGE) {
+// Pobierz rejsy organizatora
+export async function getTripsByOrganizer(organizerId: string) {
   try {
-    // pb.collection(...).getFullList(options, perPage)
-    const records: any[] = await (pb.collection(collection) as any).getFullList(query, perPage);
-    return Array.isArray(records) ? records : [];
+    const records: any[] = await (pb.collection('offers') as any).getFullList(
+      { filter: `organizer_id = "${organizerId}"`, sort: '-date_from' },
+      200
+    );
+    return records.map(mapOfferToTrip);
   } catch (err) {
-    console.warn(`safeGetFullList ${collection} failed`, err);
+    console.error('getTripsByOrganizer error', err);
     return [];
   }
 }
 
-export async function getTripsByOrganizer(organizerId: string) {
-  const records = await safeGetFullList('offers', { filter: `organizer_id = "${organizerId}"`, sort: '-date_from' });
-  return records.map(mapOfferToTrip);
-}
-
+// Pobierz rejsy uczestnika
 export async function getTripsByParticipant(userId: string) {
-  // najpierw spróbuj serwerowego filtra
-  const serverRecords = await safeGetFullList('offers', { filter: `participants = "${userId}"`, sort: '-date_from' });
-  if (serverRecords.length) return serverRecords.map(mapOfferToTrip);
+  try {
+    const serverRecords: any[] = await (pb.collection('offers') as any).getFullList(
+      { filter: `participants = "${userId}"`, sort: '-date_from' },
+      200
+    );
+    if (serverRecords.length) {
+      return serverRecords.map(mapOfferToTrip);
+    }
 
-  // fallback: pobierz wszystkie i filtruj lokalnie (bezpieczne)
-  const all = await safeGetFullList('offers');
-  const filtered = all.filter((t: any) => {
-    if (Array.isArray(t.participants)) return t.participants.map(String).includes(String(userId));
-    if (Array.isArray(t.expand?.participants)) return t.expand.participants.map((p: any) => String(p.id)).includes(String(userId));
-    return false;
-  });
-  return filtered.map(mapOfferToTrip);
+    // Fallback: pobierz wszystkie i filtruj lokalnie
+    const all: any[] = await (pb.collection('offers') as any).getFullList({}, 200);
+    const filtered = all.filter((t: any) => {
+      if (Array.isArray(t.participants)) return t.participants.map(String).includes(String(userId));
+      if (Array.isArray(t.expand?.participants)) return t.expand.participants.map((p: any) => String(p.id)).includes(String(userId));
+      return false;
+    });
+    return filtered.map(mapOfferToTrip);
+  } catch (err) {
+    console.error('getTripsByParticipant error', err);
+    return [];
+  }
 }
 
-// Edytuj ofertę (organizator)
+// Wyszukaj oferty (nowa funkcja z brancha szukaj)
+export async function searchOffers(params: { 
+  q?: string; 
+  dateFrom?: string; 
+  dateTo?: string; 
+  onlyFuture?: boolean;
+}) {
+  const parts: string[] = [];
+  
+  if (params.q) {
+    parts.push(`(title ~= "${params.q}" || description ~= "${params.q}")`);
+  }
+
+  const filter = parts.length ? parts.join(' && ') : undefined;
+
+  try {
+    const records: any[] = await (pb.collection('offers') as any).getFullList({ 
+      filter, 
+      sort: '-date_from',
+      requestKey: 'search-offers',
+    });
+    
+    let results = records.map((t) => ({
+      id: t.id,
+      organizer_id: t.organizer_id,
+      title: t.title ?? 'Rejs',
+      description: t.description,
+      date_from: t.date_from,
+      date_to: t.date_to,
+      location: t.location,
+      geo: t.geo,
+      port: t.port,
+      country: t.country,
+      price_per_person: t.price_per_person,
+      currency: t.currency,
+      seats_total: t.seats_total,
+      seats_available: t.seats_available,
+      created: t.created,
+      updated: t.updated,
+    }));
+
+    // Filtruj daty lokalnie (unikamy problemów UTC)
+    if (params.dateFrom) {
+      results = results.filter((o: any) => {
+        if (!o.date_from) return false;
+        return o.date_from.slice(0, 10) >= params.dateFrom!;
+      });
+    }
+    
+    if (params.dateTo) {
+      results = results.filter((o: any) => {
+        if (!o.date_to) return false;
+        return o.date_to.slice(0, 10) <= params.dateTo!;
+      });
+    }
+
+    if (params.onlyFuture) {
+      const now = new Date().toISOString().slice(0, 10);
+      results = results.filter((o: any) => {
+        if (!o.date_from) return false;
+        return o.date_from.slice(0, 10) >= now;
+      });
+    }
+
+    return results;
+  } catch (err) {
+    console.error('searchOffers error', err);
+    return [];
+  }
+}
+
+// Edytuj ofertę
 export async function updateOffer(id: string, data: Partial<Offer>): Promise<Offer | null> {
   try {
     const record = await pb.collection('offers').update(id, data);
@@ -73,7 +148,7 @@ export async function updateOffer(id: string, data: Partial<Offer>): Promise<Off
   }
 }
 
-// Usuń ofertę (organizator)
+// Usuń ofertę
 export async function deleteOffer(id: string): Promise<boolean> {
   try {
     await pb.collection('offers').delete(id);

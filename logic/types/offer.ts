@@ -7,6 +7,12 @@ export interface Offer {
   date_to?: string;           // ISO date string
   location?: string;
   geo?: { lat: number; lon: number };
+  port?: string;
+  country?: string;
+  price_per_person?: number;
+  currency?: string;
+  seats_total?: number;
+  seats_available?: number;
   created: string;            // ISO date string
   updated: string;            // ISO date string
 }
