@@ -25,26 +25,16 @@ export interface OfferFormData {
   country: string;
   port: string;
   price_per_person: string;
-  currency: 'PLN' | 'EUR' | 'USD';
+  currency: Currency;
   seats_total: string;
   seats_available: string;
   images: File[];
 }
 
-export interface ValidationErrors {
-  title?: string;
-  date_from?: string;
-  date_to?: string;
-  country?: string;
-  port?: string;
-  price_per_person?: string;
-  seats_total?: string;
-  seats_available?: string;
-  images?: string;
-}
+export type Currency = 'PLN' | 'EUR' | 'USD';
 
 export const CURRENCIES = [
-  { code: 'PLN', symbol: 'zł', name: 'Polski złoty' },
-  { code: 'EUR', symbol: '€', name: 'Euro' },
-  { code: 'USD', symbol: '$', name: 'Dolar amerykański' },
+  { code: 'PLN' as const, symbol: 'zł', name: 'Polski złoty' },
+  { code: 'EUR' as const, symbol: '€', name: 'Euro' },
+  { code: 'USD' as const, symbol: '$', name: 'Dolar amerykański' },
 ] as const;
