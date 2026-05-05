@@ -65,6 +65,12 @@ export default function Navbar() {
           <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
             {user ? (
               <>
+                <Link
+                  href="/oferta/nowa"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition shadow-md hover:shadow-lg"
+                >
+                  + Dodaj rejs
+                </Link>
                 <Link 
                   href="/profil" 
                   className="text-sm text-gray-700 hover:text-blue-600 font-medium transition"
@@ -131,6 +137,13 @@ export default function Navbar() {
             <div className="pt-3 border-t border-gray-200 space-y-3">
               {user ? (
                 <>
+                  <Link
+                    href="/oferta/nowa"
+                    className="block bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    + Dodaj rejs
+                  </Link>
                   <Link
                     href="/profil"
                     className="block text-gray-700 hover:text-blue-600 font-medium transition py-2"

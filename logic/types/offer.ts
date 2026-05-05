@@ -16,3 +16,35 @@ export interface Offer {
   created: string;            // ISO date string
   updated: string;            // ISO date string
 }
+
+export interface OfferFormData {
+  title: string;
+  description: string;
+  date_from: Date | null;
+  date_to: Date | null;
+  country: string;
+  port: string;
+  price_per_person: string;
+  currency: 'PLN' | 'EUR' | 'USD';
+  seats_total: string;
+  seats_available: string;
+  images: File[];
+}
+
+export interface ValidationErrors {
+  title?: string;
+  date_from?: string;
+  date_to?: string;
+  country?: string;
+  port?: string;
+  price_per_person?: string;
+  seats_total?: string;
+  seats_available?: string;
+  images?: string;
+}
+
+export const CURRENCIES = [
+  { code: 'PLN', symbol: 'zł', name: 'Polski złoty' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'USD', symbol: '$', name: 'Dolar amerykański' },
+] as const;

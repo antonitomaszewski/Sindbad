@@ -1,0 +1,1 @@
+export { default } from '@/look/app/offer/create/page'

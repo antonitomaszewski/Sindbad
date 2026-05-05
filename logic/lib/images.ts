@@ -92,3 +92,26 @@ export function buildFileUrl(collection: string, recordId: string, filename?: st
   const base = String(pb.baseURL).replace(/\/$/, '');
   return `${base}/api/files/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}/${encodeURIComponent(f)}`;
 }
+
+/**
+ * Upload wielu zdjęć do oferty (jako osobne rekordy w kolekcji images)
+ */
+export async function uploadOfferImages(offerId: string, files: File[]): Promise<void> {
+  if (files.length === 0) return;
+
+  try {
+    // Twórz osobny rekord w kolekcji 'images' dla każdego pliku
+    const uploadPromises = files.map((file, index) => 
+      createOfferImage({
+        offer_id: offerId,
+        image: file,
+        order: index,
+      })
+    );
+
+    await Promise.all(uploadPromises);
+  } catch (error: any) {
+    console.error('Upload images error:', error);
+    throw new Error(error?.message || 'Nie udało się przesłać zdjęć');
+  }
+}
