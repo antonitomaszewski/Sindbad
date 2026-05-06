@@ -16,3 +16,25 @@ export interface Offer {
   created: string;            // ISO date string
   updated: string;            // ISO date string
 }
+
+export interface OfferFormData {
+  title: string;
+  description: string;
+  date_from: Date | null;
+  date_to: Date | null;
+  country: string;
+  port: string;
+  price_per_person: string;
+  currency: Currency;
+  seats_total: string;
+  seats_available: string;
+  images: File[];
+}
+
+export type Currency = 'PLN' | 'EUR' | 'USD';
+
+export const CURRENCIES = [
+  { code: 'PLN' as const, symbol: 'zł', name: 'Polski złoty' },
+  { code: 'EUR' as const, symbol: '€', name: 'Euro' },
+  { code: 'USD' as const, symbol: '$', name: 'Dolar amerykański' },
+] as const;

@@ -157,3 +157,37 @@ export async function deleteOffer(id: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Konwertuj dane formularza do formatu API
+ */
+export function convertFormDataToOffer(
+  formData: OfferFormData,
+  organizerId: string
+): Partial<Offer> {
+  const offer: any = {
+    organizer_id: organizerId,
+    title: formData.title.trim(),
+    date_from: formData.date_from!.toISOString().split('T')[0],
+    date_to: formData.date_to!.toISOString().split('T')[0],
+    country: formData.country,
+    port: formData.port.trim(),
+    currency: formData.currency,
+  };
+
+  // Opcjonalne pola
+  if (formData.description?.trim()) {
+    offer.description = formData.description.trim();
+  }
+  if (formData.price_per_person) {
+    offer.price_per_person = Number(formData.price_per_person);
+  }
+  if (formData.seats_total) {
+    offer.seats_total = Number(formData.seats_total);
+  }
+  if (formData.seats_available) {
+    offer.seats_available = Number(formData.seats_available);
+  }
+
+  return offer;
+}
