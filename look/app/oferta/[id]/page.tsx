@@ -1,5 +1,5 @@
 'use client';
-import { use } from 'react';
+import { use, useState } from 'react';
 import Link from 'next/link';
 import { useOffer } from '@/look/hooks/useOffer';
 import { useUser } from '@/look/hooks/useUser';
@@ -11,6 +11,7 @@ import { OfferGallery } from '@/look/components/offer/OfferGallery';
 import { LoadingState } from '@/look/components/common/LoadingState';
 import { NotFoundState } from '@/look/components/common/NotFoundState';
 import { OFFER_MESSAGES } from '@/look/constants/offer';
+import BookingModal from '@/look/components/booking/BookingModal';
 
 interface OfferPageProps {
   params: Promise<{ id: string }>;
@@ -20,9 +21,15 @@ export default function OfertaPage({ params }: OfferPageProps) {
   const { id } = use(params);
   const { offer, loading, error } = useOffer(id);
   const { user: organizer, loading: organizerLoading } = useUser(offer?.organizer_id);
+  const [showModal, setShowModal] = useState(false);
 
   const handleReservation = () => {
-    alert(OFFER_MESSAGES.RESERVATION_ALERT);
+    setShowModal(true);
+  };
+
+  const handleSuccess = () => {
+    setShowModal(false);
+    alert('Rezerwacja wysłana!');
   };
 
   const handleContact = () => {
@@ -70,6 +77,14 @@ export default function OfertaPage({ params }: OfferPageProps) {
           onReservation={handleReservation}
           onContact={handleContact}
         />
+
+        {showModal && (
+          <BookingModal
+            offerId={offer.id}
+            onClose={() => setShowModal(false)}
+            onSuccess={handleSuccess}
+          />
+        )}
 
         <div className="mt-6 text-center">
           <Link 
