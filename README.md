@@ -21,7 +21,6 @@ dobra, zastanówmy sie co trzeba dorobić
 <!-- 1. logowanie użytowników, tworzenie konta 
     google auth - trzeba użyć linku http://localhost:3000/redirect -->
 <!-- 2. tworzenie ofert przez zalogowanych użytkowników -->
-3. edycja profilu użytkownika
+<!-- 3. edycja profilu użytkownika -->
 4. opcję dostawania powiadomienia, gdy pojawi się rejs w terminie/miejscu, który nas interesuje (czyli tworzenie takich zgłoszeń/marzeń)
 wtedy dostawalibysmy powiadomienia mailowe
-
