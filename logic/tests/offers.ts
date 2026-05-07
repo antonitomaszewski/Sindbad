@@ -14,7 +14,7 @@ async function testOffers() {
 
   // Logowanie użytkownika (przed operacjami na ofertach!)
   await loginUser(email, password);
-  console.log('Zalogowano użytkownika:', pb.authStore.model);
+  console.log('Zalogowano użytkownika:', pb.authStore.record);
 
   // 1. CREATE
   console.log('--- Create offer');

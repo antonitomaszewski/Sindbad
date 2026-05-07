@@ -1,5 +1,5 @@
 import pb from './pocketbase';
-import { User } from '../types/user';
+import type { User } from '../types/user';
 import { ERRORS } from './messages';
 import type { OAuthProvider } from '../types/auth';
 
@@ -54,7 +54,22 @@ export async function getUserCertifications(userId: string): Promise<string[]> {
  */
 export async function loginUser(email: string, password: string) {
   try {
-    return await pb.collection('users').authWithPassword(email, password);
+    const authData = await pb.collection('users').authWithPassword(email, password);
+    
+    // Synchronizuj z cookies (dla Server Components)
+    if (typeof window !== 'undefined') {
+      const authToken = pb.authStore.exportToCookie();
+      
+      await fetch('/api/auth/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ authToken }),
+      }).catch(err => {
+        console.error('Failed to sync auth cookie:', err);
+      });
+    }
+    
+    return authData;
   } catch (error) {
     throw new Error(ERRORS.LOGIN_FAILED);
   }
@@ -86,10 +101,25 @@ export async function registerUser(
  */
 export async function loginWithOAuth(provider: OAuthProvider) {
   try {
-    return await pb.collection('users').authWithOAuth2({ 
+    const authData = await pb.collection('users').authWithOAuth2({ 
       provider,
       createData: { emailVisibility: true }
     });
+    
+    // Synchronizuj z cookies (dla Server Components)
+    if (typeof window !== 'undefined') {
+      const authToken = pb.authStore.exportToCookie();
+      
+      await fetch('/api/auth/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ authToken }),
+      }).catch(err => {
+        console.error('Failed to sync auth cookie:', err);
+      });
+    }
+    
+    return authData;
   } catch (error: any) {
     throw new Error(error.message || `Logowanie przez ${provider} nie powiodło się`);
   }
@@ -101,15 +131,24 @@ export const loginWithGoogle = () => loginWithOAuth('google');
 /**
  * Wyloguj użytkownika (wyczyść sesję)
  */
-export function logoutUser() {
+export async function logoutUser() {
   pb.authStore.clear();
+  
+  // Usuń cookie
+  if (typeof window !== 'undefined') {
+    await fetch('/api/auth/sync', {
+      method: 'DELETE',
+    }).catch(err => {
+      console.error('Failed to delete auth cookie:', err);
+    });
+  }
 }
 
 /**
  * Pobierz aktualnie zalogowanego użytkownika
  */
 export function getCurrentUser(): User | null {
-  return pb.authStore.model as User | null;
+  return pb.authStore.record as User | null;
 }
 
 /**
@@ -121,6 +160,83 @@ export async function updateUser(id: string, newData: Partial<User>) {
     return user as unknown as User;
   } catch (error) {
     throw new Error(ERRORS.UPDATE_FAILED);
+  }
+}
+
+/**
+ * Aktualizuj profil użytkownika (name, bio, avatar)
+ */
+export async function updateUserProfile(
+  userId: string,
+  data: {
+    name?: string;
+    bio?: string;
+    avatar?: File | null;
+  }
+): Promise<User> {
+  try {
+    const formData = new FormData();
+
+    if (data.name !== undefined) {
+      formData.append('name', data.name.trim());
+    }
+
+    if (data.bio !== undefined) {
+      formData.append('bio', data.bio.trim() || '');
+    }
+
+    if (data.avatar) {
+      formData.append('avatar', data.avatar);
+    }
+
+    const record = await pb.collection('users').update(userId, formData);
+
+    return {
+      id: record.id,
+      password: record.password,
+      tokenKey: record.tokenKey,
+      email: record.email,
+      emailVisibility: record.emailVisibility,
+      verified: record.verified,
+      name: record.name,
+      avatar: record.avatar,
+      created: record.created,
+      updated: record.updated,
+      bio: record.bio,
+      certifications: record.certifications || [],
+    } as User;
+  } catch (error: any) {
+    console.error('Update profile error:', error);
+    throw new Error('Nie udało się zaktualizować profilu');
+  }
+}
+
+/**
+ * Usuń avatar użytkownika
+ */
+export async function deleteUserAvatar(userId: string): Promise<User> {
+  try {
+    const record = await pb.collection('users').update(userId, {
+      avatar: null,
+    });
+
+    return {
+      id: record.id,
+      password: record.password,
+      tokenKey: record.tokenKey,
+      email: record.email,
+      emailVisibility: record.emailVisibility,
+      verified: record.verified,
+      name: record.name,
+      avatar: record.avatar,
+      created: record.created,
+      updated: record.updated,
+      bio: record.bio,
+      certifications: record.certifications || [],
+    } as User;
+  } catch (error: any) {
+    console.error('Delete avatar error:', error);
+    throw new Error('Nie udało się usunąć avatara');
   }
 }
 

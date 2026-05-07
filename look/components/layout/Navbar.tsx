@@ -5,7 +5,8 @@ import Logo from '../ui/Logo';
 import Container from '../ui/Container';
 import Link from 'next/link';
 import { MAIN_NAVIGATION } from '@/look/constants/navigation';
-import { getCurrentUser, logoutUser } from '../../../logic/lib/users';
+import pb from '../../../logic/lib/pocketbase';
+import { logoutUser } from '../../../logic/lib/users';
 import { User } from '../../../logic/types/user';
 
 export default function Navbar() {
@@ -14,17 +15,22 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    setUser(getCurrentUser());
+    setUser(pb.authStore.record as User | null);
     setMounted(true);
+
+    const unsubscribe = pb.authStore.onChange(() => {
+      setUser(pb.authStore.record as User | null);
+    });
+
+    return unsubscribe;
   }, []);
 
-  function handleLogout() {
-    logoutUser();
+  async function handleLogout() {
+    await logoutUser();
     setUser(null);
     window.location.href = '/';
   }
 
-  // Nie renderuj auth buttons podczas SSR
   if (!mounted) {
     return (
       <nav className="w-full bg-white border-b border-gray shadow-sm">
@@ -38,7 +44,6 @@ export default function Navbar() {
                 </li>
               ))}
             </ul>
-            {/* Pusta przestrzeń zamiast skeletonu */}
             <div className="w-48"></div>
           </div>
         </Container>
@@ -71,8 +76,9 @@ export default function Navbar() {
                 >
                   + Dodaj rejs
                 </Link>
+                {/* Kliknięcie w nazwę → profil użytkownika */}
                 <Link 
-                  href="/profil" 
+                  href={`/profil/${user.id}`}
                   className="text-sm text-gray-700 hover:text-blue-600 font-medium transition"
                 >
                   {user.name || user.email}
@@ -144,8 +150,9 @@ export default function Navbar() {
                   >
                     + Dodaj rejs
                   </Link>
+                  {/* Mobile: Kliknięcie w nazwę → profil */}
                   <Link
-                    href="/profil"
+                    href={`/profil/${user.id}`}
                     className="block text-gray-700 hover:text-blue-600 font-medium transition py-2"
                     onClick={() => setMenuOpen(false)}
                   >
