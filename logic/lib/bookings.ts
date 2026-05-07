@@ -14,21 +14,42 @@ function mapRecordToBooking(record: RecordModel): Booking {
   };
 }
 
+export interface GuestBookingData {
+  name: string;
+  email?: string;
+  phone?: string;
+}
+
 export async function createBooking(
   offerId: string,
-  message?: string
+  message?: string,
+  guestData?: GuestBookingData
 ): Promise<Booking> {
-  if (!pb.authStore.isValid) {
-    throw new Error('Musisz być zalogowany');
+  const isLoggedIn = pb.authStore.isValid;
+
+  if (!isLoggedIn && !guestData) {
+    throw new Error('Podaj dane kontaktowe lub zaloguj się');
   }
 
-  const record = await pb.collection('bookings').create({
+  if (!isLoggedIn && guestData && !guestData.email && !guestData.phone) {
+    throw new Error('Podaj email lub telefon');
+  }
+
+  const data: any = {
     offer_id: offerId,
-    user_id: pb.authStore.record?.id,
     status: 'pending',
     message: message?.trim() || '',
-  });
+  };
 
+  if (isLoggedIn) {
+    data.user_id = pb.authStore.record?.id;
+  } else if (guestData) {
+    data.guest_name = guestData.name;
+    data.guest_email = guestData.email || '';
+    data.guest_phone = guestData.phone || '';
+  }
+
+  const record = await pb.collection('bookings').create(data);
   return mapRecordToBooking(record);
 }
 
