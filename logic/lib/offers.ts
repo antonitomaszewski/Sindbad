@@ -1,5 +1,5 @@
 import pb from './pocketbase';
-import type { Offer } from '../types/offer';
+import type { Offer, OfferFormData } from '../types/offer';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();

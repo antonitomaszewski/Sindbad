@@ -1,57 +1,75 @@
-// mam tu funkcję która zwraca widok strony. poszczególne elementy tego widoku
-// będą zaimportowane z folderu komponentów.
-import { getUser } from '../../../../logic/lib/users';
+"use client";
+import { use, useEffect, useState } from 'react';
+import { isCurrentServerUser } from '../../../../logic/lib/users';
 import { getTripsByOrganizer, getTripsByParticipant } from '../../../../logic/lib/offers';
 import { getUserBookingsWithOffers } from '../../../../logic/lib/bookings';
-import { getServerUser } from '../../../../logic/lib/users.server';
+import type { BookingWithOffer } from '../../../../logic/types/booking';
 import UserProfile from '../../../components/profile/UserProfile';
+import { LoadingState } from '../../../components/common/LoadingState';
+import { NotFoundState } from '../../../components/common/NotFoundState';
+import { useUser } from '../../../hooks/useUser';
 
-export default async function ProfilPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const [user, currentUser] = await Promise.all([getUser(id), getServerUser()]);
-  
-  console.log('[ProfilPage] DEBUG:', {
-    id,
-    idType: typeof id,
-    currentUserId: currentUser?.id,
-    currentUserIdType: typeof currentUser?.id,
-    isOwnProfile: currentUser?.id === id,
-    currentUser: currentUser ? { id: currentUser.id, email: currentUser.email } : null,
-  });
-  
-  const isOwnProfile = currentUser?.id === id;
+interface ProfilePageProps {
+  params: Promise<{ id: string }>;
+}
 
-  if (!user) {
+type Trip = { id: string; title?: string; date?: string };
+
+export default function ProfilPage({ params }: ProfilePageProps) {
+  const { id } = use(params);
+  const { user, loading: userLoading, error: userError } = useUser(id);
+  const [organizedTrips, setOrganizedTrips] = useState<Trip[]>([]);
+  const [participatedTrips, setParticipatedTrips] = useState<Trip[]>([]);
+  const [myBookings, setMyBookings] = useState<BookingWithOffer[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProfileData = async () => {
+      try {
+        const [organized, participated, bookings] = await Promise.all([
+          getTripsByOrganizer(id),
+          getTripsByParticipant(id),
+          getUserBookingsWithOffers(id),
+        ]);
+
+        setOrganizedTrips(organized);
+        setParticipatedTrips(participated);
+        setMyBookings(bookings);
+      } catch (e) {
+        console.warn('ProfilPage data load failed', e);
+      } finally {
+        setDataLoading(false);
+      }
+    };
+
+    loadProfileData();
+  }, [id]);
+
+  if (userLoading || dataLoading) {
+    return <LoadingState message="Ładowanie profilu..." />;
+  }
+
+  if (userError || !user) {
     return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold">Użytkownik nie znaleziony</h1>
-      </div>
+      <NotFoundState
+        title="404"
+        message="Użytkownik nie znaleziony"
+        description="Nie udało się odnaleźć profilu użytkownika."
+        backUrl="/kalendarz"
+        backText="Powrót do kalendarza"
+      />
     );
   }
 
-  let organizedTrips: any = [];
-  let participatedTrips: any = [];
-  let myBookings: any = [];
+  const isOwnProfile = isCurrentServerUser(user);
 
-  try {
-    organizedTrips = await getTripsByOrganizer(id);
-  } catch (e) {
-    console.warn('getTripsByOrganizer failed', e);
-  }
-
-  try {
-    participatedTrips = await getTripsByParticipant(id);
-  } catch (e) {
-    console.warn('getTripsByParticipant failed', e);
-  }
-
-  if (isOwnProfile) {
-    try {
-      myBookings = await getUserBookingsWithOffers(id);
-    } catch (e) {
-      console.warn('getUserBookingsWithOffers failed', e);
-    }
-  }
-
-  return <UserProfile user={user} organizedTrips={organizedTrips} participatedTrips={participatedTrips} isOwnProfile={isOwnProfile} myBookings={myBookings} />;
+  return (
+    <UserProfile
+      user={user}
+      organizedTrips={organizedTrips}
+      participatedTrips={participatedTrips}
+      isOwnProfile={isOwnProfile}
+      myBookings={myBookings}
+    />
+  );
 }

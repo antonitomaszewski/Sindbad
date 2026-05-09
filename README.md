@@ -27,3 +27,4 @@ wtedy dostawalibysmy powiadomienia mailowe
 Teraz
 2. tutaj także przydałyby się powiadomienia w odpowiedzi, dla użytkownika
 3. gdy mamy potwierdzoną rezerwację, to powinniśmy zmieniać licznik dostępnych miejsc
+4. można zrobić public/private zamiast tych relacji kiedy wyswietlać rejsy a kiedy nie

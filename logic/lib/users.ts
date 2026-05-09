@@ -55,20 +55,6 @@ export async function getUserCertifications(userId: string): Promise<string[]> {
 export async function loginUser(email: string, password: string) {
   try {
     const authData = await pb.collection('users').authWithPassword(email, password);
-    
-    // Synchronizuj z cookies (dla Server Components)
-    if (typeof window !== 'undefined') {
-      const authToken = pb.authStore.exportToCookie();
-      
-      await fetch('/api/auth/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ authToken }),
-      }).catch(err => {
-        console.error('Failed to sync auth cookie:', err);
-      });
-    }
-    
     return authData;
   } catch (error) {
     throw new Error(ERRORS.LOGIN_FAILED);
@@ -106,19 +92,6 @@ export async function loginWithOAuth(provider: OAuthProvider) {
       createData: { emailVisibility: true }
     });
     
-    // Synchronizuj z cookies (dla Server Components)
-    if (typeof window !== 'undefined') {
-      const authToken = pb.authStore.exportToCookie();
-      
-      await fetch('/api/auth/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ authToken }),
-      }).catch(err => {
-        console.error('Failed to sync auth cookie:', err);
-      });
-    }
-    
     return authData;
   } catch (error: any) {
     throw new Error(error.message || `Logowanie przez ${provider} nie powiodło się`);
@@ -133,15 +106,6 @@ export const loginWithGoogle = () => loginWithOAuth('google');
  */
 export async function logoutUser() {
   pb.authStore.clear();
-  
-  // Usuń cookie
-  if (typeof window !== 'undefined') {
-    await fetch('/api/auth/sync', {
-      method: 'DELETE',
-    }).catch(err => {
-      console.error('Failed to delete auth cookie:', err);
-    });
-  }
 }
 
 /**
@@ -150,6 +114,12 @@ export async function logoutUser() {
 export function getCurrentUser(): User | null {
   return pb.authStore.record as User | null;
 }
+
+// sprawdzamy czy wchodzimy na profil jako zalogowany uzytkownik
+export function isCurrentServerUser(user: User): boolean {
+  return pb.authStore.record?.id === user.id;
+}
+
 
 /**
  * Aktualizuj dane użytkownika
