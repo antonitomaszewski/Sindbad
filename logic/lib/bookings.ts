@@ -121,6 +121,5 @@ export async function getUserBookingsWithOffers(userId: string): Promise<Booking
     })
   );
 
-  const today = new Date().toISOString().slice(0, 10);
-  return withOffers.filter((b) => !b.offer?.date_from || b.offer.date_from >= today);
+  return withOffers;
 }

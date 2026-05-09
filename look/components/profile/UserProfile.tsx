@@ -30,7 +30,7 @@ export default function UserProfile({
           <UserBio bio={user.bio} />
 
           <TripHistory title="Rejsy organizowane" trips={organizedTrips} />
-          <TripHistory title="Rejsy jako załogant" trips={participatedTrips} />
+          {/* <TripHistory title="Rejsy jako załogant" trips={participatedTrips} /> */}
           {isOwnProfile && <MyBookingsList bookings={myBookings} />}
         </div>
 

@@ -9,6 +9,16 @@ import UserProfile from '../../../components/profile/UserProfile';
 export default async function ProfilPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [user, currentUser] = await Promise.all([getUser(id), getServerUser()]);
+  
+  console.log('[ProfilPage] DEBUG:', {
+    id,
+    idType: typeof id,
+    currentUserId: currentUser?.id,
+    currentUserIdType: typeof currentUser?.id,
+    isOwnProfile: currentUser?.id === id,
+    currentUser: currentUser ? { id: currentUser.id, email: currentUser.email } : null,
+  });
+  
   const isOwnProfile = currentUser?.id === id;
 
   if (!user) {

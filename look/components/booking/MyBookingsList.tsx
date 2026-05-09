@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import type { BookingWithOffer } from '@/logic/types/booking';
 
@@ -13,8 +15,11 @@ const statusColors = {
   cancelled: 'bg-red-100 text-red-800',
 };
 
-export default function MyBookingsList({ bookings }: { bookings: BookingWithOffer[] }) {
-  if (bookings.length === 0) {
+export default function MyBookingsList({ bookings: initialBookings }: { bookings: BookingWithOffer[] }) {
+  // DEBUG
+  console.log('[MyBookingsList] initialBookings:', initialBookings.length, initialBookings);
+
+  if (initialBookings.length === 0) {
     return (
       <section className="bg-white border border-gray-100 rounded-lg p-4">
         <h3 className="text-lg font-medium mb-3">Moje rezerwacje</h3>
@@ -27,7 +32,7 @@ export default function MyBookingsList({ bookings }: { bookings: BookingWithOffe
     <section className="bg-white border border-gray-100 rounded-lg p-4">
       <h3 className="text-lg font-medium mb-3">Moje rezerwacje</h3>
       <ul className="space-y-3">
-        {bookings.map((booking) => (
+        {initialBookings.map((booking) => (
           <li key={booking.id} className="flex justify-between items-center">
             <div>
               <Link

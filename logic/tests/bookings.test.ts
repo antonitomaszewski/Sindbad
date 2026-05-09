@@ -1,4 +1,5 @@
-import { createBooking, getUserBookings, getOfferBookings, updateBookingStatus } from '../lib/bookings';
+import { createBooking, getUserBookings, getOfferBookings, getUserBookingsWithOffers, updateBookingStatus } from '../lib/bookings';
+import { getOfferById } from '../lib/offers';
 import { loginUser, logoutUser, registerUser } from '../lib/users';
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import pb from '../lib/pocketbase';
@@ -59,5 +60,34 @@ describe('Bookings', () => {
 
     const cancelled = await updateBookingStatus(booking.id, 'cancelled');
     expect(cancelled.status).toBe('cancelled');
+  });
+
+  it('getUserBookingsWithOffers maps offer and applies upcoming filter', async () => {
+    const booking = await createBooking(testOfferId, 'Test with offer mapping');
+    createdBookingIds.push(booking.id);
+
+    const offer = await getOfferById(testOfferId);
+    const bookings = await getUserBookingsWithOffers(testUserId);
+
+    expect(Array.isArray(bookings)).toBe(true);
+
+    for (const item of bookings) {
+      expect(item.offer_id).toBeTypeOf('string');
+      if (item.offer) {
+        expect(item.offer.id).toBe(item.offer_id);
+        expect(item.offer.title).toBeTypeOf('string');
+      }
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const shouldBeVisible = !offer?.date_from || offer.date_from.slice(0, 10) >= today;
+    const createdBooking = bookings.find((item) => item.id === booking.id);
+
+    if (shouldBeVisible) {
+      expect(createdBooking).toBeTruthy();
+      expect(createdBooking?.offer?.id).toBe(testOfferId);
+    } else {
+      expect(createdBooking).toBeUndefined();
+    }
   });
 }, 15000);
