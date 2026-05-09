@@ -1,5 +1,5 @@
 import pb from './pocketbase';
-import type { Booking, BookingStatus } from '../types/booking';
+import type { Booking, BookingStatus, BookingWithOffer } from '../types/booking';
 import { getOfferById, updateOffer } from './offers';
 import { RecordModel } from 'pocketbase';
 
@@ -37,6 +37,14 @@ export async function createBooking(
 
   if (!isLoggedIn && guestData && !guestData.email && !guestData.phone) {
     throw new Error('Podaj email lub telefon');
+  }
+
+  // Organizator nie może rezerwować własnej oferty
+  if (isLoggedIn) {
+    const offer = await getOfferById(offerId);
+    if (offer && offer.organizer_id === pb.authStore.record?.id) {
+      throw new Error('Nie możesz zarezerwować własnej oferty');
+    }
   }
 
   const data: any = {
@@ -96,4 +104,23 @@ export async function updateBookingStatus(
   }
 
   return mapRecordToBooking(record);
+}
+
+export async function getUserBookingsWithOffers(userId: string): Promise<BookingWithOffer[]> {
+  const bookings = await getUserBookings(userId);
+
+  const withOffers = await Promise.all(
+    bookings.map(async (booking) => {
+      const offer = await getOfferById(booking.offer_id);
+      return {
+        ...booking,
+        offer: offer
+          ? { id: offer.id, title: offer.title, date_from: offer.date_from, date_to: offer.date_to }
+          : undefined,
+      };
+    })
+  );
+
+  const today = new Date().toISOString().slice(0, 10);
+  return withOffers.filter((b) => !b.offer?.date_from || b.offer.date_from >= today);
 }

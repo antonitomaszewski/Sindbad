@@ -2,11 +2,14 @@
 // będą zaimportowane z folderu komponentów.
 import { getUser } from '../../../../logic/lib/users';
 import { getTripsByOrganizer, getTripsByParticipant } from '../../../../logic/lib/offers';
+import { getUserBookingsWithOffers } from '../../../../logic/lib/bookings';
+import { getServerUser } from '../../../../logic/lib/users.server';
 import UserProfile from '../../../components/profile/UserProfile';
 
 export default async function ProfilPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await getUser(id);
+  const [user, currentUser] = await Promise.all([getUser(id), getServerUser()]);
+  const isOwnProfile = currentUser?.id === id;
 
   if (!user) {
     return (
@@ -16,22 +19,29 @@ export default async function ProfilPage({ params }: { params: Promise<{ id: str
     );
   }
 
-  let organizedTrips : any = [];
-  let participatedTrips : any = [];
+  let organizedTrips: any = [];
+  let participatedTrips: any = [];
+  let myBookings: any = [];
 
   try {
     organizedTrips = await getTripsByOrganizer(id);
   } catch (e) {
     console.warn('getTripsByOrganizer failed', e);
-    organizedTrips = [];
   }
 
   try {
     participatedTrips = await getTripsByParticipant(id);
   } catch (e) {
     console.warn('getTripsByParticipant failed', e);
-    participatedTrips = [];
   }
 
-  return <UserProfile user={user} organizedTrips={organizedTrips} participatedTrips={participatedTrips} />;
+  if (isOwnProfile) {
+    try {
+      myBookings = await getUserBookingsWithOffers(id);
+    } catch (e) {
+      console.warn('getUserBookingsWithOffers failed', e);
+    }
+  }
+
+  return <UserProfile user={user} organizedTrips={organizedTrips} participatedTrips={participatedTrips} isOwnProfile={isOwnProfile} myBookings={myBookings} />;
 }

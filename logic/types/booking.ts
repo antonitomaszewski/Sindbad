@@ -13,3 +13,12 @@ export interface Booking {
   created: string;
   updated: string;
 }
+
+export interface BookingWithOffer extends Booking {
+  offer?: {
+    id: string;
+    title: string;
+    date_from?: string;
+    date_to?: string;
+  };
+}
