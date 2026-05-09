@@ -1,4 +1,4 @@
-import { createBooking, getUserBookings, getOfferBookings } from '../lib/bookings';
+import { createBooking, getUserBookings, getOfferBookings, updateBookingStatus } from '../lib/bookings';
 import { loginUser, logoutUser, registerUser } from '../lib/users';
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import pb from '../lib/pocketbase';
@@ -47,5 +47,17 @@ describe('Bookings', () => {
   it('getOfferBookings returns offer bookings', async () => {
     const bookings = await getOfferBookings(testOfferId);
     expect(Array.isArray(bookings)).toBe(true);
+  });
+
+  it('updateBookingStatus changes booking status', async () => {
+    const booking = await createBooking(testOfferId, 'Test dla update');
+    createdBookingIds.push(booking.id);
+    expect(booking.status).toBe('pending');
+
+    const updated = await updateBookingStatus(booking.id, 'confirmed');
+    expect(updated.status).toBe('confirmed');
+
+    const cancelled = await updateBookingStatus(booking.id, 'cancelled');
+    expect(cancelled.status).toBe('cancelled');
   });
 }, 15000);

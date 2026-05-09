@@ -12,6 +12,8 @@ import { LoadingState } from '@/look/components/common/LoadingState';
 import { NotFoundState } from '@/look/components/common/NotFoundState';
 import { OFFER_MESSAGES } from '@/look/constants/offer';
 import BookingModal from '@/look/components/booking/BookingModal';
+import { BookingsPanel } from '@/look/components/booking/BookingsPanel';
+import { isCurrentUserOrganizer } from '@/logic/lib/offers';
 
 interface OfferPageProps {
   params: Promise<{ id: string }>;
@@ -52,6 +54,9 @@ export default function OfertaPage({ params }: OfferPageProps) {
     );
   }
 
+  // Tutaj offer na pewno istnieje
+  const isOrganizer = isCurrentUserOrganizer(offer);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-8">
@@ -73,10 +78,14 @@ export default function OfertaPage({ params }: OfferPageProps) {
           isLoading={organizerLoading}
         />
 
-        <OfferActions
-          onReservation={handleReservation}
-          onContact={handleContact}
-        />
+        {!isOrganizer && (
+          <OfferActions
+            onReservation={handleReservation}
+            onContact={handleContact}
+          />
+        )}
+
+        {isOrganizer && <BookingsPanel offerId={offer.id} />}
 
         {showModal && (
           <BookingModal

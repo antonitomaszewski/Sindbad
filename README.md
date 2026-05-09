@@ -24,12 +24,6 @@ dobra, zastanówmy sie co trzeba dorobić
 <!-- 3. edycja profilu użytkownika -->
 4. opcję dostawania powiadomienia, gdy pojawi się rejs w terminie/miejscu, który nas interesuje (czyli tworzenie takich zgłoszeń/marzeń)
 wtedy dostawalibysmy powiadomienia mailowe
-
-
-
- Krok 2: Dodaj logic/types/booking.ts
- Krok 3: Dodaj logic/lib/bookings.ts
- Krok 4: Dodaj BookingButton.tsx
- Krok 5: Dodaj przycisk do strony oferty
- Krok 6: Dodaj UserBookings.tsx
- Krok 7: Dodaj listę rezerwacji do profilu
+Teraz
+2. tutaj także przydałyby się powiadomienia w odpowiedzi, dla użytkownika
+3. gdy mamy potwierdzoną rezerwację, to powinniśmy zmieniać licznik dostępnych miejsc

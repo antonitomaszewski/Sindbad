@@ -1,5 +1,6 @@
 import pb from './pocketbase';
 import type { Booking, BookingStatus } from '../types/booking';
+import { getOfferById, updateOffer } from './offers';
 import { RecordModel } from 'pocketbase';
 
 function mapRecordToBooking(record: RecordModel): Booking {
@@ -11,6 +12,9 @@ function mapRecordToBooking(record: RecordModel): Booking {
     message: record.message,
     created: record.created,
     updated: record.updated,
+    guest_name: record.guest_name,
+    guest_email: record.guest_email,
+    guest_phone: record.guest_phone,
   };
 }
 
@@ -69,4 +73,27 @@ export async function getOfferBookings(offerId: string): Promise<Booking[]> {
   });
 
   return records.map(mapRecordToBooking);
+}
+
+// Aktualizacja statusu rezerwacji (tylko organizator oferty - w pocketbase)
+export async function updateBookingStatus(
+  bookingId: string,
+  status: BookingStatus
+): Promise<Booking> {
+  const current = await pb.collection('bookings').getOne(bookingId);
+  const previousStatus = current.status as BookingStatus;
+
+  const record = await pb.collection('bookings').update(bookingId, { status });
+
+  // Aktualizuj licznik miejsc
+  if (previousStatus !== status) {
+    const offer = await getOfferById(current.offer_id);
+    if (offer && offer.seats_available !== undefined) {
+      if (status === 'confirmed' && previousStatus !== 'confirmed') {
+        await updateOffer(offer.id, { seats_available: Math.max(0, offer.seats_available - 1) });
+      }
+    }
+  }
+
+  return mapRecordToBooking(record);
 }

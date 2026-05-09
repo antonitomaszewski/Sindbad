@@ -191,3 +191,7 @@ export function convertFormDataToOffer(
 
   return offer;
 }
+
+export function isCurrentUserOrganizer(offer: Offer): boolean {
+  return pb.authStore.record?.id === offer.organizer_id;
+}
