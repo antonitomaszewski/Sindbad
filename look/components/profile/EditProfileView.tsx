@@ -8,6 +8,7 @@ import {
   changeUserPassword,
   isCurrentUserOAuth,
   updateUserProfile,
+  updateProfileVisibility,
 } from '../../../logic/lib/users';
 import { updateUserCertifications, type Certification } from '../../../logic/lib/certifications';
 import AvatarSection from './edit/AvatarSection';
@@ -38,6 +39,9 @@ export default function EditProfileView({
   const [accountError, setAccountError] = useState('');
   const [accountSuccess, setAccountSuccess] = useState('');
   const [isOAuthAccount, setIsOAuthAccount] = useState(false);
+  const [profileVisibility, setProfileVisibility] = useState<'public' | 'private'>(
+    (user.profile_visibility as 'public' | 'private') || 'public'
+  );
   const [accountData, setAccountData] = useState({
     email: user.email || '',
     currentPasswordForEmail: '',
@@ -66,6 +70,9 @@ export default function EditProfileView({
       
       // 2. Zaktualizuj certyfikaty
       await updateUserCertifications(user.id, selectedCertIds);
+
+      // 3. Zaktualizuj widoczność profilu
+      await updateProfileVisibility(user.id, profileVisibility);
 
       router.push(`/profil/${user.id}`);
       router.refresh();
@@ -237,6 +244,38 @@ export default function EditProfileView({
               Konto logowane przez OAuth. Zmiana emaila i hasła jest wyłączona.
             </div>
           )}
+
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Widoczność profilu</h2>
+            <div className="space-y-3">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="profile_visibility"
+                  value="public"
+                  checked={profileVisibility === 'public'}
+                  onChange={(e) => setProfileVisibility(e.target.value as 'public' | 'private')}
+                  disabled={loading}
+                  className="mr-3 w-4 h-4"
+                />
+                <span className="text-gray-700 font-medium">Publiczny</span>
+                <span className="ml-2 text-sm text-gray-500">Twój profil widoczny dla wszystkich</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="profile_visibility"
+                  value="private"
+                  checked={profileVisibility === 'private'}
+                  onChange={(e) => setProfileVisibility(e.target.value as 'public' | 'private')}
+                  disabled={loading}
+                  className="mr-3 w-4 h-4"
+                />
+                <span className="text-gray-700 font-medium">Prywatny</span>
+                <span className="ml-2 text-sm text-gray-500">Twój profil widoczny tylko dla Ciebie</span>
+              </label>
+            </div>
+          </div>
 
           <CertificationsSection
             selectedIds={selectedCertIds}

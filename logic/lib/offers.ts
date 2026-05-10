@@ -69,6 +69,51 @@ export async function getTripsByParticipant(userId: string) {
   }
 }
 
+/**
+ * Sprawdź czy użytkownik uczestniczy w ofercie organizowanej przez drugiego użytkownika
+ * (lub vice versa)
+ */
+export async function haveCommonOffers(userId1: string, userId2: string): Promise<boolean> {
+  try {
+    // Oferowań organizowana przez userId2, w których userId1 uczestniczy
+    const offersFromUser2: any[] = await (pb.collection('offers') as any).getFullList(
+      { filter: `organizer_id = "${userId2}"` },
+      200
+    );
+
+    const user2OfferIds = new Set(offersFromUser2.map((o) => o.id));
+
+    // Sprawdź czy userId1 ma booking w którejś z ofert organizowanej przez userId2
+    const bookingsUser1 = await (pb.collection('bookings') as any).getFullList(
+      { filter: `user_id = "${userId1}"` },
+      200
+    );
+
+    const hasBookingInUser2Offers = bookingsUser1.some((b: any) => user2OfferIds.has(b.offer_id));
+
+    if (hasBookingInUser2Offers) return true;
+
+    // Sprawdź odwrotnie: czy userId2 ma booking w ofercie organizowanej przez userId1
+    const offersFromUser1: any[] = await (pb.collection('offers') as any).getFullList(
+      { filter: `organizer_id = "${userId1}"` },
+      200
+    );
+
+    const user1OfferIds = new Set(offersFromUser1.map((o) => o.id));
+    const bookingsUser2 = await (pb.collection('bookings') as any).getFullList(
+      { filter: `user_id = "${userId2}"` },
+      200
+    );
+
+    const hasBookingInUser1Offers = bookingsUser2.some((b: any) => user1OfferIds.has(b.offer_id));
+
+    return hasBookingInUser1Offers;
+  } catch (err) {
+    console.warn('haveCommonOffers error:', err);
+    return false;
+  }
+}
+
 // Wyszukaj oferty (nowa funkcja z brancha szukaj)
 export async function searchOffers(params: { 
   q?: string; 

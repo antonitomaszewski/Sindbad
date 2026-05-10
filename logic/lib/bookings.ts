@@ -194,3 +194,24 @@ export async function getUserBookingsWithOffers(userId: string): Promise<Booking
 
   return withOffers;
 }
+
+/**
+ * Sprawdź czy dwaj użytkownicy mają wspólne booking (uczestniczą w tej samej ofercie)
+ */
+export async function haveCommonBookings(userId1: string, userId2: string): Promise<boolean> {
+  try {
+    const [bookings1, bookings2] = await Promise.all([
+      getUserBookings(userId1),
+      getUserBookings(userId2),
+    ]);
+
+    const confirmedOfferIds1 = new Set(
+      bookings1.filter((b) => b.status === 'confirmed').map((b) => b.offer_id)
+    );
+
+    return bookings2.some((b) => b.status === 'confirmed' && confirmedOfferIds1.has(b.offer_id));
+  } catch (err) {
+    console.warn('haveCommonBookings error:', err);
+    return false;
+  }
+}

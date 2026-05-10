@@ -12,4 +12,5 @@ export interface User {
   // optional / new fields used by profile UI
   bio?: string;
   certifications?: string[];
+  profile_visibility?: 'public' | 'private';
 }

@@ -280,6 +280,60 @@ export async function updateUserProfile(
 }
 
 /**
+ * Zaktualizuj widoczność profilu (public/private)
+ */
+export async function updateProfileVisibility(
+  userId: string,
+  visibility: 'public' | 'private'
+): Promise<User> {
+  try {
+    const record = await pb.collection('users').update(userId, {
+      profile_visibility: visibility,
+    });
+
+    return record as unknown as User;
+  } catch (error: any) {
+    throw new Error('Nie udało się zmienić widoczności profilu');
+  }
+}
+
+/**
+ * Sprawdź czy użytkownik ma dostęp do profilu
+ * Profil jest dostępny jeśli:
+ * - Jest publiczny (public)
+ * - Użytkownik jest właścicielem profilu
+ * - Użytkownik ma wspólne booking lub offers (uczestniczy w tym samym rejsie)
+ */
+export async function canAccessProfile(
+  profileUserId: string,
+  currentUserId?: string
+): Promise<boolean> {
+  const profile = await getUser(profileUserId);
+
+  if (!profile) return false;
+
+  // Publiczny profil - wszyscy mają dostęp
+  if (profile.profile_visibility === 'public') return true;
+
+  // Prywatny profil - wymagany zalogowany użytkownik
+  if (!currentUserId) return false;
+
+  // Właściciel profilu
+  if (profileUserId === currentUserId) return true;
+
+  // Sprawdź wspólne booking i offers
+  const { haveCommonBookings } = await import('./bookings');
+  const { haveCommonOffers } = await import('./offers');
+
+  const [commonBookings, commonOffers] = await Promise.all([
+    haveCommonBookings(profileUserId, currentUserId),
+    haveCommonOffers(profileUserId, currentUserId),
+  ]);
+
+  return commonBookings || commonOffers;
+}
+
+/**
  * Usuń avatar użytkownika
  */
 export async function deleteUserAvatar(userId: string): Promise<User> {
