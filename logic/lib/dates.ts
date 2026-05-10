@@ -15,3 +15,7 @@ export function dateToString(date: Date | null): string | undefined {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+
+export function formatDateRange(dateFrom?: string, dateTo?: string): string {
+  return dateTo ? `${formatDate(dateFrom)} – ${formatDate(dateTo)}` : formatDate(dateFrom);
+}

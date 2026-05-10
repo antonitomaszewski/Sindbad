@@ -1,7 +1,11 @@
 import pb from './pocketbase';
 import type { Booking, BookingStatus, BookingWithOffer } from '../types/booking';
-import { getOfferById, updateOffer } from './offers';
+import { getOfferById } from './offers';
+import { sendBookingStatusEmail, sendBookingEmails } from './emails';
 import { RecordModel } from 'pocketbase';
+import {updateAvailableSeats} from './offers';
+import { Offer } from '../types/offer';
+import { GuestBookingData } from '../types/booking';
 
 function mapRecordToBooking(record: RecordModel): Booking {
   return {
@@ -18,34 +22,45 @@ function mapRecordToBooking(record: RecordModel): Booking {
   };
 }
 
-export interface GuestBookingData {
-  name: string;
-  email?: string;
-  phone?: string;
-}
-
-export async function createBooking(
-  offerId: string,
-  message?: string,
+function validateBookingAccess(
   guestData?: GuestBookingData
-): Promise<Booking> {
+) {
   const isLoggedIn = pb.authStore.isValid;
 
   if (!isLoggedIn && !guestData) {
-    throw new Error('Podaj dane kontaktowe lub zaloguj się');
+    throw new Error(
+      'Podaj dane kontaktowe lub zaloguj się'
+    );
   }
 
-  if (!isLoggedIn && guestData && !guestData.email && !guestData.phone) {
+  if (
+    !isLoggedIn &&
+    guestData &&
+    !guestData.email &&
+    !guestData.phone
+  ) {
     throw new Error('Podaj email lub telefon');
   }
+}
 
-  // Organizator nie może rezerwować własnej oferty
-  if (isLoggedIn) {
-    const offer = await getOfferById(offerId);
-    if (offer && offer.organizer_id === pb.authStore.record?.id) {
-      throw new Error('Nie możesz zarezerwować własnej oferty');
-    }
+function validateOwnOfferBooking(offer: Offer) {
+  if (!pb.authStore.isValid) {
+    return;
   }
+
+  if (offer.organizer_id === pb.authStore.record?.id) {
+    throw new Error(
+      'Nie możesz zarezerwować własnej oferty'
+    );
+  }
+}
+
+function buildBookingData(
+  offerId: string,
+  message?: string,
+  guestData?: GuestBookingData
+) {
+  const isLoggedIn = pb.authStore.isValid;
 
   const data: any = {
     offer_id: offerId,
@@ -55,14 +70,50 @@ export async function createBooking(
 
   if (isLoggedIn) {
     data.user_id = pb.authStore.record?.id;
-  } else if (guestData) {
-    data.guest_name = guestData.name;
-    data.guest_email = guestData.email || '';
-    data.guest_phone = guestData.phone || '';
+
+    return data;
   }
 
+  data.guest_name = guestData?.name;
+  data.guest_email = guestData?.email || '';
+  data.guest_phone = guestData?.phone || '';
+
+  return data;
+}
+
+export async function createBooking(
+  offerId: string,
+  message?: string,
+  guestData?: GuestBookingData
+): Promise<Booking> {
+  validateBookingAccess(guestData);
+
+  const offer = await getOfferById(offerId);
+
+  if (!offer) {
+    throw new Error('Oferta nie istnieje');
+  }
+
+  validateOwnOfferBooking(offer);
+
+  const data = buildBookingData(
+    offerId,
+    message,
+    guestData
+  );
+
   const record = await pb.collection('bookings').create(data);
-  return mapRecordToBooking(record);
+
+  const booking = mapRecordToBooking(record);
+
+  await sendBookingEmails({
+    offer,
+    offerId,
+    message,
+    guestData,
+  });
+
+  return booking;
 }
 
 export async function getUserBookings(userId: string): Promise<Booking[]> {
@@ -83,7 +134,6 @@ export async function getOfferBookings(offerId: string): Promise<Booking[]> {
   return records.map(mapRecordToBooking);
 }
 
-// Aktualizacja statusu rezerwacji (tylko organizator oferty - w pocketbase)
 export async function updateBookingStatus(
   bookingId: string,
   status: BookingStatus
@@ -91,19 +141,35 @@ export async function updateBookingStatus(
   const current = await pb.collection('bookings').getOne(bookingId);
   const previousStatus = current.status as BookingStatus;
 
-  const record = await pb.collection('bookings').update(bookingId, { status });
+  const record = await pb.collection('bookings').update(bookingId, {
+    status,
+  });
 
-  // Aktualizuj licznik miejsc
-  if (previousStatus !== status) {
-    const offer = await getOfferById(current.offer_id);
-    if (offer && offer.seats_available !== undefined) {
-      if (status === 'confirmed' && previousStatus !== 'confirmed') {
-        await updateOffer(offer.id, { seats_available: Math.max(0, offer.seats_available - 1) });
-      }
-    }
+  const booking = mapRecordToBooking(record);
+
+  if (previousStatus === status) {
+    return booking;
   }
 
-  return mapRecordToBooking(record);
+  const offer = await getOfferById(current.offer_id);
+
+  if (!offer) {
+    return booking;
+  }
+
+  await updateAvailableSeats({
+    offer,
+    previousStatus,
+    newStatus: status,
+  });
+
+  await sendBookingStatusEmail({
+    booking: current,
+    offer,
+    status,
+  });
+
+  return booking;
 }
 
 export async function getUserBookingsWithOffers(userId: string): Promise<BookingWithOffer[]> {

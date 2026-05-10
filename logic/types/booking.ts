@@ -22,3 +22,9 @@ export interface BookingWithOffer extends Booking {
     date_to?: string;
   };
 }
+
+export interface GuestBookingData {
+  name: string;
+  email?: string;
+  phone?: string;
+}
