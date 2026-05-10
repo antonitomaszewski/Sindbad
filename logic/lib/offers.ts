@@ -198,6 +198,12 @@ export function isCurrentUserOrganizer(offer: Offer): boolean {
   return pb.authStore.record?.id === offer.organizer_id;
 }
 
+export function validateSeatsAvailable(offer: Offer) {
+  if (offer.seats_available !== undefined && offer.seats_available <= 0) {
+    throw new Error('Brak dostępnych miejsc');
+  }
+}
+
 export async function updateAvailableSeats({
   offer,
   previousStatus,

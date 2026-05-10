@@ -34,7 +34,11 @@ wtedy dostawalibysmy powiadomienia mailowe
 4. można zrobić public/private zamiast tych relacji kiedy wyswietlać rejsy a kiedy nie
 5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację, 
 8. mail z zapytaniem
+9. uzytkownik może zapisac swoje marzenia: kraj, termin, organizator
 9. mail z wyszukiwaniem do uzytkownika:
 + kraj, termin, organizator
 10. obecnie mimo, ze jest 0 miejsc dostępnych, to mozna złozyc rezerwację - to jest niedobrze, takze organizator moze potwierdzić taką rezerwację -- to także jest niedobrze.
+- dodaj wyświetlanie port, country, liczbę miejsc dostępnych - do profilu oferty
 11. zmiana maila, zmiana hasła na profilu
+12. weryfikacja maila - verified: false/true
+13. użytkownik, który ma potwierdzoną rezerwację / jest organizatorem -- widzi jacy inni użytkownicy są zapisani (to nie zmienia ich private/public profilu)

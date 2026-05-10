@@ -1,6 +1,6 @@
 import pb from './pocketbase';
 import type { Booking, BookingStatus, BookingWithOffer } from '../types/booking';
-import { getOfferById } from './offers';
+import { getOfferById, validateSeatsAvailable } from './offers';
 import { sendBookingStatusEmail, sendBookingEmails } from './emails';
 import { RecordModel } from 'pocketbase';
 import {updateAvailableSeats} from './offers';
@@ -95,6 +95,7 @@ export async function createBooking(
   }
 
   validateOwnOfferBooking(offer);
+  validateSeatsAvailable(offer);
 
   const data = buildBookingData(
     offerId,
@@ -141,21 +142,25 @@ export async function updateBookingStatus(
   const current = await pb.collection('bookings').getOne(bookingId);
   const previousStatus = current.status as BookingStatus;
 
-  const record = await pb.collection('bookings').update(bookingId, {
-    status,
-  });
-
-  const booking = mapRecordToBooking(record);
-
   if (previousStatus === status) {
-    return booking;
+    return mapRecordToBooking(current);
   }
 
   const offer = await getOfferById(current.offer_id);
 
   if (!offer) {
-    return booking;
+    throw new Error('Oferta nie istnieje');
   }
+
+  if (status === 'confirmed' && previousStatus !== 'confirmed') {
+    validateSeatsAvailable(offer);
+  }
+
+  const record = await pb.collection('bookings').update(bookingId, {
+    status,
+  });
+
+  const booking = mapRecordToBooking(record);
 
   await updateAvailableSeats({
     offer,

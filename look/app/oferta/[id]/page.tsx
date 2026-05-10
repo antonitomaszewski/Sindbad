@@ -26,6 +26,9 @@ export default function OfertaPage({ params }: OfferPageProps) {
   const [showModal, setShowModal] = useState(false);
 
   const handleReservation = () => {
+    if (offer?.seats_available !== undefined && offer.seats_available <= 0) {
+      return;
+    }
     setShowModal(true);
   };
 
@@ -56,6 +59,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
 
   // Tutaj offer na pewno istnieje
   const isOrganizer = isCurrentUserOrganizer(offer);
+  const canReserve = offer.seats_available === undefined || offer.seats_available > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -82,6 +86,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
           <OfferActions
             onReservation={handleReservation}
             onContact={handleContact}
+            canReserve={canReserve}
           />
         )}
 
@@ -90,6 +95,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
         {showModal && (
           <BookingModal
             offerId={offer.id}
+            canReserve={canReserve}
             onClose={() => setShowModal(false)}
             onSuccess={handleSuccess}
           />
