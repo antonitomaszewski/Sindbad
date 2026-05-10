@@ -1,9 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { User } from '../../../logic/types/user';
-import { updateUserProfile } from '../../../logic/lib/users';
+import {
+  changeUserEmail,
+  changeUserPassword,
+  isCurrentUserOAuth,
+  updateUserProfile,
+} from '../../../logic/lib/users';
 import { updateUserCertifications, type Certification } from '../../../logic/lib/certifications';
 import AvatarSection from './edit/AvatarSection';
 import BasicInfoSection from './edit/BasicInfoSection';
@@ -29,6 +34,26 @@ export default function EditProfileView({
   const [selectedCertIds, setSelectedCertIds] = useState<string[]>(userCertificationIds);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [accountLoading, setAccountLoading] = useState(false);
+  const [accountError, setAccountError] = useState('');
+  const [accountSuccess, setAccountSuccess] = useState('');
+  const [isOAuthAccount, setIsOAuthAccount] = useState(false);
+  const [accountData, setAccountData] = useState({
+    email: user.email || '',
+    currentPasswordForEmail: '',
+    currentPassword: '',
+    newPassword: '',
+    newPasswordConfirm: '',
+  });
+
+  useEffect(() => {
+    const loadAuthType = async () => {
+      const oauth = await isCurrentUserOAuth();
+      setIsOAuthAccount(oauth);
+    };
+
+    loadAuthType();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,6 +73,48 @@ export default function EditProfileView({
       setError(err.message || 'Nie udało się zapisać zmian');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleEmailChange() {
+    setAccountError('');
+    setAccountSuccess('');
+    setAccountLoading(true);
+
+    try {
+      await changeUserEmail(user.id, accountData.email, accountData.currentPasswordForEmail);
+      setAccountSuccess('Email został zaktualizowany.');
+      setAccountData((prev) => ({ ...prev, currentPasswordForEmail: '' }));
+    } catch (err: any) {
+      setAccountError(err.message || 'Nie udało się zmienić emaila');
+    } finally {
+      setAccountLoading(false);
+    }
+  }
+
+  async function handlePasswordChange() {
+    setAccountError('');
+    setAccountSuccess('');
+    setAccountLoading(true);
+
+    try {
+      await changeUserPassword(
+        user.id,
+        accountData.currentPassword,
+        accountData.newPassword,
+        accountData.newPasswordConfirm
+      );
+      setAccountSuccess('Hasło zostało zmienione.');
+      setAccountData((prev) => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        newPasswordConfirm: '',
+      }));
+    } catch (err: any) {
+      setAccountError(err.message || 'Nie udało się zmienić hasła');
+    } finally {
+      setAccountLoading(false);
     }
   }
 
@@ -78,6 +145,98 @@ export default function EditProfileView({
             setFormData={setFormData} 
             loading={loading} 
           />
+
+          {!isOAuthAccount && (
+            <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Dane logowania</h2>
+
+              {accountError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {accountError}
+                </div>
+              )}
+
+              {accountSuccess && (
+                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+                  {accountSuccess}
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <h3 className="font-medium text-gray-800">Zmiana emaila</h3>
+                <input
+                  type="email"
+                  value={accountData.email}
+                  onChange={(e) => setAccountData((prev) => ({ ...prev, email: e.target.value }))}
+                  placeholder="Nowy email"
+                  disabled={accountLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                />
+                <input
+                  type="password"
+                  value={accountData.currentPasswordForEmail}
+                  onChange={(e) =>
+                    setAccountData((prev) => ({ ...prev, currentPasswordForEmail: e.target.value }))
+                  }
+                  placeholder="Aktualne hasło"
+                  disabled={accountLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                />
+                <button
+                  type="button"
+                  onClick={handleEmailChange}
+                  disabled={accountLoading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                >
+                  Zmień email
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="font-medium text-gray-800">Zmiana hasła</h3>
+                <input
+                  type="password"
+                  value={accountData.currentPassword}
+                  onChange={(e) => setAccountData((prev) => ({ ...prev, currentPassword: e.target.value }))}
+                  placeholder="Aktualne hasło"
+                  disabled={accountLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                />
+                <input
+                  type="password"
+                  value={accountData.newPassword}
+                  onChange={(e) => setAccountData((prev) => ({ ...prev, newPassword: e.target.value }))}
+                  placeholder="Nowe hasło (min. 8 znaków)"
+                  disabled={accountLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                />
+                <input
+                  type="password"
+                  value={accountData.newPasswordConfirm}
+                  onChange={(e) =>
+                    setAccountData((prev) => ({ ...prev, newPasswordConfirm: e.target.value }))
+                  }
+                  placeholder="Potwierdź nowe hasło"
+                  disabled={accountLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                />
+                <button
+                  type="button"
+                  onClick={handlePasswordChange}
+                  disabled={accountLoading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                >
+                  Zmień hasło
+                </button>
+              </div>
+            </div>
+          )}
+
+          {isOAuthAccount && (
+            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg">
+              Konto logowane przez OAuth. Zmiana emaila i hasła jest wyłączona.
+            </div>
+          )}
 
           <CertificationsSection
             selectedIds={selectedCertIds}

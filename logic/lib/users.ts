@@ -61,6 +61,100 @@ export async function loginUser(email: string, password: string) {
   }
 }
 
+export async function isCurrentUserOAuth(): Promise<boolean> {
+  try {
+    const user = pb.authStore.record;
+
+    if (!user) return false;
+
+    const external = await pb
+      .collection('users')
+      .listExternalAuths(user.id);
+
+    return external?.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+async function verifyCurrentPassword(currentPassword: string) {
+  const currentEmail = pb.authStore.record?.email;
+
+  if (!currentEmail) {
+    throw new Error('Brak aktywnej sesji użytkownika');
+  }
+
+  if (!currentPassword) {
+    throw new Error('Podaj aktualne hasło');
+  }
+
+  try {
+    await pb.collection('users').authWithPassword(currentEmail, currentPassword);
+  } catch {
+    throw new Error('Aktualne hasło jest nieprawidłowe');
+  }
+}
+
+export async function changeUserEmail(
+  userId: string,
+  newEmail: string,
+  currentPassword: string
+): Promise<User> {
+  const normalizedEmail = newEmail.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    throw new Error('Podaj nowy email');
+  }
+
+  if (!normalizedEmail.includes('@')) {
+    throw new Error('Podaj poprawny email');
+  }
+
+  if (await isCurrentUserOAuth()) {
+    throw new Error('Dla kont OAuth zmiana emaila jest wyłączona');
+  }
+
+  await verifyCurrentPassword(currentPassword);
+
+  try {
+    const record = await pb.collection('users').update(userId, { email: normalizedEmail });
+    return record as unknown as User;
+  } catch (error: any) {
+    throw new Error(error?.response?.message || 'Nie udało się zmienić emaila');
+  }
+}
+
+export async function changeUserPassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+  newPasswordConfirm: string
+) {
+  if (!newPassword || newPassword.length < 8) {
+    throw new Error('Nowe hasło musi mieć minimum 8 znaków');
+  }
+
+  if (newPassword !== newPasswordConfirm) {
+    throw new Error('Nowe hasła nie są identyczne');
+  }
+
+  if (await isCurrentUserOAuth()) {
+    throw new Error('Dla kont OAuth zmiana hasła jest wyłączona');
+  }
+
+  await verifyCurrentPassword(currentPassword);
+
+  try {
+    await pb.collection('users').update(userId, {
+      oldPassword: currentPassword,
+      password: newPassword,
+      passwordConfirm: newPasswordConfirm,
+    });
+  } catch (error: any) {
+    throw new Error(error?.response?.message || 'Nie udało się zmienić hasła');
+  }
+}
+
 /**
  * Zarejestruj nowego użytkownika
  */
