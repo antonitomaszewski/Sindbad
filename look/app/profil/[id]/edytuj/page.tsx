@@ -1,6 +1,5 @@
 import { redirect, notFound } from 'next/navigation';
-import { getServerUser } from '../../../../../logic/lib/users.server';
-import { getUser } from '../../../../../logic/lib/users';
+import { getUser, isCurrentServerUser } from '../../../../../logic/lib/users';
 import { getAllCertifications, getUserCertificationIds } from '../../../../../logic/lib/certifications';
 import EditProfileView from '../../../../components/profile/EditProfileView';
 
@@ -12,14 +11,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function EditProfilePage({ params }: Props) {
   const { id } = await params;
-  const currentUser = await getServerUser();
+  const isOwnProfile = await isCurrentServerUser(id);
 
-  if (!currentUser) {
+  if (!isOwnProfile) {
     redirect('/logowanie');
-  }
-
-  if (currentUser.id !== id) {
-    notFound();
   }
 
   const [freshUser, availableCertifications, userCertIds] = await Promise.all([

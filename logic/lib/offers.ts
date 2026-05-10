@@ -1,5 +1,5 @@
 import pb from './pocketbase';
-import type { Offer } from '../types/offer';
+import type { Offer, OfferFormData } from '../types/offer';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
@@ -24,8 +24,9 @@ function mapOfferToTrip(t: any) {
   return {
     id: t.id,
     title: t.title ?? t.name ?? 'Rejs',
-    date: t.date_from ?? t.date_to ?? undefined,
-  } as { id: string; title?: string; date?: string };
+    date_from: t.date_from ?? undefined,
+    date_to: t.date_to ?? undefined,
+  } as { id: string; title?: string; date_from?: string, date_to?: string };
 }
 
 // Pobierz rejsy organizatora
@@ -190,4 +191,8 @@ export function convertFormDataToOffer(
   }
 
   return offer;
+}
+
+export function isCurrentUserOrganizer(offer: Offer): boolean {
+  return pb.authStore.record?.id === offer.organizer_id;
 }

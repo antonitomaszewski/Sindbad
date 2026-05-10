@@ -4,7 +4,8 @@ import Link from 'next/link';
 type Trip = {
   id: string;
   title?: string;
-  date?: string;
+  date_from?: string;
+  date_to?: string;
 };
 
 export default function TripHistory({
@@ -27,7 +28,18 @@ export default function TripHistory({
               <Link href={`/oferta/${t.id}`} className="text-blue-600 hover:underline">
                 <span className="font-medium">{t.title ?? 'Szczegóły rejsu'}</span>
               </Link>
-              <span className="text-sm text-gray-500">{t.date ?? ''}</span>
+              <span className="text-sm text-gray-500">
+                {new Intl.DateTimeFormat('pl-PL', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                }).format(new Date(t.date_from))}
+                {t.date_to && ` – ${new Intl.DateTimeFormat('pl-PL', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                }).format(new Date(t.date_to))}`}
+              </span>
             </li>
           ))}
         </ul>

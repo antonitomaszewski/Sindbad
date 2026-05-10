@@ -2,19 +2,24 @@ import UserHeader from './UserHeader';
 import UserBio from './UserBio';
 import TripHistory from './TripHistory';
 import Certifications from './Certifications';
+import MyBookingsList from '../booking/MyBookingsList';
 import type { User } from '../../../logic/types/user';
+import type { BookingWithOffer } from '../../../logic/types/booking';
 import Link from 'next/link';
 
 export default function UserProfile({
   user,
   organizedTrips,
   participatedTrips,
+  isOwnProfile = false,
+  myBookings = [],
 }: {
   user: User;
   organizedTrips: { id: string; title?: string; date?: string }[];
   participatedTrips: { id: string; title?: string; date?: string }[];
+  isOwnProfile?: boolean;
+  myBookings?: BookingWithOffer[];
 }) {
-  const isOwnProfile = true; // Replace with actual logic to determine if it's the user's own profile
 
   return (
     <div className="max-w-[1100px] mx-auto p-8 space-y-8">
@@ -25,7 +30,8 @@ export default function UserProfile({
           <UserBio bio={user.bio} />
 
           <TripHistory title="Rejsy organizowane" trips={organizedTrips} />
-          <TripHistory title="Rejsy jako załogant" trips={participatedTrips} />
+          {/* <TripHistory title="Rejsy jako załogant" trips={participatedTrips} /> */}
+          {isOwnProfile && <MyBookingsList bookings={myBookings} />}
         </div>
 
         <aside className="space-y-6">
