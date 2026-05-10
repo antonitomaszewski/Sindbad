@@ -24,8 +24,9 @@ function mapOfferToTrip(t: any) {
   return {
     id: t.id,
     title: t.title ?? t.name ?? 'Rejs',
-    date: t.date_from ?? t.date_to ?? undefined,
-  } as { id: string; title?: string; date?: string };
+    date_from: t.date_from ?? undefined,
+    date_to: t.date_to ?? undefined,
+  } as { id: string; title?: string; date_from?: string, date_to?: string };
 }
 
 // Pobierz rejsy organizatora

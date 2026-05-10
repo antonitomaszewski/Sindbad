@@ -13,7 +13,7 @@ interface ProfilePageProps {
   params: Promise<{ id: string }>;
 }
 
-type Trip = { id: string; title?: string; date?: string };
+type Trip = { id: string; title?: string; date_from?: string, date_to?: string };
 
 export default function ProfilPage({ params }: ProfilePageProps) {
   const { id } = use(params);
