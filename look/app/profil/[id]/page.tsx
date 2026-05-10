@@ -1,5 +1,6 @@
 "use client";
 import { use, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { isCurrentServerUser } from '../../../../logic/lib/users';
 import { getTripsByOrganizer, getTripsByParticipant } from '../../../../logic/lib/offers';
 import { getUserBookingsWithOffers } from '../../../../logic/lib/bookings';
@@ -17,6 +18,7 @@ type Trip = { id: string; title?: string; date_from?: string, date_to?: string }
 
 export default function ProfilPage({ params }: ProfilePageProps) {
   const { id } = use(params);
+  const searchParams = useSearchParams();
   const { user, loading: userLoading, error: userError } = useUser(id);
   const [organizedTrips, setOrganizedTrips] = useState<Trip[]>([]);
   const [participatedTrips, setParticipatedTrips] = useState<Trip[]>([]);
@@ -62,6 +64,7 @@ export default function ProfilPage({ params }: ProfilePageProps) {
   }
 
   const isOwnProfile = isCurrentServerUser(user);
+  const registrationSuccess = searchParams.get('registered') === '1';
 
   return (
     <UserProfile
@@ -70,6 +73,7 @@ export default function ProfilPage({ params }: ProfilePageProps) {
       participatedTrips={participatedTrips}
       isOwnProfile={isOwnProfile}
       myBookings={myBookings}
+      successMessage={registrationSuccess ? 'Konto utworzone i zalogowano pomyślnie. Sprawdź skrzynkę mailową i potwierdź adres email.' : undefined}
     />
   );
 }

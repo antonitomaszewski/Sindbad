@@ -13,16 +13,24 @@ export default function UserProfile({
   participatedTrips,
   isOwnProfile = false,
   myBookings = [],
+  successMessage,
 }: {
   user: User;
   organizedTrips: { id: string; title?: string; date?: string }[];
   participatedTrips: { id: string; title?: string; date?: string }[];
   isOwnProfile?: boolean;
   myBookings?: BookingWithOffer[];
+  successMessage?: string;
 }) {
 
   return (
     <div className="max-w-[1100px] mx-auto p-8 space-y-8">
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+          {successMessage}
+        </div>
+      )}
+
       <UserHeader user={user} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

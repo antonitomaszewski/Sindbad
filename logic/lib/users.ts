@@ -75,6 +75,10 @@ export async function registerUser(
     if (name) data.name = name;
     
     const user = await pb.collection('users').create(data);
+
+    // Krok 3: wyślij mail weryfikacyjny po rejestracji.
+    await pb.collection('users').requestVerification(email);
+
     return user as unknown as User;
   } catch (error: any) {
     // Przekaż szczegółowy błąd z PocketBase (np. "User with email already exists")
