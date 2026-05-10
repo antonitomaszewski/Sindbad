@@ -1,5 +1,6 @@
 import pb from './pocketbase';
 import type { Offer, OfferFormData } from '../types/offer';
+import type { BookingStatus } from '../types/booking';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
@@ -195,4 +196,26 @@ export function convertFormDataToOffer(
 
 export function isCurrentUserOrganizer(offer: Offer): boolean {
   return pb.authStore.record?.id === offer.organizer_id;
+}
+
+export async function updateAvailableSeats({
+  offer,
+  previousStatus,
+  newStatus,
+}: {
+  offer: Offer;
+  previousStatus: BookingStatus;
+  newStatus: BookingStatus;
+}) {
+  if (
+    newStatus === 'confirmed' &&
+    previousStatus !== 'confirmed' && offer.seats_available
+  ) {
+    await updateOffer(offer.id, {
+      seats_available: Math.max(
+        0,
+        offer.seats_available - 1
+      ),
+    });
+  }
 }
