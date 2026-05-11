@@ -1,14 +1,24 @@
 import pb from './pocketbase';
 import type { Offer, OfferFormData } from '../types/offer';
 import type { BookingStatus } from '../types/booking';
+import { sendTripAlertNotifications } from './tripAlerts';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
   return result as unknown as Offer[];
 }
 
-export async function createOffer(data: Partial<Offer>) {
-  return await pb.collection('offers').create(data);
+export async function createOffer(data: Partial<Offer>): Promise<Offer> {
+  const record = await pb.collection('offers').create(data);
+
+  // Wyślij powiadomienia o nowej ofercie pasującym alertom
+  // Fire-and-forget, nie czekamy na wynik
+  const offer = record as unknown as Offer;
+  sendTripAlertNotifications(offer).catch((err) => {
+    console.warn('sendTripAlertNotifications failed:', err);
+  });
+
+  return offer;
 }
 
 export async function getOfferById(id: string): Promise<Offer | null> {
