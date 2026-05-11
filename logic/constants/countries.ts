@@ -35,6 +35,10 @@ export const COUNTRIES: Country[] = [
   { code: 'UA', name: 'Ukraine', namePL: 'Ukraina' },
 ];
 
+export const COUNTRIES_BY_NAME_PL = [...COUNTRIES].sort((a, b) =>
+  a.namePL.localeCompare(b.namePL, 'pl')
+);
+
 /**
  * Pobierz polską nazwę kraju z kodu ISO.
  * Zwraca kod jeśli kraj nie jest na liście.

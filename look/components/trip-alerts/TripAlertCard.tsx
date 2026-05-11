@@ -10,10 +10,11 @@ import type { TripAlert } from '@/logic/types/tripAlert';
 interface TripAlertCardProps {
   alert: TripAlert;
   onDelete: (alertId: string) => void;
+  onEdit: (alert: TripAlert) => void;
   deleting?: boolean;
 }
 
-export function TripAlertCard({ alert, onDelete, deleting = false }: TripAlertCardProps) {
+export function TripAlertCard({ alert, onDelete, onEdit, deleting = false }: TripAlertCardProps) {
   const { user: organizer } = useUser(alert.organizer_id || null);
   const term = formatDateRange(alert.date_from, alert.date_to);
 
@@ -23,7 +24,7 @@ export function TripAlertCard({ alert, onDelete, deleting = false }: TripAlertCa
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-            {alert.country ? getCountryName(alert.country) : 'Dowolny kraj'}
+              {alert.country ? getCountryName(alert.country) : 'Dowolny kraj'}
             </h3>
             <p className="text-sm text-gray-500">
               Powiadom mnie o podobnych rejsach
@@ -43,7 +44,14 @@ export function TripAlertCard({ alert, onDelete, deleting = false }: TripAlertCa
           </p>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          <Button
+            onClick={() => onEdit(alert)}
+            variant="secondary"
+            className="!flex-none !py-2 !px-4"
+          >
+            Edytuj
+          </Button>
           <Button
             onClick={() => onDelete(alert.id)}
             variant="secondary"

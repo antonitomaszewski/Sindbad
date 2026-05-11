@@ -64,7 +64,7 @@ export function CreateTripAlertButton({ offer }: CreateTripAlertButtonProps) {
                   date_to: offer.date_to,
                   organizer_id: offer.organizer_id,
                 }}
-                onCreated={() => setIsOpen(false)}
+                onSaved={() => setIsOpen(false)}
                 onCancel={() => setIsOpen(false)}
               />
             </Card>

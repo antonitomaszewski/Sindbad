@@ -1,19 +1,23 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createTripAlert } from '@/logic/lib/tripAlerts';
+import { createTripAlert, updateTripAlert } from '@/logic/lib/tripAlerts';
 import { getAllOrganizers } from '@/logic/lib/users';
-import { COUNTRIES } from '@/logic/constants/countries';
+import { COUNTRIES_BY_NAME_PL } from '@/logic/constants/countries';
 import { Button } from '@/look/components/ui/Button';
+import { DateRangePicker } from '@/look/components/ui/DateRangePicker';
+import type { TripAlert } from '@/logic/types/tripAlert';
 
 interface TripAlertFormProps {
   userId: string;
+  alert?: TripAlert;
   initialValues?: {
     country?: string;
     date_from?: string;
     date_to?: string;
     organizer_id?: string;
   };
+  onSaved?: () => void;
   onCreated?: () => void;
   onCancel?: () => void;
 }
@@ -25,14 +29,17 @@ interface Organizer {
 
 export function TripAlertForm({
   userId,
+  alert,
   initialValues,
+  onSaved,
   onCreated,
   onCancel,
 }: TripAlertFormProps) {
-  const [country, setCountry] = useState(initialValues?.country || '');
-  const [dateFrom, setDateFrom] = useState(initialValues?.date_from || '');
-  const [dateTo, setDateTo] = useState(initialValues?.date_to || '');
-  const [organizerId, setOrganizerId] = useState(initialValues?.organizer_id || '');
+  const sourceValues = alert ?? initialValues;
+  const [country, setCountry] = useState(sourceValues?.country || '');
+  const [dateFrom, setDateFrom] = useState(parseDate(sourceValues?.date_from));
+  const [dateTo, setDateTo] = useState(parseDate(sourceValues?.date_to));
+  const [organizerId, setOrganizerId] = useState(sourceValues?.organizer_id || '');
   const [organizers, setOrganizers] = useState<Organizer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -51,18 +58,24 @@ export function TripAlertForm({
     try {
       if (!country) {
         setError('Wybierz kraj dla alertu.');
-        setLoading(false);
         return;
       }
 
-      await createTripAlert(userId, {
+      const payload = {
         country,
-        date_from: dateFrom || undefined,
-        date_to: dateTo || undefined,
+        date_from: formatDate(dateFrom),
+        date_to: formatDate(dateTo),
         organizer_id: organizerId || undefined,
-      });
+      };
 
-      setSuccess('Alert został zapisany.');
+      if (alert) {
+        await updateTripAlert(alert.id, payload);
+      } else {
+        await createTripAlert(userId, payload);
+      }
+
+      setSuccess(alert ? 'Alert został zaktualizowany.' : 'Alert został zapisany.');
+      onSaved?.();
       onCreated?.();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Nie udało się utworzyć alertu';
@@ -85,7 +98,7 @@ export function TripAlertForm({
           required
         >
           <option value="">Wybierz kraj</option>
-          {COUNTRIES.map((c) => (
+          {COUNTRIES_BY_NAME_PL.map((c) => (
             <option key={c.code} value={c.code}>
               {c.namePL}
             </option>
@@ -93,31 +106,14 @@ export function TripAlertForm({
         </select>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Od kiedy
-          </label>
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Do kiedy
-          </label>
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-          />
-        </div>
-      </div>
+      <DateRangePicker
+        startLabel="Od kiedy"
+        endLabel="Do kiedy"
+        startDate={dateFrom}
+        endDate={dateTo}
+        onStartDateChange={setDateFrom}
+        onEndDateChange={setDateTo}
+      />
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -142,7 +138,7 @@ export function TripAlertForm({
 
       <div className="flex gap-3">
         <Button className="justify-center" disabled={loading}>
-          {loading ? 'Zapisywanie...' : 'Zapisz alert'}
+          {loading ? 'Zapisywanie...' : alert ? 'Zapisz zmiany' : 'Zapisz alert'}
         </Button>
         {onCancel && (
           <button
@@ -157,4 +153,14 @@ export function TripAlertForm({
       </div>
     </form>
   );
+}
+
+function parseDate(value?: string): Date | null {
+  if (!value) return null;
+  const parsed = new Date(`${value}T00:00:00`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatDate(value: Date | null): string | undefined {
+  return value ? value.toISOString().split('T')[0] : undefined;
 }

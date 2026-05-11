@@ -35,6 +35,32 @@ export async function createTripAlert(
 }
 
 /**
+ * Zaktualizuj alert o rejsach
+ */
+export async function updateTripAlert(
+  alertId: string,
+  data: {
+    country?: string;
+    date_from?: string;
+    date_to?: string;
+    organizer_id?: string;
+  }
+): Promise<TripAlert> {
+  try {
+    const record = await pb.collection(ALERTS_COLLECTION).update(alertId, {
+      country: data.country ?? '',
+      date_from: data.date_from ?? '',
+      date_to: data.date_to ?? '',
+      organizer_id: data.organizer_id ?? '',
+    });
+
+    return record as unknown as TripAlert;
+  } catch (err: any) {
+    throw new Error(err?.response?.message || 'Nie udało się zaktualizować alertu');
+  }
+}
+
+/**
  * Pobierz alerty użytkownika
  */
 export async function getUserTripAlerts(userId: string): Promise<TripAlert[]> {
