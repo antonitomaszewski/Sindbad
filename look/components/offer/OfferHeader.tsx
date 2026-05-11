@@ -1,6 +1,7 @@
 import { Card } from '@/look/components/ui/Card';
 import { OFFER_LABELS } from '@/look/constants/offer';
 import { formatDateRange } from '@/look/utils/dateFormatter';
+import { getCountryName } from '@/logic/constants/countries';
 
 interface OfferHeaderProps {
   title: string;
@@ -55,7 +56,7 @@ export function OfferHeader({
         <div className="bg-gray-50 rounded-lg p-4">
           <h3 className="font-semibold text-gray mb-2">{OFFER_LABELS.LOCATION}</h3>
           <div className="space-y-1">
-            {country && <p className="text-main">{country}</p>}
+            {country && <p className="text-main">{getCountryName(country)}</p>}
             {port && <p className="text-main">{port}</p>}
           </div>
         </div>

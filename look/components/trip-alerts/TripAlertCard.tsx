@@ -4,6 +4,7 @@ import { useUser } from '@/look/hooks/useUser';
 import { Card } from '@/look/components/ui/Card';
 import { Button } from '@/look/components/ui/Button';
 import { formatDateRange } from '@/logic/lib/dates';
+import { getCountryName } from '@/logic/constants/countries';
 import type { TripAlert } from '@/logic/types/tripAlert';
 
 interface TripAlertCardProps {
@@ -22,7 +23,7 @@ export function TripAlertCard({ alert, onDelete, deleting = false }: TripAlertCa
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-              {alert.country || 'Dowolny kraj'}
+            {alert.country ? getCountryName(alert.country) : 'Dowolny kraj'}
             </h3>
             <p className="text-sm text-gray-500">
               Powiadom mnie o podobnych rejsach

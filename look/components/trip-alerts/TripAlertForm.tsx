@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createTripAlert } from '@/logic/lib/tripAlerts';
+import { getAllOrganizers } from '@/logic/lib/users';
+import { COUNTRIES } from '@/logic/constants/countries';
 import { Button } from '@/look/components/ui/Button';
 
 interface TripAlertFormProps {
@@ -16,6 +18,11 @@ interface TripAlertFormProps {
   onCancel?: () => void;
 }
 
+interface Organizer {
+  id: string;
+  name: string;
+}
+
 export function TripAlertForm({
   userId,
   initialValues,
@@ -26,9 +33,14 @@ export function TripAlertForm({
   const [dateFrom, setDateFrom] = useState(initialValues?.date_from || '');
   const [dateTo, setDateTo] = useState(initialValues?.date_to || '');
   const [organizerId, setOrganizerId] = useState(initialValues?.organizer_id || '');
+  const [organizers, setOrganizers] = useState<Organizer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    getAllOrganizers().then((list) => setOrganizers(list));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,23 +49,24 @@ export function TripAlertForm({
     setSuccess('');
 
     try {
-      if (!country.trim()) {
+      if (!country) {
         setError('Wybierz kraj dla alertu.');
         setLoading(false);
         return;
       }
 
       await createTripAlert(userId, {
-        country: country.trim(),
+        country,
         date_from: dateFrom || undefined,
         date_to: dateTo || undefined,
-        organizer_id: organizerId.trim() || undefined,
+        organizer_id: organizerId || undefined,
       });
 
       setSuccess('Alert został zapisany.');
       onCreated?.();
-    } catch (err: any) {
-      setError(err?.message || 'Nie udało się utworzyć alertu');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Nie udało się utworzyć alertu';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -63,16 +76,21 @@ export function TripAlertForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Kraj
+          Kraj <span className="text-red-500">*</span>
         </label>
-        <input
-          type="text"
+        <select
           value={country}
           onChange={(e) => setCountry(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-          placeholder="Np. Grecja"
           required
-        />
+        >
+          <option value="">Wybierz kraj</option>
+          {COUNTRIES.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.namePL}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -103,15 +121,20 @@ export function TripAlertForm({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Organizator ID
+          Organizator (opcjonalnie)
         </label>
-        <input
-          type="text"
+        <select
           value={organizerId}
           onChange={(e) => setOrganizerId(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-          placeholder="Opcjonalnie"
-        />
+        >
+          <option value="">Wszyscy organizatorzy</option>
+          {organizers.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

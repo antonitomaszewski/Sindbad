@@ -111,7 +111,7 @@ export default function SearchPanel() {
               >
                 <option value="">Wszystkie</option>
                 {countries.map((c) => (
-                  <option key={c.code} value={c.name}>{c.namePL}</option>
+                  <option key={c.code} value={c.code}>{c.namePL}</option>
                 ))}
               </select>
             </div>
