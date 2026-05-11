@@ -23,6 +23,11 @@ export interface BookingWithOffer extends Booking {
   };
 }
 
+export interface OfferParticipant {
+  userId: string;
+  name: string;
+}
+
 export interface GuestBookingData {
   name: string;
   email?: string;

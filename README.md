@@ -31,17 +31,17 @@ ZROBIONE
 <!-- 12. weryfikacja maila - verified: false/true narazie działa jedynie dla betylhiro@gmail.com, potrzebowałbym swojego osobnego DNS, domeny -->
 <!-- 11. zmiana maila, zmiana hasła na profilu -->
 <!-- profil oferty zawiera liczbę dostępnych miejsc -->
+<!-- 4. można zrobić public/private zamiast tych relacji kiedy wyswietlać rejsy a kiedy nie -->
+<!-- 13. użytkownik, który ma potwierdzoną rezerwację / jest organizatorem -- widzi jacy inni użytkownicy są zapisani (to nie zmienia ich private/public profilu) -->
 
 
 dobra, zastanówmy sie co trzeba dorobić
 4. opcję dostawania powiadomienia, gdy pojawi się rejs w terminie/miejscu, który nas interesuje (czyli tworzenie takich zgłoszeń/marzeń)
 wtedy dostawalibysmy powiadomienia mailowe
-4. można zrobić public/private zamiast tych relacji kiedy wyswietlać rejsy a kiedy nie
 5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację, 
 8. mail z zapytaniem
 9. uzytkownik może zapisac swoje marzenia: kraj, termin, organizator
 9. mail z wyszukiwaniem do uzytkownika: kraj, termin, organizator
-13. użytkownik, który ma potwierdzoną rezerwację / jest organizatorem -- widzi jacy inni użytkownicy są zapisani (to nie zmienia ich private/public profilu)
 
 
 
