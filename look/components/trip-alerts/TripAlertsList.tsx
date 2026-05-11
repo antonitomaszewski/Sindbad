@@ -91,7 +91,7 @@ export function TripAlertsList() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4">
+      <div className="space-y-3">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Alerty rejsów</h2>
           <p className="text-sm text-gray-600">Powiadomimy Cię, gdy pojawią się podobne rejsy.</p>
@@ -99,7 +99,7 @@ export function TripAlertsList() {
         <button
           type="button"
           onClick={handleCreateClick}
-          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-50"
+          className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-400 hover:bg-gray-50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-main/40"
         >
           Dodaj alert rejsu
         </button>

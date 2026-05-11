@@ -48,14 +48,14 @@ export function TripAlertCard({ alert, onDelete, onEdit, deleting = false }: Tri
           <Button
             onClick={() => onEdit(alert)}
             variant="secondary"
-            className="!flex-none !py-2 !px-4"
+            className="!flex-none !py-2 !px-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
           >
             Edytuj
           </Button>
           <Button
             onClick={() => onDelete(alert.id)}
             variant="secondary"
-            className="!flex-none !py-2 !px-4"
+            className="!flex-none !py-2 !px-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
             disabled={deleting}
           >
             {deleting ? 'Usuwanie...' : 'Usuń'}
