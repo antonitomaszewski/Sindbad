@@ -37,15 +37,19 @@ ZROBIONE
 <!-- 9. uzytkownik może zapisac swoje marzenia: kraj, termin, organizator -->
 <!-- 4. opcję dostawania powiadomienia, gdy pojawi się rejs w terminie/miejscu, który nas interesuje (czyli tworzenie takich zgłoszeń/marzeń) wtedy dostawalibysmy powiadomienia mailowe -->
 <!-- 9. mail z wyszukiwaniem do uzytkownika: kraj, termin, organizator -->
+<!-- 8. mail z zapytaniem (to jest drobnostka, można usunąć jeśli nie zdążę skończyć) -->
+<!-- 10. można by dodać komentarze, opinie organizatorów/rejsów -->
 
 DO ZROBIENIA
 dobra, zastanówmy sie co trzeba dorobić
-8. mail z zapytaniem (to jest drobnostka, można usunąć jeśli nie zdążę skończyć)
-10. można by dodać komentarze, opinie organizatorów/rejsów
 9. opcja zapisz rejs - <3
 11. mapa ?? (to chyba na koniec)
 5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
 6. obecnie nie wyświetlam rejsów z przeszłości jako załogant (a może powinienem)
+
+obecnie profile są dostępne jedynie dla zalogowanych użytkowników
+jak jest po rejsie, to można dodawać komentarze, nie można wysyłać rezerwacji, ale mozna wysłać zapytanie
+
 
 
 
