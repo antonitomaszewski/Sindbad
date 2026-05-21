@@ -7,9 +7,10 @@ interface BookingModalProps {
   offerId: string;
   onClose: () => void;
   onSuccess: () => void;
+  canReserve?: boolean;
 }
 
-export default function BookingModal({ offerId, onClose, onSuccess }: BookingModalProps) {
+export default function BookingModal({ offerId, onClose, onSuccess, canReserve = true }: BookingModalProps) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -23,6 +24,12 @@ export default function BookingModal({ offerId, onClose, onSuccess }: BookingMod
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!canReserve) {
+      setError('Brak dostępnych miejsc');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -131,10 +138,10 @@ export default function BookingModal({ offerId, onClose, onSuccess }: BookingMod
           <div className="flex gap-3">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !canReserve}
               className="flex-1 py-3 px-6 rounded-lg font-semibold bg-main text-white hover:bg-green-dark disabled:opacity-50"
             >
-              {loading ? 'Wysyłanie...' : 'Potwierdź'}
+              {loading ? 'Wysyłanie...' : canReserve ? 'Potwierdź' : 'Brak miejsc'}
             </button>
             <button
               type="button"

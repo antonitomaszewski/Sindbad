@@ -1,6 +1,7 @@
 "use client";
 import { use, useEffect, useState } from 'react';
-import { isCurrentServerUser } from '../../../../logic/lib/users';
+import { useSearchParams } from 'next/navigation';
+import { isCurrentServerUser, getCurrentUser, canAccessProfile } from '../../../../logic/lib/users';
 import { getTripsByOrganizer, getTripsByParticipant } from '../../../../logic/lib/offers';
 import { getUserBookingsWithOffers } from '../../../../logic/lib/bookings';
 import type { BookingWithOffer } from '../../../../logic/types/booking';
@@ -17,15 +18,27 @@ type Trip = { id: string; title?: string; date_from?: string, date_to?: string }
 
 export default function ProfilPage({ params }: ProfilePageProps) {
   const { id } = use(params);
+  const searchParams = useSearchParams();
   const { user, loading: userLoading, error: userError } = useUser(id);
   const [organizedTrips, setOrganizedTrips] = useState<Trip[]>([]);
   const [participatedTrips, setParticipatedTrips] = useState<Trip[]>([]);
   const [myBookings, setMyBookings] = useState<BookingWithOffer[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
   useEffect(() => {
     const loadProfileData = async () => {
       try {
+        // Sprawdź dostęp do profilu
+        const currentUser = getCurrentUser();
+        const access = await canAccessProfile(id, currentUser?.id);
+        setHasAccess(access);
+
+        if (!access) {
+          setDataLoading(false);
+          return;
+        }
+
         const [organized, participated, bookings] = await Promise.all([
           getTripsByOrganizer(id),
           getTripsByParticipant(id),
@@ -49,19 +62,24 @@ export default function ProfilPage({ params }: ProfilePageProps) {
     return <LoadingState message="Ładowanie profilu..." />;
   }
 
-  if (userError || !user) {
+  if (userError || !user || hasAccess === false) {
     return (
       <NotFoundState
         title="404"
-        message="Użytkownik nie znaleziony"
-        description="Nie udało się odnaleźć profilu użytkownika."
+        message="Profil nie jest dostępny"
+        description="Nie masz dostępu do tego profilu lub profil nie istnieje."
         backUrl="/kalendarz"
         backText="Powrót do kalendarza"
       />
     );
   }
 
+  if (hasAccess === null) {
+    return <LoadingState message="Ładowanie profilu..." />;
+  }
+
   const isOwnProfile = isCurrentServerUser(user);
+  const registrationSuccess = searchParams.get('registered') === '1';
 
   return (
     <UserProfile
@@ -70,6 +88,7 @@ export default function ProfilPage({ params }: ProfilePageProps) {
       participatedTrips={participatedTrips}
       isOwnProfile={isOwnProfile}
       myBookings={myBookings}
+      successMessage={registrationSuccess ? 'Konto utworzone i zalogowano pomyślnie. Sprawdź skrzynkę mailową i potwierdź adres email.' : undefined}
     />
   );
 }

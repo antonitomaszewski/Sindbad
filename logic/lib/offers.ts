@@ -1,14 +1,24 @@
 import pb from './pocketbase';
 import type { Offer, OfferFormData } from '../types/offer';
 import type { BookingStatus } from '../types/booking';
+import { sendTripAlertNotifications } from './tripAlerts';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
   return result as unknown as Offer[];
 }
 
-export async function createOffer(data: Partial<Offer>) {
-  return await pb.collection('offers').create(data);
+export async function createOffer(data: Partial<Offer>): Promise<Offer> {
+  const record = await pb.collection('offers').create(data);
+
+  // Wyślij powiadomienia o nowej ofercie pasującym alertom
+  // Fire-and-forget, nie czekamy na wynik
+  const offer = record as unknown as Offer;
+  sendTripAlertNotifications(offer).catch((err) => {
+    console.warn('sendTripAlertNotifications failed:', err);
+  });
+
+  return offer;
 }
 
 export async function getOfferById(id: string): Promise<Offer | null> {
@@ -66,6 +76,51 @@ export async function getTripsByParticipant(userId: string) {
   } catch (err) {
     console.error('getTripsByParticipant error', err);
     return [];
+  }
+}
+
+/**
+ * Sprawdź czy użytkownik uczestniczy w ofercie organizowanej przez drugiego użytkownika
+ * (lub vice versa)
+ */
+export async function haveCommonOffers(userId1: string, userId2: string): Promise<boolean> {
+  try {
+    // Oferowań organizowana przez userId2, w których userId1 uczestniczy
+    const offersFromUser2: any[] = await (pb.collection('offers') as any).getFullList(
+      { filter: `organizer_id = "${userId2}"` },
+      200
+    );
+
+    const user2OfferIds = new Set(offersFromUser2.map((o) => o.id));
+
+    // Sprawdź czy userId1 ma booking w którejś z ofert organizowanej przez userId2
+    const bookingsUser1 = await (pb.collection('bookings') as any).getFullList(
+      { filter: `user_id = "${userId1}"` },
+      200
+    );
+
+    const hasBookingInUser2Offers = bookingsUser1.some((b: any) => user2OfferIds.has(b.offer_id));
+
+    if (hasBookingInUser2Offers) return true;
+
+    // Sprawdź odwrotnie: czy userId2 ma booking w ofercie organizowanej przez userId1
+    const offersFromUser1: any[] = await (pb.collection('offers') as any).getFullList(
+      { filter: `organizer_id = "${userId1}"` },
+      200
+    );
+
+    const user1OfferIds = new Set(offersFromUser1.map((o) => o.id));
+    const bookingsUser2 = await (pb.collection('bookings') as any).getFullList(
+      { filter: `user_id = "${userId2}"` },
+      200
+    );
+
+    const hasBookingInUser1Offers = bookingsUser2.some((b: any) => user1OfferIds.has(b.offer_id));
+
+    return hasBookingInUser1Offers;
+  } catch (err) {
+    console.warn('haveCommonOffers error:', err);
+    return false;
   }
 }
 
@@ -196,6 +251,12 @@ export function convertFormDataToOffer(
 
 export function isCurrentUserOrganizer(offer: Offer): boolean {
   return pb.authStore.record?.id === offer.organizer_id;
+}
+
+export function validateSeatsAvailable(offer: Offer) {
+  if (offer.seats_available !== undefined && offer.seats_available <= 0) {
+    throw new Error('Brak dostępnych miejsc');
+  }
 }
 
 export async function updateAvailableSeats({

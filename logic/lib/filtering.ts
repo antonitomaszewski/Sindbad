@@ -12,18 +12,14 @@ interface FilterOptions {
 export function filterOffers(
   offers: Offer[],
   filters: FilterOptions,
-  countries: { code: string; name: string; namePL: string }[]
+  // Argument countries zachowany dla zgodności ze starymi call-sites, nie jest już używany.
+  _countries?: { code: string; name: string; namePL: string }[]
 ): Offer[] {
   let results = offers;
 
   if (filters.country) {
-    const selectedCountry = countries.find(
-      (c) => c.name === filters.country || c.namePL === filters.country
-    );
-    results = results.filter((o) => {
-      if (!o.country) return false;
-      return o.country === selectedCountry?.name || o.country === selectedCountry?.namePL;
-    });
+    // Przechowujemy country jako ISO code (np. "PL"), więc porównujemy bezpośrednio.
+    results = results.filter((o) => o.country === filters.country);
   }
 
   if (filters.port) {

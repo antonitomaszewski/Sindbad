@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { formatDate } from '../../../logic/lib/dates';
 import { Offer } from '../../../logic/types/offer';
 import { CalendarIcon, LocationIcon, UsersIcon, UserIcon } from './Icons';
+import { getCountryName } from '../../../logic/constants/countries';
 
 interface OfferCardProps {
   offer: Offer;
@@ -38,7 +39,7 @@ export default function OfferCard({ offer, coverUrl, organizerName }: OfferCardP
         <div className="text-sm text-gray-600 flex items-center gap-1">
           <LocationIcon />
           <span className="line-clamp-1">
-            {offer.port ?? offer.location ?? '—'} • {offer.country ?? '—'}
+            {offer.port ?? offer.location ?? '—'} • {offer.country ? getCountryName(offer.country) : '—'}
           </span>
         </div>
 

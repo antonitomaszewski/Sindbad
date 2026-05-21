@@ -1,7 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import SearchResults from './SearchResults';
 import { searchOffers } from '../../../logic/lib/offers';
 import { getAllCountries } from '../../../logic/lib/countries';
@@ -10,6 +8,7 @@ import { dateToString } from '../../../logic/lib/dates';
 import { filterOffers } from '../../../logic/lib/filtering';
 import { loadOfferImages, loadOrganizerNames } from '../../../logic/lib/offerData';
 import { Offer } from '../../../logic/types/offer';
+import { DateRangePicker } from '@/look/components/ui/DateRangePicker';
 
 interface Filters {
   country: string;
@@ -111,7 +110,7 @@ export default function SearchPanel() {
               >
                 <option value="">Wszystkie</option>
                 {countries.map((c) => (
-                  <option key={c.code} value={c.name}>{c.namePL}</option>
+                  <option key={c.code} value={c.code}>{c.namePL}</option>
                 ))}
               </select>
             </div>
@@ -140,29 +139,14 @@ export default function SearchPanel() {
               </select>
             </div>
 
-            <div>
-              <label className="block mb-1 text-sm font-medium">Data wyjazdu (od)</label>
-              <DatePicker
-                selected={dateFrom}
-                onChange={(date : any) => setDateFrom(date)}
-                dateFormat="dd.MM.yyyy"
-                placeholderText="Wybierz datę"
-                isClearable
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1 text-sm font-medium">Data wyjazdu (do)</label>
-              <DatePicker
-                selected={dateTo}
-                onChange={(date: any) => setDateTo(date)}
-                dateFormat="dd.MM.yyyy"
-                placeholderText="Wybierz datę"
-                isClearable
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <DateRangePicker
+              startLabel="Data wyjazdu (od)"
+              endLabel="Data wyjazdu (do)"
+              startDate={dateFrom}
+              endDate={dateTo}
+              onStartDateChange={setDateFrom}
+              onEndDateChange={setDateTo}
+            />
 
             <div>
               <label className="block mb-1 text-sm font-medium">Cena (zł)</label>

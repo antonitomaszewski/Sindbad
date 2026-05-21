@@ -1,11 +1,17 @@
 import pb from './pocketbase';
-import type { Booking, BookingStatus, BookingWithOffer } from '../types/booking';
-import { getOfferById } from './offers';
-import { sendBookingStatusEmail, sendBookingEmails } from './emails';
+import type {
+  Booking,
+  BookingStatus,
+  BookingWithOffer,
+  GuestBookingData,
+  OfferParticipant,
+} from '../types/booking';
 import { RecordModel } from 'pocketbase';
-import {updateAvailableSeats} from './offers';
+import { getOfferById, updateAvailableSeats, validateSeatsAvailable } from './offers';
+import { sendBookingStatusEmail, sendBookingEmails } from './emails';
 import { Offer } from '../types/offer';
-import { GuestBookingData } from '../types/booking';
+
+const BOOKINGS_COLLECTION = 'bookings';
 
 function mapRecordToBooking(record: RecordModel): Booking {
   return {
@@ -60,17 +66,14 @@ function buildBookingData(
   message?: string,
   guestData?: GuestBookingData
 ) {
-  const isLoggedIn = pb.authStore.isValid;
-
   const data: any = {
     offer_id: offerId,
     status: 'pending',
     message: message?.trim() || '',
   };
 
-  if (isLoggedIn) {
+  if (pb.authStore.isValid) {
     data.user_id = pb.authStore.record?.id;
-
     return data;
   }
 
@@ -79,6 +82,33 @@ function buildBookingData(
   data.guest_phone = guestData?.phone || '';
 
   return data;
+}
+
+async function listBookingsByFilter(filter: string): Promise<Booking[]> {
+  const records = await pb.collection(BOOKINGS_COLLECTION).getFullList({
+    filter,
+    sort: '-created',
+  });
+
+  return records.map(mapRecordToBooking);
+}
+
+async function hasConfirmedBookingForOffer(offerId: string, userId: string): Promise<boolean> {
+  const list = await pb.collection(BOOKINGS_COLLECTION).getList(1, 1, {
+    filter: `offer_id = "${offerId}" && user_id = "${userId}" && status = "confirmed"`,
+  });
+
+  return list.totalItems > 0;
+}
+
+async function getConfirmedOfferIdsForUser(userId: string): Promise<Set<string>> {
+  const bookings = await getUserBookings(userId);
+
+  return new Set(
+    bookings
+      .filter((booking) => booking.status === 'confirmed')
+      .map((booking) => booking.offer_id)
+  );
 }
 
 export async function createBooking(
@@ -95,6 +125,7 @@ export async function createBooking(
   }
 
   validateOwnOfferBooking(offer);
+  validateSeatsAvailable(offer);
 
   const data = buildBookingData(
     offerId,
@@ -102,7 +133,7 @@ export async function createBooking(
     guestData
   );
 
-  const record = await pb.collection('bookings').create(data);
+  const record = await pb.collection(BOOKINGS_COLLECTION).create(data);
 
   const booking = mapRecordToBooking(record);
 
@@ -117,45 +148,39 @@ export async function createBooking(
 }
 
 export async function getUserBookings(userId: string): Promise<Booking[]> {
-  const records = await pb.collection('bookings').getFullList({
-    filter: `user_id = "${userId}"`,
-    sort: '-created',
-  });
-
-  return records.map(mapRecordToBooking);
+  return listBookingsByFilter(`user_id = "${userId}"`);
 }
 
 export async function getOfferBookings(offerId: string): Promise<Booking[]> {
-  const records = await pb.collection('bookings').getFullList({
-    filter: `offer_id = "${offerId}"`,
-    sort: '-created',
-  });
-
-  return records.map(mapRecordToBooking);
+  return listBookingsByFilter(`offer_id = "${offerId}"`);
 }
 
 export async function updateBookingStatus(
   bookingId: string,
   status: BookingStatus
 ): Promise<Booking> {
-  const current = await pb.collection('bookings').getOne(bookingId);
+  const current = await pb.collection(BOOKINGS_COLLECTION).getOne(bookingId);
   const previousStatus = current.status as BookingStatus;
 
-  const record = await pb.collection('bookings').update(bookingId, {
-    status,
-  });
-
-  const booking = mapRecordToBooking(record);
-
   if (previousStatus === status) {
-    return booking;
+    return mapRecordToBooking(current);
   }
 
   const offer = await getOfferById(current.offer_id);
 
   if (!offer) {
-    return booking;
+    throw new Error('Oferta nie istnieje');
   }
+
+  if (status === 'confirmed' && previousStatus !== 'confirmed') {
+    validateSeatsAvailable(offer);
+  }
+
+  const record = await pb.collection(BOOKINGS_COLLECTION).update(bookingId, {
+    status,
+  });
+
+  const booking = mapRecordToBooking(record);
 
   await updateAvailableSeats({
     offer,
@@ -188,4 +213,74 @@ export async function getUserBookingsWithOffers(userId: string): Promise<Booking
   );
 
   return withOffers;
+}
+
+/**
+ * Sprawdź czy dwaj użytkownicy mają wspólne booking (uczestniczą w tej samej ofercie)
+ */
+export async function haveCommonBookings(userId1: string, userId2: string): Promise<boolean> {
+  try {
+    const [confirmedOfferIds1, confirmedOfferIds2] = await Promise.all([
+      getConfirmedOfferIdsForUser(userId1),
+      getConfirmedOfferIdsForUser(userId2),
+    ]);
+
+    return Array.from(confirmedOfferIds2).some((offerId) => confirmedOfferIds1.has(offerId));
+  } catch (err) {
+    console.warn('haveCommonBookings error:', err);
+    return false;
+  }
+}
+
+export async function canViewParticipants(
+  offerId: string
+): Promise<boolean> {
+  const currentUserId = pb.authStore.record?.id;
+  if (!currentUserId) return false;
+
+  const offer = await getOfferById(offerId);
+  if (!offer) return false;
+
+  // organizer
+  if (offer.organizer_id === currentUserId) {
+    return true;
+  }
+
+  // confirmed booking
+  return hasConfirmedBookingForOffer(offerId, currentUserId);
+}
+
+export async function getConfirmedParticipants(
+  offerId: string
+): Promise<OfferParticipant[]> {
+  try {
+    const records: any[] = await (pb.collection(BOOKINGS_COLLECTION) as any).getFullList({
+      filter: `offer_id = "${offerId}" && status = "confirmed" && user_id != ""`,
+      expand: 'user_id',
+      sort: 'created',
+    });
+
+    const byUserId = new Map<string, OfferParticipant>();
+
+    for (const record of records) {
+      const expandedUser = Array.isArray(record.expand?.user_id)
+        ? record.expand.user_id[0]
+        : record.expand?.user_id;
+
+      const userId = String(record.user_id || expandedUser?.id || '');
+      if (!userId || byUserId.has(userId)) {
+        continue;
+      }
+
+      byUserId.set(userId, {
+        userId,
+        name: String(expandedUser?.name || expandedUser?.email || 'Użytkownik'),
+      });
+    }
+
+    return Array.from(byUserId.values());
+  } catch (err) {
+    console.warn('getConfirmedParticipants error:', err);
+    return [];
+  }
 }

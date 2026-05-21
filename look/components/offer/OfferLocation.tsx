@@ -24,7 +24,7 @@ export default function OfferLocation({ country, port, countries, onCountryChang
         >
           <option value="">Wybierz kraj</option>
           {countries.map((c) => (
-            <option key={c.code} value={c.name}>
+            <option key={c.code} value={c.code}>
               {c.namePL}
             </option>
           ))}

@@ -11,12 +11,14 @@ export default function RegisterPage() {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     if (password !== passwordConfirm) {
       setError('Hasła nie są identyczne');
@@ -32,9 +34,18 @@ export default function RegisterPage() {
 
     try {
       await registerUser(email, password, passwordConfirm, name || undefined);
-      // Auto-login po rejestracji
-      await loginUser(email, password);
-      router.push('/profil');
+      const authData = await loginUser(email, password);
+      const userId = authData?.record?.id;
+
+      if (!userId) {
+        throw new Error('Nie udało się pobrać ID użytkownika po logowaniu.');
+      }
+
+      router.push(`/profil/${userId}?registered=1`);
+      setEmail('');
+      setPassword('');
+      setPasswordConfirm('');
+      setName('');
     } catch (err: any) {
       setError(err.message || 'Błąd rejestracji. Spróbuj ponownie.');
     } finally {
@@ -53,6 +64,12 @@ export default function RegisterPage() {
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+            {success}
           </div>
         )}
 

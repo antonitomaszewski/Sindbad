@@ -3,6 +3,7 @@ import UserBio from './UserBio';
 import TripHistory from './TripHistory';
 import Certifications from './Certifications';
 import MyBookingsList from '../booking/MyBookingsList';
+import { TripAlertsList } from '../trip-alerts/TripAlertsList';
 import type { User } from '../../../logic/types/user';
 import type { BookingWithOffer } from '../../../logic/types/booking';
 import Link from 'next/link';
@@ -13,16 +14,24 @@ export default function UserProfile({
   participatedTrips,
   isOwnProfile = false,
   myBookings = [],
+  successMessage,
 }: {
   user: User;
   organizedTrips: { id: string; title?: string; date?: string }[];
   participatedTrips: { id: string; title?: string; date?: string }[];
   isOwnProfile?: boolean;
   myBookings?: BookingWithOffer[];
+  successMessage?: string;
 }) {
 
   return (
     <div className="max-w-[1100px] mx-auto p-8 space-y-8">
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+          {successMessage}
+        </div>
+      )}
+
       <UserHeader user={user} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -36,6 +45,7 @@ export default function UserProfile({
 
         <aside className="space-y-6">
           <Certifications certifications={user.certifications ?? []} />
+          {isOwnProfile && <TripAlertsList />}
         </aside>
       </div>
 

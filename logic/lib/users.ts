@@ -61,6 +61,100 @@ export async function loginUser(email: string, password: string) {
   }
 }
 
+export async function isCurrentUserOAuth(): Promise<boolean> {
+  try {
+    const user = pb.authStore.record;
+
+    if (!user) return false;
+
+    const external = await pb
+      .collection('users')
+      .listExternalAuths(user.id);
+
+    return external?.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+async function verifyCurrentPassword(currentPassword: string) {
+  const currentEmail = pb.authStore.record?.email;
+
+  if (!currentEmail) {
+    throw new Error('Brak aktywnej sesji użytkownika');
+  }
+
+  if (!currentPassword) {
+    throw new Error('Podaj aktualne hasło');
+  }
+
+  try {
+    await pb.collection('users').authWithPassword(currentEmail, currentPassword);
+  } catch {
+    throw new Error('Aktualne hasło jest nieprawidłowe');
+  }
+}
+
+export async function changeUserEmail(
+  userId: string,
+  newEmail: string,
+  currentPassword: string
+): Promise<User> {
+  const normalizedEmail = newEmail.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    throw new Error('Podaj nowy email');
+  }
+
+  if (!normalizedEmail.includes('@')) {
+    throw new Error('Podaj poprawny email');
+  }
+
+  if (await isCurrentUserOAuth()) {
+    throw new Error('Dla kont OAuth zmiana emaila jest wyłączona');
+  }
+
+  await verifyCurrentPassword(currentPassword);
+
+  try {
+    const record = await pb.collection('users').update(userId, { email: normalizedEmail });
+    return record as unknown as User;
+  } catch (error: any) {
+    throw new Error(error?.response?.message || 'Nie udało się zmienić emaila');
+  }
+}
+
+export async function changeUserPassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+  newPasswordConfirm: string
+) {
+  if (!newPassword || newPassword.length < 8) {
+    throw new Error('Nowe hasło musi mieć minimum 8 znaków');
+  }
+
+  if (newPassword !== newPasswordConfirm) {
+    throw new Error('Nowe hasła nie są identyczne');
+  }
+
+  if (await isCurrentUserOAuth()) {
+    throw new Error('Dla kont OAuth zmiana hasła jest wyłączona');
+  }
+
+  await verifyCurrentPassword(currentPassword);
+
+  try {
+    await pb.collection('users').update(userId, {
+      oldPassword: currentPassword,
+      password: newPassword,
+      passwordConfirm: newPasswordConfirm,
+    });
+  } catch (error: any) {
+    throw new Error(error?.response?.message || 'Nie udało się zmienić hasła');
+  }
+}
+
 /**
  * Zarejestruj nowego użytkownika
  */
@@ -75,6 +169,10 @@ export async function registerUser(
     if (name) data.name = name;
     
     const user = await pb.collection('users').create(data);
+
+    // Krok 3: wyślij mail weryfikacyjny po rejestracji.
+    await pb.collection('users').requestVerification(email);
+
     return user as unknown as User;
   } catch (error: any) {
     // Przekaż szczegółowy błąd z PocketBase (np. "User with email already exists")
@@ -179,6 +277,60 @@ export async function updateUserProfile(
     console.error('Update profile error:', error);
     throw new Error('Nie udało się zaktualizować profilu');
   }
+}
+
+/**
+ * Zaktualizuj widoczność profilu (public/private)
+ */
+export async function updateProfileVisibility(
+  userId: string,
+  visibility: 'public' | 'private'
+): Promise<User> {
+  try {
+    const record = await pb.collection('users').update(userId, {
+      profile_visibility: visibility,
+    });
+
+    return record as unknown as User;
+  } catch (error: any) {
+    throw new Error('Nie udało się zmienić widoczności profilu');
+  }
+}
+
+/**
+ * Sprawdź czy użytkownik ma dostęp do profilu
+ * Profil jest dostępny jeśli:
+ * - Jest publiczny (public)
+ * - Użytkownik jest właścicielem profilu
+ * - Użytkownik ma wspólne booking lub offers (uczestniczy w tym samym rejsie)
+ */
+export async function canAccessProfile(
+  profileUserId: string,
+  currentUserId?: string
+): Promise<boolean> {
+  const profile = await getUser(profileUserId);
+
+  if (!profile) return false;
+
+  // Publiczny profil - wszyscy mają dostęp
+  if (profile.profile_visibility === 'public') return true;
+
+  // Prywatny profil - wymagany zalogowany użytkownik
+  if (!currentUserId) return false;
+
+  // Właściciel profilu
+  if (profileUserId === currentUserId) return true;
+
+  // Sprawdź wspólne booking i offers
+  const { haveCommonBookings } = await import('./bookings');
+  const { haveCommonOffers } = await import('./offers');
+
+  const [commonBookings, commonOffers] = await Promise.all([
+    haveCommonBookings(profileUserId, currentUserId),
+    haveCommonOffers(profileUserId, currentUserId),
+  ]);
+
+  return commonBookings || commonOffers;
 }
 
 /**

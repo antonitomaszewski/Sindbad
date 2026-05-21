@@ -11,6 +11,7 @@ export const OFFER_MESSAGES = {
 
 export const OFFER_LABELS = {
   TERM: "Termin:",
+  LOCATION: "Lokalizacja:",
   DESCRIPTION: "Opis",
   ORGANIZER: "Organizator",
   SEND_RESERVATION: "Wyślij rezerwację",
