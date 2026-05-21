@@ -14,6 +14,7 @@ import { LoadingState } from '@/look/components/common/LoadingState';
 import { NotFoundState } from '@/look/components/common/NotFoundState';
 import { OFFER_MESSAGES } from '@/look/constants/offer';
 import BookingModal from '@/look/components/booking/BookingModal';
+import QuestionModal from '@/look/components/offer/QuestionModal';
 import { BookingsPanel } from '@/look/components/booking/BookingsPanel';
 import { isCurrentUserOrganizer } from '@/logic/lib/offers';
 import {
@@ -31,6 +32,8 @@ export default function OfertaPage({ params }: OfferPageProps) {
   const { offer, loading, error } = useOffer(id);
   const { user: organizer, loading: organizerLoading } = useUser(offer?.organizer_id);
   const [showModal, setShowModal] = useState(false);
+  const [showQuestionModal, setShowQuestionModal] = useState(false);
+  const [questionSent, setQuestionSent] = useState(false);
   const [participants, setParticipants] = useState<OfferParticipant[]>([]);
   const [participantsLoading, setParticipantsLoading] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
@@ -48,7 +51,13 @@ export default function OfertaPage({ params }: OfferPageProps) {
   };
 
   const handleContact = () => {
-    alert(OFFER_MESSAGES.CONTACT_ALERT);
+    setQuestionSent(false);
+    setShowQuestionModal(true);
+  };
+
+  const handleQuestionSuccess = () => {
+    setShowQuestionModal(false);
+    setQuestionSent(true);
   };
 
   const resetParticipants = () => {
@@ -161,6 +170,12 @@ export default function OfertaPage({ params }: OfferPageProps) {
           />
         )}
 
+        {questionSent && (
+          <div className="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+            Pytanie zostało wysłane.
+          </div>
+        )}
+
         <CreateTripAlertButton offer={offer} />
 
         {isOrganizer && <BookingsPanel offerId={offer.id} />}
@@ -171,6 +186,14 @@ export default function OfertaPage({ params }: OfferPageProps) {
             canReserve={canReserve}
             onClose={() => setShowModal(false)}
             onSuccess={handleSuccess}
+          />
+        )}
+
+        {showQuestionModal && (
+          <QuestionModal
+            offerId={offer.id}
+            onClose={() => setShowQuestionModal(false)}
+            onSuccess={handleQuestionSuccess}
           />
         )}
 

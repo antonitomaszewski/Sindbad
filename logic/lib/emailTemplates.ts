@@ -7,6 +7,15 @@ interface BookingEmailData {
   bookingLink?: string;
 }
 
+interface QuestionEmailData {
+  recipientName: string;
+  offerTitle: string;
+  offerDate: string;
+  askerEmail: string;
+  question: string;
+  offerLink?: string;
+}
+
 export function newBookingTemplate({
   recipientName,
   offerTitle,
@@ -108,6 +117,62 @@ export function bookingRejectedTemplate({
       <p>Możesz przeglądać inne dostępne rejsy w naszej aplikacji:</p>
       <a href="${process.env.NEXT_PUBLIC_BASE_URL}/szukaj" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Przeglądaj rejsy</a>
       
+      <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
+    </div>
+  `;
+}
+
+export function questionToOrganizerTemplate({
+  recipientName,
+  offerTitle,
+  offerDate,
+  askerEmail,
+  question,
+  offerLink,
+}: QuestionEmailData) {
+  return `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Nowe pytanie do oferty: ${offerTitle}</h2>
+      <p>Cześć ${recipientName},</p>
+      <p>Otrzymałeś nowe pytanie od użytkownika zainteresowanego Twoją ofertą.</p>
+
+      <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <strong>Nazwa rejsu:</strong> ${offerTitle}<br>
+        <strong>Data:</strong> ${offerDate}<br>
+        <strong>Email pytającego:</strong> ${askerEmail}<br>
+        <strong>Treść pytania:</strong><br>
+        <div style="margin-top: 8px; white-space: pre-wrap;">${question}</div>
+      </div>
+
+      ${offerLink ? `<a href="${offerLink}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zobacz ofertę</a>` : ''}
+
+      <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
+    </div>
+  `;
+}
+
+export function questionConfirmationTemplate({
+  recipientName,
+  offerTitle,
+  offerDate,
+  question,
+  offerLink,
+}: Omit<QuestionEmailData, 'askerEmail'>) {
+  return `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Pytanie zostało wysłane ✓</h2>
+      <p>Cześć ${recipientName},</p>
+      <p>Twoje pytanie do oferty zostało przekazane do organizatora.</p>
+
+      <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <strong>Nazwa rejsu:</strong> ${offerTitle}<br>
+        <strong>Data:</strong> ${offerDate}<br>
+        <strong>Twoja wiadomość:</strong><br>
+        <div style="margin-top: 8px; white-space: pre-wrap;">${question}</div>
+      </div>
+
+      ${offerLink ? `<a href="${offerLink}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zobacz ofertę</a>` : ''}
+
       <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
     </div>
   `;

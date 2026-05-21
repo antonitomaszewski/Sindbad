@@ -16,6 +16,7 @@ do bazy i autentykacji: pocketbase
 
 1.02.2026 - nadal żyję
 29.04.2026 cisnę
+21.05.2026 - cisnę, już jestem na finiszu. Drobne poprawki i tyle. Będzie niedługo skończone. Niedługo już koniec tych męk inżynierskich. Wystarczy dograć 
 
 
 ZROBIONE
@@ -33,15 +34,19 @@ ZROBIONE
 <!-- profil oferty zawiera liczbę dostępnych miejsc -->
 <!-- 4. można zrobić public/private zamiast tych relacji kiedy wyswietlać rejsy a kiedy nie -->
 <!-- 13. użytkownik, który ma potwierdzoną rezerwację / jest organizatorem -- widzi jacy inni użytkownicy są zapisani (to nie zmienia ich private/public profilu) -->
+<!-- 9. uzytkownik może zapisac swoje marzenia: kraj, termin, organizator -->
+<!-- 4. opcję dostawania powiadomienia, gdy pojawi się rejs w terminie/miejscu, który nas interesuje (czyli tworzenie takich zgłoszeń/marzeń) wtedy dostawalibysmy powiadomienia mailowe -->
+<!-- 9. mail z wyszukiwaniem do uzytkownika: kraj, termin, organizator -->
 
-
+DO ZROBIENIA
 dobra, zastanówmy sie co trzeba dorobić
-4. opcję dostawania powiadomienia, gdy pojawi się rejs w terminie/miejscu, który nas interesuje (czyli tworzenie takich zgłoszeń/marzeń)
-wtedy dostawalibysmy powiadomienia mailowe
-5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację, 
-8. mail z zapytaniem
-9. uzytkownik może zapisac swoje marzenia: kraj, termin, organizator
-9. mail z wyszukiwaniem do uzytkownika: kraj, termin, organizator
+8. mail z zapytaniem (to jest drobnostka, można usunąć jeśli nie zdążę skończyć)
+10. można by dodać komentarze, opinie organizatorów/rejsów
+9. opcja zapisz rejs - <3
+11. mapa ?? (to chyba na koniec)
+5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
+6. obecnie nie wyświetlam rejsów z przeszłości jako załogant (a może powinienem)
+
 
 
 

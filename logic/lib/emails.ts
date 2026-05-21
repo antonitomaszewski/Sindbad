@@ -9,6 +9,8 @@ import {
   bookingConfirmationTemplate,
   bookingConfirmedTemplate,
   bookingRejectedTemplate,
+  questionToOrganizerTemplate,
+  questionConfirmationTemplate,
 } from './emailTemplates';
 import pb from './pocketbase';
 import type {GuestBookingData} from '../types/booking';
@@ -155,4 +157,47 @@ export async function sendBookingEmails({
         }),
       });
     }
+}
+
+export async function sendOfferQuestionEmails({
+  offer,
+  question,
+  askerEmail,
+  askerName,
+}: {
+  offer: Offer;
+  question: string;
+  askerEmail: string;
+  askerName?: string;
+}) {
+  const organizer = await getUser(offer.organizer_id);
+  const dateRange = formatDateRange(offer.date_from, offer.date_to);
+  const offerLink = `${process.env.NEXT_PUBLIC_BASE_URL}/oferta/${offer.id}`;
+
+  if (organizer?.email) {
+    await sendEmail({
+      to: organizer.email,
+      subject: `Nowe pytanie do oferty: ${offer.title}`,
+      html: questionToOrganizerTemplate({
+        recipientName: organizer.name || 'Organizatorze',
+        offerTitle: offer.title,
+        offerDate: dateRange,
+        askerEmail,
+        question,
+        offerLink,
+      }),
+    });
+  }
+
+  await sendEmail({
+    to: askerEmail,
+    subject: `Potwierdzenie wysłania pytania: ${offer.title}`,
+    html: questionConfirmationTemplate({
+      recipientName: askerName || 'Użytkowniku',
+      offerTitle: offer.title,
+      offerDate: dateRange,
+      question,
+      offerLink,
+    }),
+  });
 }
