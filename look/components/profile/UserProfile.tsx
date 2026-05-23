@@ -4,6 +4,7 @@ import TripHistory from './TripHistory';
 import Certifications from './Certifications';
 import MyBookingsList from '../booking/MyBookingsList';
 import { TripAlertsList } from '../trip-alerts/TripAlertsList';
+import { OrganizerReviewsSummary } from './OrganizerReviewsSummary';
 import type { User } from '../../../logic/types/user';
 import type { BookingWithOffer } from '../../../logic/types/booking';
 import Link from 'next/link';
@@ -45,6 +46,7 @@ export default function UserProfile({
 
         <aside className="space-y-6">
           <Certifications certifications={user.certifications ?? []} />
+          <OrganizerReviewsSummary organizerId={user.id} />
           {isOwnProfile && <TripAlertsList />}
         </aside>
       </div>

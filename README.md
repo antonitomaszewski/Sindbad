@@ -37,15 +37,23 @@ ZROBIONE
 <!-- 9. uzytkownik może zapisac swoje marzenia: kraj, termin, organizator -->
 <!-- 4. opcję dostawania powiadomienia, gdy pojawi się rejs w terminie/miejscu, który nas interesuje (czyli tworzenie takich zgłoszeń/marzeń) wtedy dostawalibysmy powiadomienia mailowe -->
 <!-- 9. mail z wyszukiwaniem do uzytkownika: kraj, termin, organizator -->
+<!-- 8. mail z zapytaniem (to jest drobnostka, można usunąć jeśli nie zdążę skończyć) -->
+<!-- 10. można by dodać komentarze, opinie organizatorów/rejsów -->
+<!-- 6. publiczny/ prywatny działa tak, że prywatny może widzeć wspólny załogant i ty sam, a publiczny - wszyscy zalogowani -->
 
 DO ZROBIENIA
 dobra, zastanówmy sie co trzeba dorobić
-8. mail z zapytaniem (to jest drobnostka, można usunąć jeśli nie zdążę skończyć)
-10. można by dodać komentarze, opinie organizatorów/rejsów
 9. opcja zapisz rejs - <3
 11. mapa ?? (to chyba na koniec)
-5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
 6. obecnie nie wyświetlam rejsów z przeszłości jako załogant (a może powinienem)
+5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
+7. resend nie działa, dopóki nie zarejestruje sobie domeny
+8. po zalogowaniu przekierowuje nas na stronę http://localhost:3000/profil a powinno na stronę główną
+
+
+obecnie profile są dostępne jedynie dla zalogowanych użytkowników
+jak jest po rejsie, to można dodawać komentarze, nie można wysyłać rezerwacji, ale mozna wysłać zapytanie
+
 
 
 
@@ -56,3 +64,5 @@ wysyłkę maili załatwia resend, ma do tego gotowe funkcje
 
 rejestrujemy się na istniejący mail - Failed to create record.
 logujemy sie na konto niezweryfikowane/nieistniejące - Invalid credentials
+
+Jak mamy w bazie emailVisibility = False, to zawsze getUserEmail zwróci null, a przez to nie będą do danego ziomka dochodzić żadne emaile.

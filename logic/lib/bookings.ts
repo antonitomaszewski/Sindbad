@@ -13,6 +13,16 @@ import { Offer } from '../types/offer';
 
 const BOOKINGS_COLLECTION = 'bookings';
 
+type BookingCreateData = {
+  offer_id: string;
+  status: 'pending';
+  message: string;
+  user_id?: string;
+  guest_name?: string;
+  guest_email?: string;
+  guest_phone?: string;
+};
+
 function mapRecordToBooking(record: RecordModel): Booking {
   return {
     id: record.id,
@@ -28,60 +38,100 @@ function mapRecordToBooking(record: RecordModel): Booking {
   };
 }
 
-function validateBookingAccess(
-  guestData?: GuestBookingData
-) {
-  const isLoggedIn = pb.authStore.isValid;
+function validateBookingAccess(guestData?: GuestBookingData) {
+  if (pb.authStore.isValid) {
+    return;
+  }
 
-  if (!isLoggedIn && !guestData) {
+  if (!guestData) {
     throw new Error(
       'Podaj dane kontaktowe lub zaloguj się'
     );
   }
 
-  if (
-    !isLoggedIn &&
-    guestData &&
-    !guestData.email &&
-    !guestData.phone
-  ) {
+  if (!guestData.email && !guestData.phone) {
     throw new Error('Podaj email lub telefon');
   }
 }
 
 function validateOwnOfferBooking(offer: Offer) {
-  if (!pb.authStore.isValid) {
+  const currentUserId = pb.authStore.record?.id;
+
+  if (!currentUserId) {
     return;
   }
 
-  if (offer.organizer_id === pb.authStore.record?.id) {
+  if (offer.organizer_id === currentUserId) {
     throw new Error(
       'Nie możesz zarezerwować własnej oferty'
     );
   }
 }
 
-function buildBookingData(
+async function getOfferOrThrow(offerId: string): Promise<Offer> {
+  const offer = await getOfferById(offerId);
+
+  if (!offer) {
+    throw new Error('Oferta nie istnieje');
+  }
+
+  return offer;
+}
+
+async function resolveCurrentUserContact() {
+  const record = (pb.authStore.record || {}) as {
+    id?: string;
+    email?: string;
+    name?: string;
+  };
+
+  let email = record.email || '';
+  let name = record.name || '';
+
+  if (pb.authStore.isValid && record?.id && !email) {
+    try {
+      const refreshed = await (pb.collection('users') as any).authRefresh();
+      email = refreshed?.record?.email || email;
+      name = refreshed?.record?.name || name;
+    } catch (err) {
+      console.warn('resolveCurrentUserContact authRefresh failed:', err);
+    }
+  }
+
+  return {
+    userId: record?.id || null,
+    email,
+    name,
+  };
+}
+
+async function buildBookingData(
   offerId: string,
   message?: string,
   guestData?: GuestBookingData
-) {
-  const data: any = {
+): Promise<BookingCreateData> {
+  const data: BookingCreateData = {
     offer_id: offerId,
     status: 'pending',
     message: message?.trim() || '',
   };
 
   if (pb.authStore.isValid) {
-    data.user_id = pb.authStore.record?.id;
-    return data;
+    const currentUser = await resolveCurrentUserContact();
+    return {
+      ...data,
+      user_id: currentUser.userId || undefined,
+      guest_email: currentUser.email,
+      guest_name: currentUser.name,
+    };
   }
 
-  data.guest_name = guestData?.name;
-  data.guest_email = guestData?.email || '';
-  data.guest_phone = guestData?.phone || '';
-
-  return data;
+  return {
+    ...data,
+    guest_name: guestData?.name,
+    guest_email: guestData?.email || '',
+    guest_phone: guestData?.phone || '',
+  };
 }
 
 async function listBookingsByFilter(filter: string): Promise<Booking[]> {
@@ -118,16 +168,12 @@ export async function createBooking(
 ): Promise<Booking> {
   validateBookingAccess(guestData);
 
-  const offer = await getOfferById(offerId);
-
-  if (!offer) {
-    throw new Error('Oferta nie istnieje');
-  }
+  const offer = await getOfferOrThrow(offerId);
 
   validateOwnOfferBooking(offer);
   validateSeatsAvailable(offer);
 
-  const data = buildBookingData(
+  const data = await buildBookingData(
     offerId,
     message,
     guestData
@@ -142,6 +188,10 @@ export async function createBooking(
     offerId,
     message,
     guestData,
+    bookingRecipient: {
+      email: booking.guest_email,
+      name: booking.guest_name,
+    },
   });
 
   return booking;
@@ -166,11 +216,7 @@ export async function updateBookingStatus(
     return mapRecordToBooking(current);
   }
 
-  const offer = await getOfferById(current.offer_id);
-
-  if (!offer) {
-    throw new Error('Oferta nie istnieje');
-  }
+  const offer = await getOfferOrThrow(current.offer_id);
 
   if (status === 'confirmed' && previousStatus !== 'confirmed') {
     validateSeatsAvailable(offer);
@@ -200,19 +246,23 @@ export async function updateBookingStatus(
 export async function getUserBookingsWithOffers(userId: string): Promise<BookingWithOffer[]> {
   const bookings = await getUserBookings(userId);
 
-  const withOffers = await Promise.all(
+  return Promise.all(
     bookings.map(async (booking) => {
       const offer = await getOfferById(booking.offer_id);
+
       return {
         ...booking,
         offer: offer
-          ? { id: offer.id, title: offer.title, date_from: offer.date_from, date_to: offer.date_to }
+          ? {
+              id: offer.id,
+              title: offer.title,
+              date_from: offer.date_from,
+              date_to: offer.date_to,
+            }
           : undefined,
       };
     })
   );
-
-  return withOffers;
 }
 
 /**
@@ -236,17 +286,21 @@ export async function canViewParticipants(
   offerId: string
 ): Promise<boolean> {
   const currentUserId = pb.authStore.record?.id;
-  if (!currentUserId) return false;
+
+  if (!currentUserId) {
+    return false;
+  }
 
   const offer = await getOfferById(offerId);
-  if (!offer) return false;
 
-  // organizer
+  if (!offer) {
+    return false;
+  }
+
   if (offer.organizer_id === currentUserId) {
     return true;
   }
 
-  // confirmed booking
   return hasConfirmedBookingForOffer(offerId, currentUserId);
 }
 

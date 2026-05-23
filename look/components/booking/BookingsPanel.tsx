@@ -29,7 +29,7 @@ export function BookingsPanel({ offerId }: BookingsPanelProps) {
     }
   };
 
-  const handleStatusChange = async (bookingId: string, newStatus: 'confirmed' | 'cancelled') => {
+  const handleStatusChange = async (bookingId: string, newStatus: 'confirmed' | 'rejected') => {
     try {
       await updateBookingStatus(bookingId, newStatus);
       // Odśwież listę
@@ -67,7 +67,7 @@ export function BookingsPanel({ offerId }: BookingsPanelProps) {
 
 interface BookingItemProps {
   booking: Booking;
-  onStatusChange: (id: string, status: 'confirmed' | 'cancelled') => void;
+  onStatusChange: (id: string, status: 'confirmed' | 'rejected') => void;
 }
 
 function BookingItem({ booking, onStatusChange }: BookingItemProps) {
@@ -77,7 +77,7 @@ function BookingItem({ booking, onStatusChange }: BookingItemProps) {
   const statusColors = {
     pending: 'bg-yellow-100 text-yellow-800',
     confirmed: 'bg-green-100 text-green-800',
-    cancelled: 'bg-red-100 text-red-800',
+    rejected: 'bg-red-100 text-red-800',
   };
 
   return (
@@ -115,7 +115,7 @@ function BookingItem({ booking, onStatusChange }: BookingItemProps) {
         <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[booking.status]}`}>
           {booking.status === 'pending' && 'Oczekuje'}
           {booking.status === 'confirmed' && 'Potwierdzona'}
-          {booking.status === 'cancelled' && 'Anulowana'}
+          {booking.status === 'rejected' && 'Odrzucona'}
         </span>
       </div>
 
@@ -134,7 +134,7 @@ function BookingItem({ booking, onStatusChange }: BookingItemProps) {
             ✓ Potwierdź
           </button>
           <button
-            onClick={() => onStatusChange(booking.id, 'cancelled')}
+            onClick={() => onStatusChange(booking.id, 'rejected')}
             className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
           >
             ✕ Anuluj

@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     try {
       await loginUser(email, password);
-      router.push('/profil');
+      router.push('/');
     } catch (err: any) {
       setError(err.message || 'Nieprawidłowy email lub hasło');
     } finally {
@@ -96,7 +96,7 @@ export default function LoginPage() {
           <div className="mt-4">
             <OAuthButton
               provider="google"
-              onSuccess={() => router.push('/profil')}
+              onSuccess={() => router.push('/')}
               onError={(err) => setError(err)}
             />
           </div>

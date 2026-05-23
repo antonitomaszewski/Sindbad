@@ -1,9 +1,9 @@
 'use server';
 
 import { Resend } from 'resend';
-import type {Offer} from '../types/offer'
-import type {BookingStatus} from '../types/booking';
-import {formatDateRange} from './dates';
+import type { Offer } from '../types/offer';
+import type { BookingStatus, GuestBookingData } from '../types/booking';
+import { formatDateRange } from './dates';
 import {
   newBookingTemplate,
   bookingConfirmationTemplate,
@@ -13,13 +13,13 @@ import {
   questionConfirmationTemplate,
 } from './emailTemplates';
 import pb from './pocketbase';
-import type {GuestBookingData} from '../types/booking';
-import {getUser} from './users';
+import { getUser } from './users';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// const FROM_EMAIL = 'noreply@sindbad.pl';
-const FROM_EMAIL = 'noreply@resend.dev';
+const FROM_EMAIL = process.env.RESEND_FROM || 'noreply@resend.dev';
+const DEFAULT_BOOKING_NAME = 'Rezerwujący';
+const DEFAULT_ASKER_NAME = 'Użytkowniku';
 
 export async function sendEmail({
   to,
@@ -48,6 +48,12 @@ export async function sendEmail({
       return { success: false, error: result.error.message };
     }
 
+    console.log('Email sent:', {
+      to,
+      subject,
+      id: result.data?.id,
+    });
+
     return { success: true, id: result.data?.id };
   } catch (error) {
     console.error('Email service error:', error);
@@ -55,36 +61,45 @@ export async function sendEmail({
   }
 }
 
-
 export async function sendBookingStatusEmail({
   booking,
   offer,
   status,
 }: {
-  booking: any;
+  booking: {
+    id?: string;
+    user_id?: string;
+    guest_email?: string;
+    guest_name?: string;
+  };
   offer: Offer;
   status: BookingStatus;
 }) {
-  const guestEmail = booking.guest_email;
-
-  if (!guestEmail) {
+  if (status !== 'confirmed' && status !== 'rejected') {
     return;
   }
 
-  const guestName =
-    booking.guest_name || 'Rezerwujący';
+  let recipientEmail = booking.guest_email || null;
+  let recipientName = booking.guest_name || DEFAULT_BOOKING_NAME;
 
-  const dateRange = formatDateRange(
-    offer.date_from,
-    offer.date_to
-  );
+  if (!recipientEmail && booking.user_id) {
+    const user = await getUser(booking.user_id);
+    recipientEmail = user?.email || null;
+    recipientName = booking.guest_name || user?.name || DEFAULT_BOOKING_NAME;
+  }
+
+  if (!recipientEmail) {
+    return;
+  }
+
+  const dateRange = formatDateRange(offer.date_from, offer.date_to);
 
   if (status === 'confirmed') {
     await sendEmail({
-      to: guestEmail,
+      to: recipientEmail,
       subject: `✓ Rezerwacja potwierdzona: ${offer.title}`,
       html: bookingConfirmedTemplate({
-        recipientName: guestName,
+        recipientName,
         offerTitle: offer.title,
         offerDate: dateRange,
       }),
@@ -93,17 +108,15 @@ export async function sendBookingStatusEmail({
     return;
   }
 
-  if (status === 'cancelled') {
-    await sendEmail({
-      to: guestEmail,
-      subject: `✗ Rezerwacja odrzucona: ${offer.title}`,
-      html: bookingRejectedTemplate({
-        recipientName: guestName,
-        offerTitle: offer.title,
-        offerDate: dateRange,
-      }),
-    });
-  }
+  await sendEmail({
+    to: recipientEmail,
+    subject: `✗ Rezerwacja odrzucona: ${offer.title}`,
+    html: bookingRejectedTemplate({
+      recipientName,
+      offerTitle: offer.title,
+      offerDate: dateRange,
+    }),
+  });
 }
 
 export async function sendBookingEmails({
@@ -111,52 +124,50 @@ export async function sendBookingEmails({
   offerId,
   message,
   guestData,
+  bookingRecipient,
 }: {
   offer: Offer;
   offerId: string;
   message?: string;
   guestData?: GuestBookingData;
+  bookingRecipient?: {
+    email?: string;
+    name?: string;
+  };
 }) {
-  const guestEmail =
-    guestData?.email ||
-    pb.authStore.record?.email;
+  const recipientEmail =
+    guestData?.email || bookingRecipient?.email || pb.authStore.record?.email;
+  const recipientName =
+    guestData?.name || bookingRecipient?.name || pb.authStore.record?.name || DEFAULT_BOOKING_NAME;
+  const dateRange = formatDateRange(offer.date_from, offer.date_to);
 
-  const guestName =
-    guestData?.name ||
-    pb.authStore.record?.name;
-
-  const dateRange = formatDateRange(
-    offer.date_from,
-    offer.date_to
-  );
-
-  if (guestEmail) {
+  if (recipientEmail) {
     await sendEmail({
-      to: guestEmail,
+      to: recipientEmail,
       subject: `Rezerwacja wysłana: ${offer.title}`,
       html: bookingConfirmationTemplate({
-        recipientName: guestName,
+        recipientName,
         offerTitle: offer.title,
         offerDate: dateRange,
       }),
     });
   }
 
-    // Mail do organizatora
-    const organizer = await getUser(offer.organizer_id);
-    if (organizer?.email) {
-      await sendEmail({
-        to: organizer.email,
-        subject: `Nowa rezerwacja: ${offer.title}`,
-        html: newBookingTemplate({
-          recipientName: organizer.name || 'Organizatorze',
-          offerTitle: offer.title,
-          offerDate: dateRange,
-          message,
-          bookingLink: `${process.env.NEXT_PUBLIC_BASE_URL}/oferta/${offerId}`,
-        }),
-      });
-    }
+  const organizer = await getUser(offer.organizer_id);
+
+  if (organizer?.email) {
+    await sendEmail({
+      to: organizer.email,
+      subject: `Nowa rezerwacja: ${offer.title}`,
+      html: newBookingTemplate({
+        recipientName: organizer.name || 'Organizatorze',
+        offerTitle: offer.title,
+        offerDate: dateRange,
+        message,
+        bookingLink: `${process.env.NEXT_PUBLIC_BASE_URL}/oferta/${offerId}`,
+      }),
+    });
+  }
 }
 
 export async function sendOfferQuestionEmails({
@@ -193,7 +204,7 @@ export async function sendOfferQuestionEmails({
     to: askerEmail,
     subject: `Potwierdzenie wysłania pytania: ${offer.title}`,
     html: questionConfirmationTemplate({
-      recipientName: askerName || 'Użytkowniku',
+      recipientName: askerName || DEFAULT_ASKER_NAME,
       offerTitle: offer.title,
       offerDate: dateRange,
       question,
