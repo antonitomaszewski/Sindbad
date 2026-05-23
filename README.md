@@ -39,6 +39,7 @@ ZROBIONE
 <!-- 9. mail z wyszukiwaniem do uzytkownika: kraj, termin, organizator -->
 <!-- 8. mail z zapytaniem (to jest drobnostka, można usunąć jeśli nie zdążę skończyć) -->
 <!-- 10. można by dodać komentarze, opinie organizatorów/rejsów -->
+<!-- 6. publiczny/ prywatny działa tak, że prywatny może widzeć wspólny załogant i ty sam, a publiczny - wszyscy zalogowani -->
 
 DO ZROBIENIA
 dobra, zastanówmy sie co trzeba dorobić
@@ -46,8 +47,8 @@ dobra, zastanówmy sie co trzeba dorobić
 11. mapa ?? (to chyba na koniec)
 6. obecnie nie wyświetlam rejsów z przeszłości jako załogant (a może powinienem)
 5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
-6. publiczny/ prywatny działa tak, że prywatny może widzeć wspólny załogant i ty sam, a publiczny - wszyscy zalogowani
 7. resend nie działa, dopóki nie zarejestruje sobie domeny
+8. po zalogowaniu przekierowuje nas na stronę http://localhost:3000/profil a powinno na stronę główną
 
 
 obecnie profile są dostępne jedynie dla zalogowanych użytkowników
