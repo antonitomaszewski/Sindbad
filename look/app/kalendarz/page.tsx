@@ -2,6 +2,7 @@
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import plLocale from '@fullcalendar/core/locales/pl';
 import EventModal from '@/look/components/ui/EventModal';
 import { useOffers } from '@/look/hooks/useOffers';
 import { useEventModal } from '@/look/hooks/useEventModal';
@@ -32,6 +33,7 @@ export default function KalendarzPage() {
       <div className="bg-white rounded-lg shadow-sm border border-gray p-6">
         <FullCalendar
           plugins={[dayGridPlugin]}
+          locale={plLocale}
           initialView={CALENDAR_CONFIG.INITIAL_VIEW}
           height={CALENDAR_CONFIG.HEIGHT}
           events={events}

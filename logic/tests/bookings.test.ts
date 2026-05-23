@@ -58,8 +58,8 @@ describe('Bookings', () => {
     const updated = await updateBookingStatus(booking.id, 'confirmed');
     expect(updated.status).toBe('confirmed');
 
-    const cancelled = await updateBookingStatus(booking.id, 'cancelled');
-    expect(cancelled.status).toBe('cancelled');
+    const rejected = await updateBookingStatus(booking.id, 'rejected');
+    expect(rejected.status).toBe('rejected');
   });
 
   it('getUserBookingsWithOffers maps offer and applies upcoming filter', async () => {

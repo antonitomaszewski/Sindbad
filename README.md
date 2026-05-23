@@ -44,8 +44,11 @@ DO ZROBIENIA
 dobra, zastanówmy sie co trzeba dorobić
 9. opcja zapisz rejs - <3
 11. mapa ?? (to chyba na koniec)
-5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
 6. obecnie nie wyświetlam rejsów z przeszłości jako załogant (a może powinienem)
+5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
+6. publiczny/ prywatny działa tak, że prywatny może widzeć wspólny załogant i ty sam, a publiczny - wszyscy zalogowani
+7. resend nie działa, dopóki nie zarejestruje sobie domeny
+
 
 obecnie profile są dostępne jedynie dla zalogowanych użytkowników
 jak jest po rejsie, to można dodawać komentarze, nie można wysyłać rezerwacji, ale mozna wysłać zapytanie
@@ -60,3 +63,5 @@ wysyłkę maili załatwia resend, ma do tego gotowe funkcje
 
 rejestrujemy się na istniejący mail - Failed to create record.
 logujemy sie na konto niezweryfikowane/nieistniejące - Invalid credentials
+
+Jak mamy w bazie emailVisibility = False, to zawsze getUserEmail zwróci null, a przez to nie będą do danego ziomka dochodzić żadne emaile.

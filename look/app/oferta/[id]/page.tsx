@@ -72,7 +72,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
       return;
     }
 
-    let isCancelled = false;
+    let isRejected = false;
 
     const loadParticipants = async () => {
       setParticipantsLoading(true);
@@ -80,7 +80,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
       try {
         const canView = await canViewParticipants(offer.id);
 
-        if (isCancelled) return;
+        if (isRejected) return;
 
         if (!canView) {
           resetParticipants();
@@ -88,17 +88,17 @@ export default function OfertaPage({ params }: OfferPageProps) {
         }
 
         const data = await getConfirmedParticipants(offer.id);
-        if (isCancelled) return;
+        if (isRejected) return;
 
         setShowParticipants(true);
         setParticipants(data);
       } catch (err) {
         console.warn('loadParticipants error:', err);
-        if (!isCancelled) {
+        if (!isRejected) {
           resetParticipants();
         }
       } finally {
-        if (!isCancelled) {
+        if (!isRejected) {
           setParticipantsLoading(false);
         }
       }
@@ -107,7 +107,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
     loadParticipants();
 
     return () => {
-      isCancelled = true;
+      isRejected = true;
     };
   }, [offer]);
 

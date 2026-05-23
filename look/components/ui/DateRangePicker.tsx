@@ -1,7 +1,11 @@
 'use client';
 
 import DatePicker from 'react-datepicker';
+import { pl } from 'date-fns/locale/pl';
+import { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+
+registerLocale('pl', pl);
 
 interface DateRangePickerProps {
   startDate: Date | null;
@@ -43,6 +47,7 @@ export function DateRangePicker({
         <DatePicker
           selected={startDate}
           onChange={onStartDateChange}
+          locale="pl"
           dateFormat="dd.MM.yyyy"
           minDate={minStartDate}
           placeholderText={startPlaceholder}
@@ -59,6 +64,7 @@ export function DateRangePicker({
         <DatePicker
           selected={endDate}
           onChange={onEndDateChange}
+          locale="pl"
           dateFormat="dd.MM.yyyy"
           minDate={minEndDate}
           placeholderText={endPlaceholder}

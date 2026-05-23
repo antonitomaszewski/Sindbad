@@ -35,7 +35,9 @@ export default function Navbar() {
     return (
       <nav className="w-full bg-white border-b border-gray shadow-sm">
         <Container className="flex items-center justify-between h-20">
-          <Logo />
+          <Link href="/" aria-label="Przejdź do strony głównej">
+            <Logo />
+          </Link>
           <div className="hidden md:flex items-center gap-8">
             <ul className="flex gap-8">
               {MAIN_NAVIGATION.map((item) => (
@@ -54,7 +56,9 @@ export default function Navbar() {
   return (
     <nav className="w-full bg-white border-b border-gray shadow-sm">
       <Container className="flex items-center justify-between h-20">
-        <Logo />
+        <Link href="/" aria-label="Przejdź do strony głównej">
+          <Logo />
+        </Link>
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">

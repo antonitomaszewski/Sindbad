@@ -165,7 +165,7 @@ export async function registerUser(
   name?: string
 ) {
   try {
-    const data: any = { email, password, passwordConfirm };
+    const data: any = { email, password, passwordConfirm, emailVisibility: true };
     if (name) data.name = name;
     
     const user = await pb.collection('users').create(data);

@@ -259,7 +259,7 @@ export default function EditProfileView({
                   className="mr-3 w-4 h-4"
                 />
                 <span className="text-gray-700 font-medium">Publiczny</span>
-                <span className="ml-2 text-sm text-gray-500">Twój profil widoczny dla wszystkich</span>
+                <span className="ml-2 text-sm text-gray-500">Twój profil widoczny dla wszystkich zalogowanych użytkowników</span>
               </label>
               <label className="flex items-center cursor-pointer">
                 <input
@@ -272,7 +272,7 @@ export default function EditProfileView({
                   className="mr-3 w-4 h-4"
                 />
                 <span className="text-gray-700 font-medium">Prywatny</span>
-                <span className="ml-2 text-sm text-gray-500">Twój profil widoczny tylko dla Ciebie</span>
+                <span className="ml-2 text-sm text-gray-500">Twój profil widoczny tylko dla Ciebie i osób, z którymi brałeś udział w rejsie</span>
               </label>
             </div>
           </div>
