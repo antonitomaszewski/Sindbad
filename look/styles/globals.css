@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @import "./colors.css";
+
+.map-datepicker-popper {
+	z-index: 9999 !important;
+}

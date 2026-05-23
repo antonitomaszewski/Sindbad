@@ -24,6 +24,8 @@ export interface OfferFormData {
   date_to: Date | null;
   country: string;
   port: string;
+  geo_lat: string;
+  geo_lon: string;
   price_per_person: string;
   currency: Currency;
   seats_total: string;

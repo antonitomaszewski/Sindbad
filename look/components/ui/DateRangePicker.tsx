@@ -20,6 +20,9 @@ interface DateRangePickerProps {
   endPlaceholder?: string;
   minStartDate?: Date;
   minEndDate?: Date;
+  fieldClassName?: string;
+  inputClassName?: string;
+  popperClassName?: string;
 }
 
 export function DateRangePicker({
@@ -35,13 +38,18 @@ export function DateRangePicker({
   endPlaceholder = 'Wybierz datę',
   minStartDate,
   minEndDate,
+  fieldClassName,
+  inputClassName,
+  popperClassName,
 }: DateRangePickerProps) {
-  const baseInputClassName = 'w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition';
+  const baseInputClassName = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition';
+  const baseLabelClassName = 'mb-1 block text-xs text-gray-600';
+  const combinedInputClassName = `${baseInputClassName} ${inputClassName || ''}`.trim();
 
   return (
-    <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+    <div className="space-y-3">
+      <div className={fieldClassName}>
+        <label className={baseLabelClassName}>
           {startLabel}
         </label>
         <DatePicker
@@ -52,13 +60,14 @@ export function DateRangePicker({
           minDate={minStartDate}
           placeholderText={startPlaceholder}
           isClearable
-          className={`${baseInputClassName} ${startError ? 'border-red-300' : 'border-gray-300'}`}
+          className={`${combinedInputClassName} ${startError ? 'border-red-300' : 'border-gray-300'}`}
+          popperClassName={popperClassName}
         />
         {startError && <p className="mt-1 text-sm text-red-600">{startError}</p>}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className={fieldClassName}>
+        <label className={baseLabelClassName}>
           {endLabel}
         </label>
         <DatePicker
@@ -69,7 +78,8 @@ export function DateRangePicker({
           minDate={minEndDate}
           placeholderText={endPlaceholder}
           isClearable
-          className={`${baseInputClassName} ${endError ? 'border-red-300' : 'border-gray-300'}`}
+          className={`${combinedInputClassName} ${endError ? 'border-red-300' : 'border-gray-300'}`}
+          popperClassName={popperClassName}
         />
         {endError && <p className="mt-1 text-sm text-red-600">{endError}</p>}
       </div>
