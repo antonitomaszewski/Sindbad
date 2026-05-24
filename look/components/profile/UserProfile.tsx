@@ -17,6 +17,7 @@ export default function UserProfile({
   isOwnProfile = false,
   myBookings = [],
   userContacts = [],
+  commonContactIds = [],
   successMessage,
 }: {
   user: User;
@@ -25,6 +26,7 @@ export default function UserProfile({
   isOwnProfile?: boolean;
   myBookings?: BookingWithOffer[];
   userContacts?: UserContact[];
+  commonContactIds?: string[];
   successMessage?: string;
 }) {
 
@@ -42,7 +44,7 @@ export default function UserProfile({
         <div className="md:col-span-2 space-y-6">
           <UserBio bio={user.bio} />
 
-          <SailedWithSection contacts={userContacts} />
+          <SailedWithSection contacts={userContacts} commonContactIds={commonContactIds} />
 
           <TripHistory title="Rejsy organizowane" trips={organizedTrips} />
           {/* <TripHistory title="Rejsy jako załogant" trips={participatedTrips} /> */}

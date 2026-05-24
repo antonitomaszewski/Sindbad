@@ -30,6 +30,7 @@ export default function ProfilPage({ params }: ProfilePageProps) {
   const [participatedTrips, setParticipatedTrips] = useState<Trip[]>([]);
   const [myBookings, setMyBookings] = useState<BookingWithOffer[]>([]);
   const [userContacts, setUserContacts] = useState<UserContact[]>([]);
+  const [commonContactIds, setCommonContactIds] = useState<string[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
@@ -83,10 +84,21 @@ export default function ProfilPage({ params }: ProfilePageProps) {
           getUserContacts(id),
         ]);
 
+        const viewerContacts =
+          currentUser?.id && currentUser.id !== id
+            ? await getUserContacts(currentUser.id)
+            : [];
+
+        const viewerContactIdSet = new Set(viewerContacts.map((contact) => contact.userId));
+        const commonIds = contacts
+          .map((contact) => contact.userId)
+          .filter((contactId) => viewerContactIdSet.has(contactId));
+
         setOrganizedTrips(organized);
         setParticipatedTrips(participated);
         setMyBookings(bookings);
         setUserContacts(contacts);
+        setCommonContactIds(commonIds);
       } catch (e) {
         console.warn('ProfilPage data load failed', e);
       } finally {
@@ -128,6 +140,7 @@ export default function ProfilPage({ params }: ProfilePageProps) {
       isOwnProfile={isOwnProfile}
       myBookings={myBookings}
       userContacts={userContacts}
+      commonContactIds={commonContactIds}
       successMessage={registrationSuccess ? 'Konto utworzone i zalogowano pomyślnie. Sprawdź skrzynkę mailową i potwierdź adres email.' : undefined}
     />
   );
