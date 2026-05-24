@@ -44,16 +44,16 @@ ZROBIONE
 <!-- 8. po zalogowaniu przekierowuje nas na stronę http://localhost:3000/profil a powinno na stronę główną -->
 <!-- 11. opisz swoje doświadczenie, styl pływania, akweny na których pływałes lub chciałbyś pływać. -->
 <!-- 12. tak samo w charakterze rejsu: rodzinny, regatowy, chill, szkoleniowy -->
+<!-- 9. dodać, by na profilu uzytkownika widać było osoby z którymi żeglował. -->
+<!-- 8. aspekt łączenia ludzi nie jest jakoś mocno wydajny obecnie. powinienem jakoś nad tym popracować -->
 
 DO ZROBIENIA
+7. resend nie działa, dopóki nie zarejestruje sobie domeny -- ale nie uważam że to jest problem, bo tamże w panelu mam rozpisane logi
 dobra, zastanówmy sie co trzeba dorobić
 9. opcja zapisz rejs - <3
 6. obecnie nie wyświetlam rejsów z przeszłości jako załogant (a może powinienem)
 5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
-7. resend nie działa, dopóki nie zarejestruje sobie domeny
-8. aspekt łączenia ludzi nie jest jakoś mocno wydajny obecnie. powinienem jakoś nad tym popracować
-9. dodać, by na profilu uzytkownika widać było osoby z którymi żeglował.
-10. może dodać funkcje jakie dana osoba pełniła na rejsie (1 oficer, itd)
+10. może dodać funkcje jakie dana osoba pełniła na rejsie (1 oficer, itd) - to jest raczej miły dodatek, wazniejsze by łączyć ludzi 
 
 
 
