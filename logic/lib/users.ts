@@ -321,16 +321,18 @@ export async function canAccessProfile(
   // Właściciel profilu
   if (profileUserId === currentUserId) return true;
 
-  // Sprawdź wspólne booking i offers
-  const { haveCommonBookings } = await import('./bookings');
-  const { haveCommonOffers } = await import('./offers');
-
-  const [commonBookings, commonOffers] = await Promise.all([
-    haveCommonBookings(profileUserId, currentUserId),
-    haveCommonOffers(profileUserId, currentUserId),
+  // Sprawdź relację "żeglował z" symetrycznie (A->B lub B->A),
+  // żeby działało też dla prywatnych organizatorów bez własnych bookingów.
+  const { getUserContacts } = await import('./bookings');
+  const [profileContacts, viewerContacts] = await Promise.all([
+    getUserContacts(profileUserId),
+    getUserContacts(currentUserId),
   ]);
 
-  return commonBookings || commonOffers;
+  return (
+    profileContacts.some((contact) => contact.userId === currentUserId) ||
+    viewerContacts.some((contact) => contact.userId === profileUserId)
+  );
 }
 
 /**

@@ -32,12 +32,15 @@ export default function OfferBasicInfo({
       </FormField>
 
       <FormField label="Opis rejsu">
+        <p className="text-xs text-gray-500 mb-2">
+          Podpowiedź: wpisz krótko jaki macie plan rejsu, trasę i klimat pływania.
+        </p>
         <Textarea
           id="description"
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           rows={6}
-          placeholder="Opisz trasę, atrakcje, wymagania dla uczestników..."
+          placeholder="Np. Start w Gdańsku, 3 dni po Zatoce, postoje na kąpiel i wieczorne wejścia do portów."
         />
       </FormField>
     </div>

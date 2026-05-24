@@ -276,20 +276,74 @@ export async function updateAvailableSeats({
   offer,
   previousStatus,
   newStatus,
+  bookingUserId,
 }: {
   offer: Offer;
   previousStatus: BookingStatus;
   newStatus: BookingStatus;
+  bookingUserId?: string;
 }) {
+  console.log('[offers][updateAvailableSeats] start', {
+    offerId: offer.id,
+    previousStatus,
+    newStatus,
+    bookingUserId,
+    seatsAvailableBefore: offer.seats_available,
+    participantsBefore: Array.isArray((offer as any).participants)
+      ? (offer as any).participants
+      : [],
+  });
+
+  const updateData: any = {};
+
   if (
     newStatus === 'confirmed' &&
     previousStatus !== 'confirmed' && offer.seats_available
   ) {
-    await updateOffer(offer.id, {
-      seats_available: Math.max(
-        0,
-        offer.seats_available - 1
-      ),
-    });
+    updateData.seats_available = Math.max(0, offer.seats_available - 1);
   }
+
+  if (bookingUserId) {
+    const currentParticipants = new Set<string>(
+      Array.isArray((offer as any).participants)
+        ? (offer as any).participants.map((id: any) => String(id)).filter(Boolean)
+        : []
+    );
+
+    if (newStatus === 'confirmed' && previousStatus !== 'confirmed') {
+      currentParticipants.add(bookingUserId);
+      updateData.participants = Array.from(currentParticipants);
+      console.log('[offers][updateAvailableSeats] add-participant', {
+        offerId: offer.id,
+        bookingUserId,
+        participantsAfter: updateData.participants,
+      });
+    }
+
+    if (previousStatus === 'confirmed' && newStatus !== 'confirmed') {
+      currentParticipants.delete(bookingUserId);
+      updateData.participants = Array.from(currentParticipants);
+      console.log('[offers][updateAvailableSeats] remove-participant', {
+        offerId: offer.id,
+        bookingUserId,
+        participantsAfter: updateData.participants,
+      });
+    }
+  }
+
+  if (Object.keys(updateData).length > 0) {
+    console.log('[offers][updateAvailableSeats] applying-update', {
+      offerId: offer.id,
+      updateData,
+    });
+    await updateOffer(offer.id, updateData);
+    console.log('[offers][updateAvailableSeats] update-applied', {
+      offerId: offer.id,
+    });
+    return;
+  }
+
+  console.log('[offers][updateAvailableSeats] no-update-needed', {
+    offerId: offer.id,
+  });
 }

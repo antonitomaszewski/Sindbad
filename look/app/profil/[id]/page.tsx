@@ -3,8 +3,14 @@ import { use, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { isCurrentServerUser, getCurrentUser, canAccessProfile } from '../../../../logic/lib/users';
 import { getTripsByOrganizer, getTripsByParticipant } from '../../../../logic/lib/offers';
-import { getUserBookingsWithOffers } from '../../../../logic/lib/bookings';
-import type { BookingWithOffer } from '../../../../logic/types/booking';
+import {
+  getBookingsOrganizers,
+  getBookingsParticipants,
+  getUserConfirmedBookings,
+  getUserContacts,
+  getUserBookingsWithOffers,
+} from '../../../../logic/lib/bookings';
+import type { BookingWithOffer, UserContact } from '../../../../logic/types/booking';
 import UserProfile from '../../../components/profile/UserProfile';
 import { LoadingState } from '../../../components/common/LoadingState';
 import { NotFoundState } from '../../../components/common/NotFoundState';
@@ -23,8 +29,40 @@ export default function ProfilPage({ params }: ProfilePageProps) {
   const [organizedTrips, setOrganizedTrips] = useState<Trip[]>([]);
   const [participatedTrips, setParticipatedTrips] = useState<Trip[]>([]);
   const [myBookings, setMyBookings] = useState<BookingWithOffer[]>([]);
+  const [userContacts, setUserContacts] = useState<UserContact[]>([]);
+  const [commonContactIds, setCommonContactIds] = useState<string[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') {
+      return;
+    }
+
+    (window as any).debugContacts = {
+      getUserConfirmedBookings,
+      getBookingsOrganizers,
+      getBookingsParticipants,
+      getUserContacts,
+      run: async (userId: string) => {
+        const bookings = await getUserConfirmedBookings(userId);
+        const organizers = await getBookingsOrganizers(bookings);
+        const participants = await getBookingsParticipants(bookings);
+        const contacts = await getUserContacts(userId);
+
+        return {
+          bookings,
+          organizers: Array.from(organizers),
+          participants: Array.from(participants),
+          contacts,
+        };
+      },
+    };
+
+    return () => {
+      delete (window as any).debugContacts;
+    };
+  }, []);
 
   useEffect(() => {
     const loadProfileData = async () => {
@@ -39,15 +77,28 @@ export default function ProfilPage({ params }: ProfilePageProps) {
           return;
         }
 
-        const [organized, participated, bookings] = await Promise.all([
+        const [organized, participated, bookings, contacts] = await Promise.all([
           getTripsByOrganizer(id),
           getTripsByParticipant(id),
           getUserBookingsWithOffers(id),
+          getUserContacts(id),
         ]);
+
+        const viewerContacts =
+          currentUser?.id && currentUser.id !== id
+            ? await getUserContacts(currentUser.id)
+            : [];
+
+        const viewerContactIdSet = new Set(viewerContacts.map((contact) => contact.userId));
+        const commonIds = contacts
+          .map((contact) => contact.userId)
+          .filter((contactId) => viewerContactIdSet.has(contactId));
 
         setOrganizedTrips(organized);
         setParticipatedTrips(participated);
         setMyBookings(bookings);
+        setUserContacts(contacts);
+        setCommonContactIds(commonIds);
       } catch (e) {
         console.warn('ProfilPage data load failed', e);
       } finally {
@@ -88,6 +139,8 @@ export default function ProfilPage({ params }: ProfilePageProps) {
       participatedTrips={participatedTrips}
       isOwnProfile={isOwnProfile}
       myBookings={myBookings}
+      userContacts={userContacts}
+      commonContactIds={commonContactIds}
       successMessage={registrationSuccess ? 'Konto utworzone i zalogowano pomyślnie. Sprawdź skrzynkę mailową i potwierdź adres email.' : undefined}
     />
   );

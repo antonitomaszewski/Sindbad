@@ -58,7 +58,7 @@ export function OrganizerReviewsSummary({ organizerId }: { organizerId: string }
               const value = e.target.value;
               setRatingFilter(value === 'all' ? 'all' : Number(value) as 1 | 2 | 3 | 4 | 5);
             }}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+            className="rounded-md border border-gray-200 px-3 py-1.5 text-sm"
           >
             {FILTER_OPTIONS.map((option) => (
               <option key={String(option.value)} value={String(option.value)}>{option.label}</option>
@@ -70,15 +70,15 @@ export function OrganizerReviewsSummary({ organizerId }: { organizerId: string }
 
         {!loading && (
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-lg border border-gray-200 p-2">
+            <div className="rounded-lg border border-gray-100 p-2">
               <p className="text-xs text-gray-500">Średnia</p>
               <p className="text-lg font-bold text-gray-900">{summary.averageRating || '-'}</p>
             </div>
-            <div className="rounded-lg border border-gray-200 p-2">
+            <div className="rounded-lg border border-gray-100 p-2">
               <p className="text-xs text-gray-500">Liczba opinii</p>
               <p className="text-lg font-bold text-gray-900">{summary.totalReviews}</p>
             </div>
-            <div className="rounded-lg border border-gray-200 p-2">
+            <div className="rounded-lg border border-gray-100 p-2">
               <p className="text-xs text-gray-500">Oceny &lt;= 3</p>
               <p className="text-lg font-bold text-gray-900">{summary.lowRatingsCount}</p>
             </div>
@@ -92,7 +92,7 @@ export function OrganizerReviewsSummary({ organizerId }: { organizerId: string }
         {!loading && summary.reviews.length > 0 && (
           <div className="space-y-3">
             {summary.reviews.slice(0, 3).map((review) => (
-              <div key={review.id} className="rounded-lg border border-gray-200 p-3">
+              <div key={review.id} className="rounded-lg border border-gray-100 p-3">
                 <div className="flex items-start justify-between gap-2">
                   <Link
                     href={`/profil/${review.user_id}`}

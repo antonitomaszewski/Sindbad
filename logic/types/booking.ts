@@ -28,6 +28,17 @@ export interface OfferParticipant {
   name: string;
 }
 
+export interface UserContact {
+  userId: string;
+  name: string;
+  trips: {
+    offerId: string;
+    title: string;
+    date_from?: string;
+    date_to?: string;
+  }[];
+}
+
 export interface GuestBookingData {
   name: string;
   email?: string;
