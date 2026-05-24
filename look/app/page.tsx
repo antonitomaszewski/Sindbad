@@ -91,7 +91,7 @@ export default function HomePage() {
 
           <p className="mt-5 max-w-2xl text-lg text-slate-600">
             Prosta platforma do łączenia załogantów i organizatorów rejsów.
-            Bez zbędnych kroków.
+            By budować zaufaną sieć kontaktów na wodzie.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">

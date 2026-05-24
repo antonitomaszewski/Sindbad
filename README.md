@@ -40,15 +40,21 @@ ZROBIONE
 <!-- 8. mail z zapytaniem (to jest drobnostka, można usunąć jeśli nie zdążę skończyć) -->
 <!-- 10. można by dodać komentarze, opinie organizatorów/rejsów -->
 <!-- 6. publiczny/ prywatny działa tak, że prywatny może widzeć wspólny załogant i ty sam, a publiczny - wszyscy zalogowani -->
+<!-- 11. mapa ?? (to chyba na koniec) -->
+<!-- 8. po zalogowaniu przekierowuje nas na stronę http://localhost:3000/profil a powinno na stronę główną -->
 
 DO ZROBIENIA
 dobra, zastanówmy sie co trzeba dorobić
 9. opcja zapisz rejs - <3
-11. mapa ?? (to chyba na koniec)
 6. obecnie nie wyświetlam rejsów z przeszłości jako załogant (a może powinienem)
 5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
 7. resend nie działa, dopóki nie zarejestruje sobie domeny
-8. po zalogowaniu przekierowuje nas na stronę http://localhost:3000/profil a powinno na stronę główną
+8. aspekt łączenia ludzi nie jest jakoś mocno wydajny obecnie. powinienem jakoś nad tym popracować
+9. dodać, by na profilu uzytkownika widać było osoby z którymi żeglował.
+10. może dodać funkcje jakie dana osoba pełniła na rejsie (1 oficer, itd)
+11. opisz swoje doświadczenie, styl pływania, akweny na których pływałes lub chciałbyś pływać.
+12. tak samo w charakterze rejsu: rodzinny, regatowy, chill, szkoleniowy
+
 
 
 obecnie profile są dostępne jedynie dla zalogowanych użytkowników
