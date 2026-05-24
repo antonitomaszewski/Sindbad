@@ -1,5 +1,6 @@
 // ...existing code...
 import Link from 'next/link';
+import { Card } from '@/look/components/ui/Card';
 
 type Trip = {
   id: string;
@@ -16,7 +17,7 @@ export default function TripHistory({
   title?: string;
 }) {
   return (
-    <section className="bg-white border border-gray-100 rounded-lg p-4">
+    <Card className="mb-0">
       <h3 className="text-lg font-medium mb-3">{title}</h3>
 
       {trips.length === 0 ? (
@@ -29,11 +30,13 @@ export default function TripHistory({
                 <span className="font-medium">{t.title ?? 'Szczegóły rejsu'}</span>
               </Link>
               <span className="text-sm text-gray-500">
-                {new Intl.DateTimeFormat('pl-PL', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                }).format(new Date(t.date_from))}
+                {t.date_from
+                  ? new Intl.DateTimeFormat('pl-PL', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                    }).format(new Date(t.date_from))
+                  : '-'}
                 {t.date_to && ` – ${new Intl.DateTimeFormat('pl-PL', {
                   day: '2-digit',
                   month: '2-digit',
@@ -44,7 +47,7 @@ export default function TripHistory({
           ))}
         </ul>
       )}
-    </section>
+    </Card>
   );
 }
 // ...existing code...

@@ -5,8 +5,9 @@ import Certifications from './Certifications';
 import MyBookingsList from '../booking/MyBookingsList';
 import { TripAlertsList } from '../trip-alerts/TripAlertsList';
 import { OrganizerReviewsSummary } from './OrganizerReviewsSummary';
+import { SailedWithSection } from './SailedWithSection';
 import type { User } from '../../../logic/types/user';
-import type { BookingWithOffer } from '../../../logic/types/booking';
+import type { BookingWithOffer, UserContact } from '../../../logic/types/booking';
 import Link from 'next/link';
 
 export default function UserProfile({
@@ -15,6 +16,7 @@ export default function UserProfile({
   participatedTrips,
   isOwnProfile = false,
   myBookings = [],
+  userContacts = [],
   successMessage,
 }: {
   user: User;
@@ -22,6 +24,7 @@ export default function UserProfile({
   participatedTrips: { id: string; title?: string; date?: string }[];
   isOwnProfile?: boolean;
   myBookings?: BookingWithOffer[];
+  userContacts?: UserContact[];
   successMessage?: string;
 }) {
 
@@ -38,6 +41,8 @@ export default function UserProfile({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
           <UserBio bio={user.bio} />
+
+          <SailedWithSection contacts={userContacts} />
 
           <TripHistory title="Rejsy organizowane" trips={organizedTrips} />
           {/* <TripHistory title="Rejsy jako załogant" trips={participatedTrips} /> */}

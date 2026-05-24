@@ -5,6 +5,7 @@ import type {
   BookingWithOffer,
   GuestBookingData,
   OfferParticipant,
+  UserContact,
 } from '../types/booking';
 import { RecordModel } from 'pocketbase';
 import { getOfferById, updateAvailableSeats, validateSeatsAvailable } from './offers';
@@ -161,6 +162,288 @@ async function getConfirmedOfferIdsForUser(userId: string): Promise<Set<string>>
   );
 }
 
+export async function getUserConfirmedBookings(userId: string): Promise<Booking[]> {
+  const [crewBookings, organizerBookings] = await Promise.all([
+    listBookingsByFilter(`user_id = "${userId}" && status = "confirmed"`),
+    listBookingsByFilter(`offer_id.organizer_id = "${userId}" && status = "confirmed"`),
+  ]);
+
+  const merged = new Map<string, Booking>();
+
+  for (const booking of [...crewBookings, ...organizerBookings]) {
+    merged.set(booking.id, booking);
+  }
+
+  return Array.from(merged.values());
+}
+
+async function getBookingOrganizer(booking: Booking): Promise<string | null> {
+  const offer = await getOfferById(booking.offer_id);
+  if (!offer?.organizer_id) {
+    return null;
+  }
+
+  return String(offer.organizer_id);
+}
+
+export async function getBookingsOrganizers(bookings: Booking[]): Promise<Set<string>> {
+  const organizers = new Set<string>();
+
+  for (const booking of bookings) {
+    const organizerId = await getBookingOrganizer(booking);
+    if (organizerId) {
+      organizers.add(organizerId);
+    }
+  }
+
+  return organizers;
+}
+
+async function getBookingParticipants(booking: Booking): Promise<Set<string>> {
+  try {
+    const offer: any = await (pb.collection('offers') as any).getOne(booking.offer_id, {
+      expand: 'participants',
+      fields: 'id,organizer_id,participants,expand.participants.id',
+    });
+
+    const relationParticipants = new Set<string>();
+
+    if (Array.isArray(offer?.participants)) {
+      for (const participantId of offer.participants) {
+        const id = String(participantId || '');
+        if (id) {
+          relationParticipants.add(id);
+        }
+      }
+    }
+
+    if (Array.isArray(offer?.expand?.participants)) {
+      for (const participant of offer.expand.participants) {
+        const id = String(participant?.id || '');
+        if (id) {
+          relationParticipants.add(id);
+        }
+      }
+    }
+
+    if (relationParticipants.size > 0) {
+      console.log('[contacts][getBookingParticipants] source=offer.participants', {
+        offerId: booking.offer_id,
+        participantIds: Array.from(relationParticipants),
+      });
+
+      return relationParticipants;
+    }
+
+    console.log('[contacts][getBookingParticipants] offer.participants-empty-fallback-bookings', {
+      offerId: booking.offer_id,
+    });
+  } catch (err) {
+    console.warn('[contacts][getBookingParticipants] offer-read-failed-fallback-bookings', {
+      offerId: booking.offer_id,
+      err,
+    });
+  }
+
+  try {
+    const records: any[] = await (pb.collection(BOOKINGS_COLLECTION) as any).getFullList({
+      filter: `offer_id = "${booking.offer_id}" && status = "confirmed" && user_id != ""`,
+      fields: 'user_id',
+    });
+
+    const bookingParticipants = new Set(
+      records
+        .map((record: any) => String(record.user_id || ''))
+        .filter(Boolean)
+    );
+
+    console.log('[contacts][getBookingParticipants] source=bookings-fallback', {
+      offerId: booking.offer_id,
+      recordsCount: records.length,
+      participantIds: Array.from(bookingParticipants),
+    });
+
+    return bookingParticipants;
+  } catch (err) {
+    console.warn('[contacts][getBookingParticipants] bookings-fallback-failed', {
+      offerId: booking.offer_id,
+      err,
+    });
+    return new Set<string>();
+  }
+}
+
+export async function getBookingsParticipants(bookings: Booking[]): Promise<Set<string>> {
+  const participants = new Set<string>();
+
+  for (const booking of bookings) {
+    const bookingParticipants = await getBookingParticipants(booking);
+    for (const participantId of bookingParticipants) {
+      participants.add(participantId);
+    }
+  }
+
+  return participants;
+}
+
+function addContactTrip(
+  map: Map<string, Set<string>>,
+  contactUserId: string,
+  offerId: string
+) {
+  if (!map.has(contactUserId)) {
+    map.set(contactUserId, new Set<string>());
+  }
+  map.get(contactUserId)!.add(offerId);
+}
+
+async function getUserContactTripMap(userId: string): Promise<Map<string, Set<string>>> {
+  const bookings = await getUserConfirmedBookings(userId);
+
+  console.log('[contacts][getUserContacts] user-trips', {
+    userId,
+    bookingsCount: bookings.length,
+    tripIds: bookings.map((booking) => booking.offer_id),
+  });
+
+  if (bookings.length === 0) {
+    return new Map<string, Set<string>>();
+  }
+
+  const [organizers, participants] = await Promise.all([
+    getBookingsOrganizers(bookings),
+    getBookingsParticipants(bookings),
+  ]);
+
+  console.log('[contacts][getUserContacts] trip-organizers', {
+    userId,
+    organizerIds: Array.from(organizers),
+    organizersCount: organizers.size,
+  });
+
+  console.log('[contacts][getUserContacts] trip-members', {
+    userId,
+    participantIds: Array.from(participants),
+    participantsCount: participants.size,
+  });
+
+  const contactTripMap = new Map<string, Set<string>>();
+
+  for (const booking of bookings) {
+    const offerId = booking.offer_id;
+    if (!offerId) {
+      continue;
+    }
+
+    const organizerId = await getBookingOrganizer(booking);
+    if (organizerId && organizerId !== userId) {
+      addContactTrip(contactTripMap, organizerId, offerId);
+    }
+
+    const bookingParticipants = await getBookingParticipants(booking);
+    for (const participantId of bookingParticipants) {
+      if (participantId !== userId) {
+        addContactTrip(contactTripMap, participantId, offerId);
+      }
+    }
+  }
+
+  console.log('[contacts][getUserContacts] contact-trip-map', {
+    userId,
+    contactIds: Array.from(contactTripMap.keys()),
+    pairs: Array.from(contactTripMap.entries()).map(([contactId, offerIds]) => ({
+      contactId,
+      offerIds: Array.from(offerIds),
+    })),
+  });
+
+  return contactTripMap;
+}
+
+export async function getUserContacts(
+  userId: string
+): Promise<UserContact[]> {
+  try {
+    console.log('[contacts][getUserContacts] start', { userId });
+
+    const contactTripMap = await getUserContactTripMap(userId);
+    const contactIds = Array.from(contactTripMap.keys());
+
+    if (contactIds.length === 0) {
+      console.log('[contacts][getUserContacts] no-contacts', { userId });
+      return [];
+    }
+
+    const allOfferIds = Array.from(
+      new Set(
+        Array.from(contactTripMap.values()).flatMap((offerIds) => Array.from(offerIds))
+      )
+    );
+
+    const offers = await Promise.all(
+      allOfferIds.map(async (offerId) => {
+        const offer = await getOfferById(offerId);
+        return {
+          offerId,
+          title: offer?.title || 'Rejs',
+          date_from: offer?.date_from,
+          date_to: offer?.date_to,
+        };
+      })
+    );
+
+    const offerById = new Map(
+      offers.map((offer) => [offer.offerId, offer] as const)
+    );
+
+    const contacts = await Promise.all(
+      contactIds.map(async (contactUserId) => {
+        const tripIds = Array.from(contactTripMap.get(contactUserId) || []);
+        const trips = tripIds
+          .map((tripId) => offerById.get(tripId))
+          .filter(Boolean)
+          .map((trip) => ({
+            offerId: trip!.offerId,
+            title: trip!.title,
+            date_from: trip!.date_from,
+            date_to: trip!.date_to,
+          }));
+
+        try {
+          const user = await pb.collection('users').getOne(contactUserId, {
+            fields: 'id,name,email',
+          });
+
+          return {
+            userId: String(user.id),
+            name: String(user.name || user.email || 'Użytkownik'),
+            trips,
+          } as UserContact;
+        } catch {
+          return {
+            userId: contactUserId,
+            name: 'Użytkownik',
+            trips,
+          } as UserContact;
+        }
+      })
+    );
+
+    const sorted = contacts.sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+
+    console.log('[contacts][getUserContacts] resolved', {
+      userId,
+      contacts: sorted,
+      contactsCount: sorted.length,
+    });
+
+    return sorted;
+  } catch (err) {
+    console.warn('getUserContacts error:', err);
+    return [];
+  }
+}
+
 export async function createBooking(
   offerId: string,
   message?: string,
@@ -212,6 +495,14 @@ export async function updateBookingStatus(
   const current = await pb.collection(BOOKINGS_COLLECTION).getOne(bookingId);
   const previousStatus = current.status as BookingStatus;
 
+  console.log('[bookings][updateBookingStatus] start', {
+    bookingId,
+    offerId: current.offer_id,
+    bookingUserId: current.user_id,
+    previousStatus,
+    newStatus: status,
+  });
+
   if (previousStatus === status) {
     return mapRecordToBooking(current);
   }
@@ -230,6 +521,13 @@ export async function updateBookingStatus(
 
   await updateAvailableSeats({
     offer,
+    previousStatus,
+    newStatus: status,
+    bookingUserId: current.user_id ? String(current.user_id) : undefined,
+  });
+
+  console.log('[bookings][updateBookingStatus] done', {
+    bookingId,
     previousStatus,
     newStatus: status,
   });

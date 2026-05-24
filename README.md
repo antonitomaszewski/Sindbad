@@ -43,6 +43,7 @@ ZROBIONE
 <!-- 11. mapa ?? (to chyba na koniec) -->
 <!-- 8. po zalogowaniu przekierowuje nas na stronę http://localhost:3000/profil a powinno na stronę główną -->
 <!-- 11. opisz swoje doświadczenie, styl pływania, akweny na których pływałes lub chciałbyś pływać. -->
+<!-- 12. tak samo w charakterze rejsu: rodzinny, regatowy, chill, szkoleniowy -->
 
 DO ZROBIENIA
 dobra, zastanówmy sie co trzeba dorobić
@@ -53,7 +54,6 @@ dobra, zastanówmy sie co trzeba dorobić
 8. aspekt łączenia ludzi nie jest jakoś mocno wydajny obecnie. powinienem jakoś nad tym popracować
 9. dodać, by na profilu uzytkownika widać było osoby z którymi żeglował.
 10. może dodać funkcje jakie dana osoba pełniła na rejsie (1 oficer, itd)
-12. tak samo w charakterze rejsu: rodzinny, regatowy, chill, szkoleniowy
 
 
 

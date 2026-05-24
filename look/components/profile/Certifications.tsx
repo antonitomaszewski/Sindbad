@@ -1,10 +1,12 @@
+import { Card } from '@/look/components/ui/Card';
+
 const COLOR_MAP: Record<string, string> = {
   default: 'bg-gray-100 text-gray-700',
 };
 
 export default function Certifications({ certifications }: { certifications: string[] }) {
   return (
-    <section className="bg-white border border-gray-100 rounded-lg p-4">
+    <Card className="mb-0">
       <h4 className="text-md font-medium mb-3">Uprawnienia żeglarskie</h4>
 
       {certifications.length === 0 ? (
@@ -21,6 +23,6 @@ export default function Certifications({ certifications }: { certifications: str
           })}
         </div>
       )}
-    </section>
+    </Card>
   );
 }
