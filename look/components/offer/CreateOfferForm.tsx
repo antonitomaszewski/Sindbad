@@ -25,6 +25,8 @@ const INITIAL_FORM_DATA: OfferFormData = {
   date_to: null,
   country: '',
   port: '',
+  geo_lat: '',
+  geo_lon: '',
   price_per_person: '',
   currency: 'PLN',
   seats_total: '',
@@ -124,9 +126,13 @@ export default function CreateOfferForm({ countries }: Props) {
         <OfferLocation
           country={formData.country}
           port={formData.port}
+          geoLat={formData.geo_lat}
+          geoLon={formData.geo_lon}
           countries={countries}
           onCountryChange={(value) => updateField('country', value)}
           onPortChange={(value) => updateField('port', value)}
+          onGeoLatChange={(value) => updateField('geo_lat', value)}
+          onGeoLonChange={(value) => updateField('geo_lon', value)}
           errors={errors}
         />
       </FormSection>

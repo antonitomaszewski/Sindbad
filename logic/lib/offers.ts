@@ -246,6 +246,19 @@ export function convertFormDataToOffer(
     offer.seats_available = Number(formData.seats_available);
   }
 
+  const lat = Number(formData.geo_lat);
+  const lon = Number(formData.geo_lon);
+  if (
+    formData.geo_lat &&
+    formData.geo_lon &&
+    Number.isFinite(lat) &&
+    Number.isFinite(lon) &&
+    lat >= -90 && lat <= 90 &&
+    lon >= -180 && lon <= 180
+  ) {
+    offer.geo = { lat, lon };
+  }
+
   return offer;
 }
 
