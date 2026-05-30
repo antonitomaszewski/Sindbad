@@ -61,7 +61,7 @@ dobra, zastanówmy sie co trzeba dorobić
 obecnie profile są dostępne jedynie dla zalogowanych użytkowników
 jak jest po rejsie, to można dodawać komentarze, nie można wysyłać rezerwacji, ale mozna wysłać zapytanie
 
-
+12. bank account number trzeba dodać do profilu organizatora / lub oferty. Gdzieś byc musi. potrzebujemy uzupełniać w mailach.
 
 
 
