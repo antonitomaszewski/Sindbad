@@ -85,6 +85,7 @@ export function bookingConfirmedTemplate({
       <p style="margin: 10px 0;">Prosimy o dokonanie wpłaty na poniższe konto w ciągu <strong>7 dni</strong>:</p>
       
       <div style="background: #fff9e6; padding: 20px; border-left: 4px solid #ffc107; margin: 20px 0;">
+      // tu brakuje danych organizatora: numer konta bankowego, kwota do płatności i imię i nazwisko
         <strong>Numer konta:</strong> PL61109010140000071219812874<br>
         <strong>Imię i nazwisko:</strong> Jan Kowalski<br>
         <strong>Kwota:</strong> 150,00 PLN<br>

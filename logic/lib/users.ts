@@ -214,8 +214,9 @@ export function getCurrentUser(): User | null {
 }
 
 // sprawdzamy czy wchodzimy na profil jako zalogowany uzytkownik
-export function isCurrentServerUser(user: User): boolean {
-  return pb.authStore.record?.id === user.id;
+export function isCurrentServerUser(userOrId: User | string): boolean {
+  const userId = typeof userOrId === 'string' ? userOrId : userOrId.id;
+  return pb.authStore.record?.id === userId;
 }
 
 

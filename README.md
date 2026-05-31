@@ -54,13 +54,14 @@ dobra, zastanówmy sie co trzeba dorobić
 6. obecnie nie wyświetlam rejsów z przeszłości jako załogant (a może powinienem)
 5. wśród znajomych - mamy strava activities, czyli poprostu miejsce, by wrzucić relację
 10. może dodać funkcje jakie dana osoba pełniła na rejsie (1 oficer, itd) - to jest raczej miły dodatek, wazniejsze by łączyć ludzi 
+11. jaka łódź, ilo osobowa. zdjęcia łodzi, o kapitanie
 
 
 
 obecnie profile są dostępne jedynie dla zalogowanych użytkowników
 jak jest po rejsie, to można dodawać komentarze, nie można wysyłać rezerwacji, ale mozna wysłać zapytanie
 
-
+12. bank account number trzeba dodać do profilu organizatora / lub oferty. Gdzieś byc musi. potrzebujemy uzupełniać w mailach.
 
 
 

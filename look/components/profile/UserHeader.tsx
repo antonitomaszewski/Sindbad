@@ -2,12 +2,12 @@ import type { User } from '../../../logic/types/user';
 import { buildFileUrl } from '../../../logic/lib/images';
 
 export default function UserHeader({ user }: { user: User }) {
-  const avatarUrl = buildFileUrl('users', String(user.id), user.avatar ?? null);
+  const avatarUrl = buildFileUrl('users', String(user.id), user.avatar ?? null) ?? undefined;
 
   return (
     <header className="flex items-center gap-6">
       <div className="w-28 h-28 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-        {user.avatar ? (
+        {avatarUrl ? (
           <img src={avatarUrl} alt={user?.name ?? 'avatar'} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
