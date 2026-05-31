@@ -30,7 +30,7 @@
     "@fullcalendar/daygrid": "^6.1.18",
     "@fullcalendar/react": "^6.1.18",
     "leaflet": "^1.9.4",
-    "next": "15.3.4",
+    "next": "15.3.8",
     "pocketbase": "^0.26.1",
     "react": "^19.0.0",
     "react-datepicker": "^9.1.0",
