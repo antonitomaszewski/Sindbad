@@ -6,6 +6,9 @@ import { getOffers } from '../../../logic/lib/offers';
 import type { Offer } from '../../../logic/types/offer';
 import { DateRangePicker } from '../../components/ui/DateRangePicker';
 import { getCountryName } from '../../../logic/constants/countries';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 type GeoPoint = {
   lat: number;
@@ -16,13 +19,6 @@ type OfferWithGeo = {
   offer: Offer;
   geo: GeoPoint;
 };
-
-const LEAFLET_CSS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-const MARKER_CLUSTER_CSS = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css';
-const MARKER_CLUSTER_DEFAULT_CSS =
-  'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css';
-const LEAFLET_JS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-const MARKER_CLUSTER_JS = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
 
 function parseGeo(geoRaw: unknown): GeoPoint | null {
   let geo = geoRaw;
@@ -67,45 +63,6 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#039;');
 }
 
-function ensureStyle(href: string) {
-  if (document.querySelector(`link[href="${href}"]`)) {
-    return;
-  }
-
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = href;
-  document.head.appendChild(link);
-}
-
-function ensureScript(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
-
-    if (existing) {
-      if (existing.dataset.loaded === 'true') {
-        resolve();
-        return;
-      }
-
-      existing.addEventListener('load', () => resolve(), { once: true });
-      existing.addEventListener('error', () => reject(new Error(`Failed to load script: ${src}`)), {
-        once: true,
-      });
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = src;
-    script.async = true;
-    script.addEventListener('load', () => {
-      script.dataset.loaded = 'true';
-      resolve();
-    });
-    script.addEventListener('error', () => reject(new Error(`Failed to load script: ${src}`)));
-    document.body.appendChild(script);
-  });
-}
 
 function parsePriceValue(value: string): number | null {
   if (!value.trim()) {
@@ -267,29 +224,36 @@ export default function MapaPage() {
 
     async function initializeMap() {
       if (!mapContainerRef.current || mapRef.current) {
+        console.log('EXITING')
         return;
       }
 
       try {
-        ensureStyle(LEAFLET_CSS);
-        ensureStyle(MARKER_CLUSTER_CSS);
-        ensureStyle(MARKER_CLUSTER_DEFAULT_CSS);
+        console.log('[mapa] importing leaflet');
+        const L = (await import('leaflet')).default;
+        console.log('[mapa] leaflet loaded', L.version);
 
-        await ensureScript(LEAFLET_JS);
-        await ensureScript(MARKER_CLUSTER_JS);
+        delete (L.Icon.Default.prototype as any)._getIconUrl;
+        L.Icon.Default.mergeOptions({
+          iconUrl: '/leaflet/marker-icon.png',
+          iconRetinaUrl: '/leaflet/marker-icon-2x.png',
+          shadowUrl: '/leaflet/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41],
+        });
+
+        (window as any).L = L;
+        await import('leaflet.markercluster');
+        console.log('[mapa] markercluster loaded');
 
         if (cancelled || !mapContainerRef.current) {
+          console.log('[mapa] cancelled or no container');
           return;
         }
 
-        const L = (window as any).L;
-        if (!L) {
-          throw new Error('Leaflet not loaded');
-        }
-
-        if (mapContainerRef.current.clientHeight === 0) {
-          console.warn('Map container has no height');
-        }
+        console.log('[mapa] container height:', mapContainerRef.current.clientHeight);
 
         mapRef.current = L.map(mapContainerRef.current, {
           zoomControl: false,
@@ -309,6 +273,7 @@ export default function MapaPage() {
 
         isMapInitialized = true;
         setMapReady(true);
+        console.log('[mapa] map initialized successfully');
 
         setTimeout(() => {
           if (mapRef.current && !cancelled) {
@@ -483,13 +448,19 @@ export default function MapaPage() {
         </div>
       </div>
 
-      {loading ? (
+      {loading && (
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-gray-600">
           Ładowanie mapy...
         </div>
-      ) : (
+      )}
+
+      <div
+        ref={mapContainerRef}
+        className={`h-[65vh] min-h-[420px] w-full rounded-xl border border-gray-200 ${loading ? 'hidden' : ''}`}
+      />
+
+      {!loading && (
         <>
-          <div ref={mapContainerRef} className="h-[65vh] min-h-[420px] w-full rounded-xl border border-gray-200" />
 
           {offersWithGeo.length === 0 && (
             <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-800">
