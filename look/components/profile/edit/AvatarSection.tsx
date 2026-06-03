@@ -96,7 +96,7 @@ export default function AvatarSection({ user, formData, setFormData, loading }: 
             )}
           </div>
           <p className="text-xs text-gray-500">
-            Maksymalny rozmiar: 2MB. Format: JPG, PNG, GIF
+            Maksymalny rozmiar: 5MB. Format: JPG, PNG, GIF
           </p>
         </div>
       </div>

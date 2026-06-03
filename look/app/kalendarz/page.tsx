@@ -1,12 +1,14 @@
 "use client";
 
-import FullCalendar from '@fullcalendar/react';
+import dynamic from 'next/dynamic';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import plLocale from '@fullcalendar/core/locales/pl';
 import EventModal from '@/look/components/ui/EventModal';
 import { useOffers } from '@/look/hooks/useOffers';
 import { useEventModal } from '@/look/hooks/useEventModal';
 import { CALENDAR_TEXTS, CALENDAR_CONFIG } from '@/look/constants/calendar';
+
+const FullCalendar = dynamic(() => import('@fullcalendar/react'), { ssr: false });
 
 export default function KalendarzPage() {
   const { events, loading } = useOffers();
