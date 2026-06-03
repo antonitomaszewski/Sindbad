@@ -39,10 +39,7 @@ export default function EditProfilePage({ params }: Props) {
     });
   }, [id, user, userLoading]);
 
-  const isOwnProfile = isCurrentServerUser(user);
-
-
-  if (userError || !user || !isOwnProfile) {
+  if (userError || !user) {
       return (
         <NotFoundState
           title="404"
