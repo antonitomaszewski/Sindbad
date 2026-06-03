@@ -1,35 +1,67 @@
+'use client';
+
 import { redirect, notFound } from 'next/navigation';
 import { getUser, isCurrentServerUser } from '../../../../../logic/lib/users';
-import { getAllCertifications, getUserCertificationIds } from '../../../../../logic/lib/certifications';
+import { Certification, getAllCertifications, getUserCertificationIds } from '../../../../../logic/lib/certifications';
 import EditProfileView from '../../../../components/profile/EditProfileView';
+import { useUser } from '../../../../hooks/useUser';
+import { use, useEffect, useState } from 'react';
+import { LoadingState } from '../../../../components/common/LoadingState';
+import { NotFoundState } from '../../../../components/common/NotFoundState';
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
-export const dynamic = 'force-dynamic';
+export default function EditProfilePage({ params }: Props) {
+  const { id } = use(params);
+  const { user, loading: userLoading, error: userError } = useUser(id);
 
-export default async function EditProfilePage({ params }: Props) {
-  const { id } = await params;
-  const isOwnProfile = await isCurrentServerUser(id);
+  const [availableCertifications, setAvailableCertifications] = useState<Certification[]>([]);
+  const [userCertIds, setUserCertIds] = useState<string[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
-  if (!isOwnProfile) {
-    redirect('/logowanie');
-  }
+  useEffect(() => {
+    if (userLoading || !user) return;
 
-  const [freshUser, availableCertifications, userCertIds] = await Promise.all([
-    getUser(id),
-    getAllCertifications(),
-    getUserCertificationIds(id),
-  ]);
+    if (!isCurrentServerUser(user)) {
+      redirect('/logowanie');
+      return;
+    }
 
-  if (!freshUser) {
-    notFound();
+    Promise.all([
+      getAllCertifications(),
+      getUserCertificationIds(id),
+    ]).then(([certs, certIds]) => {
+      setAvailableCertifications(certs);
+      setUserCertIds(certIds);
+      setDataLoading(false);
+    });
+  }, [id, user, userLoading]);
+
+  const isOwnProfile = isCurrentServerUser(user);
+
+
+  if (userError || !user || !isOwnProfile) {
+      return (
+        <NotFoundState
+          title="404"
+          message="Profil nie jest dostępny"
+          description="Nie masz dostępu do tego profilu lub profil nie istnieje."
+          backUrl="/kalendarz"
+          backText="Powrót do kalendarza"
+        />
+      );
+    }
+
+
+  if (userLoading || dataLoading) {
+    return <LoadingState message="Ładowanie ..." />;
   }
 
   return (
-    <EditProfileView 
-      user={freshUser} 
+    <EditProfileView
+      user={user}
       availableCertifications={availableCertifications}
       userCertificationIds={userCertIds}
     />

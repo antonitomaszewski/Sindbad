@@ -175,8 +175,21 @@ export async function registerUser(
 
     return user as unknown as User;
   } catch (error: any) {
-    // Przekaż szczegółowy błąd z PocketBase (np. "User with email already exists")
-    throw new Error(error?.response?.message || ERRORS.REGISTRATION_FAILED);
+    // Przekaż szczegółowy błąd z PocketBase (np. "User with email already exists").
+    const pbMessage = error?.response?.message;
+    const fallbackMessage = error?.message;
+    const likelyNetworkIssue =
+      !error?.response &&
+      (typeof fallbackMessage === 'string' &&
+        /fetch|network|cors|failed to fetch/i.test(fallbackMessage));
+
+    if (likelyNetworkIssue) {
+      throw new Error(
+        'Brak połączenia z bazą PocketBase. Sprawdź NEXT_PUBLIC_PB_URL w Vercel oraz CORS (Allowed origins) w PocketBase.'
+      );
+    }
+
+    throw new Error(pbMessage || fallbackMessage || ERRORS.REGISTRATION_FAILED);
   }
 }
 
