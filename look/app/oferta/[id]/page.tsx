@@ -10,7 +10,6 @@ import { OfferActions } from '@/look/components/offer/OfferActions';
 import { OfferGallery } from '@/look/components/offer/OfferGallery';
 import { OfferParticipants } from '@/look/components/offer/OfferParticipants';
 import { OfferCommentsSection } from '@/look/components/comments/OfferCommentsSection';
-import { CreateTripAlertButton } from '@/look/components/trip-alerts/CreateTripAlertButton';
 import { LoadingState } from '@/look/components/common/LoadingState';
 import { NotFoundState } from '@/look/components/common/NotFoundState';
 import { OFFER_MESSAGES } from '@/look/constants/offer';
@@ -169,6 +168,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
           <OfferActions
             onReservation={handleReservation}
             onContact={handleContact}
+            offer={offer}
             canReserve={canReserve}
           />
         )}
@@ -178,9 +178,6 @@ export default function OfertaPage({ params }: OfferPageProps) {
             Pytanie zostało wysłane.
           </div>
         )}
-
-        <CreateTripAlertButton offer={offer} />
-
         {isOrganizer && <BookingsPanel offerId={offer.id} />}
 
         {showModal && (

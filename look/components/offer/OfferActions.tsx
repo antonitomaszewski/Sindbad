@@ -1,14 +1,17 @@
 import { Card } from '@/look/components/ui/Card';
 import { Button } from '@/look/components/ui/Button';
 import { OFFER_LABELS, OFFER_MESSAGES } from '@/look/constants/offer';
+import { CreateTripAlertButton } from '@/look/components/trip-alerts/CreateTripAlertButton';
+import type { Offer } from '@/logic/types/offer';
 
 interface OfferActionsProps {
   onReservation: () => void;
   onContact: () => void;
+  offer: Offer;
   canReserve?: boolean;
 }
 
-export function OfferActions({ onReservation, onContact, canReserve = true }: OfferActionsProps) {
+export function OfferActions({ onReservation, onContact, offer, canReserve = true }: OfferActionsProps) {
   return (
     <Card>
       <div className="flex gap-4">
@@ -23,6 +26,13 @@ export function OfferActions({ onReservation, onContact, canReserve = true }: Of
         <Button onClick={onContact} variant="secondary">
           {OFFER_LABELS.ASK_QUESTION}
         </Button>
+        <CreateTripAlertButton
+          offer={offer}
+          label={OFFER_LABELS.NOTIFY_SIMILAR}
+          showIcon={false}
+          fullWidth
+          className="border-2 border-gray text-gray hover:bg-gray hover:text-white font-semibold"
+        />
       </div>
     </Card>
   );
