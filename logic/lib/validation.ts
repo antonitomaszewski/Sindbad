@@ -5,6 +5,7 @@ import type { ValidationErrors } from '../types/form';
 const VALIDATION_RULES = {
   TITLE_MIN_LENGTH: 3,
   TITLE_MAX_LENGTH: 100,
+  DESCRIPTION_MAX_LENGTH: 1000,
   MAX_IMAGE_SIZE_MB: 5,
   MAX_IMAGE_SIZE_BYTES: 5 * 1024 * 1024,
 } as const;
@@ -13,6 +14,7 @@ const VALIDATION_MESSAGES = {
   TITLE_REQUIRED: 'Tytuł jest wymagany',
   TITLE_TOO_SHORT: `Tytuł musi mieć minimum ${VALIDATION_RULES.TITLE_MIN_LENGTH} znaki`,
   TITLE_TOO_LONG: `Tytuł może mieć maksymalnie ${VALIDATION_RULES.TITLE_MAX_LENGTH} znaków`,
+  DESCRIPTION_TOO_LONG: `Tytuł może mieć maksymalnie ${VALIDATION_RULES.DESCRIPTION_MAX_LENGTH} znaków`,
   DATE_FROM_REQUIRED: 'Data rozpoczęcia jest wymagana',
   DATE_FROM_PAST: 'Data rozpoczęcia nie może być w przeszłości',
   DATE_TO_REQUIRED: 'Data zakończenia jest wymagana',
@@ -39,6 +41,11 @@ export function validateOfferForm(data: OfferFormData): ValidationErrors {
     errors.title = VALIDATION_MESSAGES.TITLE_TOO_SHORT;
   } else if (data.title.length > VALIDATION_RULES.TITLE_MAX_LENGTH) {
     errors.title = VALIDATION_MESSAGES.TITLE_TOO_LONG;
+  }
+
+  // description validation
+  if (data.description.length > VALIDATION_RULES.DESCRIPTION_MAX_LENGTH) {
+    errors.title = VALIDATION_MESSAGES.DESCRIPTION_TOO_LONG;
   }
 
   // Date validation

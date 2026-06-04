@@ -13,7 +13,7 @@ export default function OfferPricing({ price, currency, onPriceChange, onCurrenc
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Cena za osobę <span className="text-gray-400">(opcjonalnie)</span>
+          Cena za osobę <span className="text-gray-400"></span>
         </label>
         <div className="flex gap-3">
           <input

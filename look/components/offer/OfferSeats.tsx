@@ -11,7 +11,7 @@ export default function OfferSeats({ seatsTotal, seatsAvailable, onSeatsTotalCha
     <div className="space-y-4">
       <div>
         <label htmlFor="seatsTotal" className="block text-sm font-medium text-gray-700 mb-2">
-          Liczba miejsc (całkowita) <span className="text-gray-400">(opcjonalnie)</span>
+          Liczba miejsc (całkowita) <span className="text-gray-400"></span>
         </label>
         <input
           id="seatsTotal"
@@ -29,7 +29,7 @@ export default function OfferSeats({ seatsTotal, seatsAvailable, onSeatsTotalCha
 
       <div>
         <label htmlFor="seatsAvailable" className="block text-sm font-medium text-gray-700 mb-2">
-          Liczba wolnych miejsc <span className="text-gray-400">(opcjonalnie)</span>
+          Liczba wolnych miejsc <span className="text-gray-400"></span>
         </label>
         <input
           id="seatsAvailable"

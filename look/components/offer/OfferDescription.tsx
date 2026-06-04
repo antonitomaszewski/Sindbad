@@ -9,7 +9,7 @@ export function OfferDescription({ description }: OfferDescriptionProps) {
   return (
     <Card>
       <h2 className="text-xl font-bold text-main mb-4">{OFFER_LABELS.DESCRIPTION}</h2>
-      <p className="text-gray leading-relaxed">{description}</p>
+      <p className="text-gray leading-relaxed break-words">{description}</p>
     </Card>
   );
 }
