@@ -23,13 +23,13 @@ export default function SearchPanel() {
   const [q, setQ] = useState('');
   const [dateFrom, setDateFrom] = useState<Date | null>(null);
   const [dateTo, setDateTo] = useState<Date | null>(null);
-  const [onlyFuture, setOnlyFuture] = useState(false);
+  const [onlyFuture, setOnlyFuture] = useState(true);
   const [filters, setFilters] = useState<Filters>({
     country: '',
     port: '',
     priceMin: '',
     priceMax: '',
-    onlyFree: false,
+    onlyFree: true,
     organizerId: '',
   });
 
@@ -85,16 +85,6 @@ export default function SearchPanel() {
 
   return (
     <div className="space-y-6">
-      {/* Szukaj rejsów — wyszukuje w title i description */}
-      <div className="flex justify-center">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Szukaj rejsów po nazwie lub opisie..."
-          className="w-full md:w-2/3 p-3 rounded-lg border focus-ring-main focus-border-main"
-        />
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Filtry - lewa kolumna */}
         <div className="col-span-1">
