@@ -163,7 +163,6 @@ export default function SearchPanel() {
                 type="checkbox" 
                 checked={filters.onlyFree} 
                 onChange={(e) => setFilters({ ...filters, onlyFree: e.target.checked })} 
-                className="h-4 w-4 rounded border border-gray-300 text-main focus-ring-main"
               />
               Tylko z wolnymi miejscami
             </label>
@@ -173,7 +172,6 @@ export default function SearchPanel() {
                 type="checkbox" 
                 checked={onlyFuture} 
                 onChange={(e) => setOnlyFuture(e.target.checked)} 
-                className="h-4 w-4 rounded border border-gray-300 text-main focus-ring-main"
               />
               Pomiń rejsy z przeszłości
             </label>
