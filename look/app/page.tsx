@@ -81,7 +81,7 @@ export default function HomePage() {
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <section className="mx-auto max-w-5xl px-4 pb-12 pt-20 sm:px-6 lg:px-8">
         <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-12">
-          <p className="mb-3 inline-flex rounded-full bg-sky-100 px-3 py-1 text-sm font-medium text-sky-700">
+          <p className="mb-3 inline-flex rounded-full bg-main-soft px-3 py-1 text-sm font-medium text-main">
             Sindbad
           </p>
 
@@ -97,7 +97,7 @@ export default function HomePage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/szukaj"
-              className="rounded-lg bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-700"
+              className="rounded-lg bg-main px-5 py-3 text-sm font-semibold text-white transition hover-bg-main"
             >
               Szukaj rejsów
             </Link>

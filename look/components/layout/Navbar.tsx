@@ -76,14 +76,14 @@ export default function Navbar() {
               <>
                 <Link
                   href="/oferta/nowa"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition shadow-md hover:shadow-lg"
+                  className="px-4 py-2 bg-main text-white rounded-lg text-sm font-semibold hover-bg-main transition shadow-md hover:shadow-lg"
                 >
                   + Dodaj rejs
                 </Link>
                 {/* Kliknięcie w nazwę → profil użytkownika */}
                 <Link 
                   href={`/profil/${user.id}`}
-                  className="text-sm text-gray-700 hover:text-blue-600 font-medium transition"
+                  className="text-sm text-gray-700 hover-text-main font-medium transition"
                 >
                   {user.name || user.email}
                 </Link>
@@ -98,13 +98,13 @@ export default function Navbar() {
               <>
                 <Link
                   href="/logowanie"
-                  className="px-4 py-2 text-sm text-gray-700 hover:text-blue-600 font-medium transition"
+                  className="px-4 py-2 text-sm text-gray-700 hover-text-main font-medium transition"
                 >
                   Zaloguj się
                 </Link>
                 <Link
                   href="/rejestracja"
-                  className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition shadow-md hover:shadow-lg"
+                  className="px-5 py-2 bg-main text-white rounded-lg text-sm font-semibold hover-bg-main transition shadow-md hover:shadow-lg"
                 >
                   Zarejestruj się
                 </Link>
@@ -137,7 +137,7 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="block text-gray-700 hover:text-blue-600 font-medium transition py-2"
+                className="block text-gray-700 hover-text-main font-medium transition py-2"
                 onClick={() => setMenuOpen(false)}
               >
                 {item.label}
@@ -149,7 +149,7 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/oferta/nowa"
-                    className="block bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition text-center"
+                    className="block bg-main text-white px-4 py-2 rounded-lg font-semibold hover-bg-main transition text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     + Dodaj rejs
@@ -157,7 +157,7 @@ export default function Navbar() {
                   {/* Mobile: Kliknięcie w nazwę → profil */}
                   <Link
                     href={`/profil/${user.id}`}
-                    className="block text-gray-700 hover:text-blue-600 font-medium transition py-2"
+                    className="block text-gray-700 hover-text-main font-medium transition py-2"
                     onClick={() => setMenuOpen(false)}
                   >
                     Mój profil ({user.name || user.email})
@@ -176,14 +176,14 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/logowanie"
-                    className="block text-gray-700 hover:text-blue-600 font-medium transition py-2"
+                    className="block text-gray-700 hover-text-main font-medium transition py-2"
                     onClick={() => setMenuOpen(false)}
                   >
                     Zaloguj się
                   </Link>
                   <Link
                     href="/rejestracja"
-                    className="block bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition text-center"
+                    className="block bg-main text-white px-4 py-2 rounded-lg font-semibold hover-bg-main transition text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Zarejestruj się

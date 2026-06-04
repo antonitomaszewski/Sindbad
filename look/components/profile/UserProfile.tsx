@@ -33,7 +33,7 @@ export default function UserProfile({
   return (
     <div className="max-w-[1100px] mx-auto p-8 space-y-8">
       {successMessage && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+        <div className="bg-main-soft border border-main-soft text-main px-4 py-3 rounded-lg">
           {successMessage}
         </div>
       )}
@@ -61,7 +61,7 @@ export default function UserProfile({
       {isOwnProfile && (
         <Link
           href={`/profil/${user.id}/edytuj`} // Zmień z /profil/edycja
-          className="px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow-md hover:shadow-lg"
+          className="px-5 py-2 bg-main text-white rounded-lg font-semibold hover-bg-main transition shadow-md hover:shadow-lg"
         >
           Edytuj profil
         </Link>

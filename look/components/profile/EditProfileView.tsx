@@ -164,7 +164,7 @@ export default function EditProfileView({
               )}
 
               {accountSuccess && (
-                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+                <div className="bg-main-soft border border-main-soft text-main px-4 py-3 rounded-lg text-sm">
                   {accountSuccess}
                 </div>
               )}
@@ -177,7 +177,7 @@ export default function EditProfileView({
                   onChange={(e) => setAccountData((prev) => ({ ...prev, email: e.target.value }))}
                   placeholder="Nowy email"
                   disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
                 />
                 <input
                   type="password"
@@ -187,13 +187,13 @@ export default function EditProfileView({
                   }
                   placeholder="Aktualne hasło"
                   disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
                 />
                 <button
                   type="button"
                   onClick={handleEmailChange}
                   disabled={accountLoading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                  className="px-4 py-2 bg-main text-white rounded-lg font-semibold hover-bg-main transition disabled:opacity-50"
                 >
                   Zmień email
                 </button>
@@ -207,7 +207,7 @@ export default function EditProfileView({
                   onChange={(e) => setAccountData((prev) => ({ ...prev, currentPassword: e.target.value }))}
                   placeholder="Aktualne hasło"
                   disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
                 />
                 <input
                   type="password"
@@ -215,7 +215,7 @@ export default function EditProfileView({
                   onChange={(e) => setAccountData((prev) => ({ ...prev, newPassword: e.target.value }))}
                   placeholder="Nowe hasło (min. 8 znaków)"
                   disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
                 />
                 <input
                   type="password"
@@ -225,13 +225,13 @@ export default function EditProfileView({
                   }
                   placeholder="Potwierdź nowe hasło"
                   disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
                 />
                 <button
                   type="button"
                   onClick={handlePasswordChange}
                   disabled={accountLoading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                  className="px-4 py-2 bg-main text-white rounded-lg font-semibold hover-bg-main transition disabled:opacity-50"
                 >
                   Zmień hasło
                 </button>
@@ -296,7 +296,7 @@ export default function EditProfileView({
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+              className="flex-1 px-6 py-3 bg-main text-white rounded-lg font-semibold hover-bg-main transition disabled:opacity-50"
             >
               {loading ? 'Zapisywanie...' : 'Zapisz zmiany'}
             </button>

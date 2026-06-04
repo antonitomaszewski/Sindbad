@@ -3,23 +3,42 @@
   --white: #ffffff;
   --black: #000000;
   --gray: #6b7280;        /* do tekstu pomocniczego, granic */
-  
-  /* Zielone akcenty */
-  --green-main: #059669;   /* główny zielony */
+
+  /* Główny kolor aplikacji */
+  --main: #2b8c9e;
+  --main-hover: #24798a;
+  --main-soft: #eef8fa;
+  --main-soft-border: #c5e3e8;
+
+  /* Backward compatibility */
+  --green-main: var(--main);
 }
 
 /* Utility classes */
 .text-white { color: var(--white); }
 .text-black { color: var(--black); }
 .text-gray { color: var(--gray); }
-.text-main { color: var(--green-main); }
+.text-main { color: var(--main); }
 
 .bg-white { background-color: var(--white); }
 .bg-black { background-color: var(--black); }
-.bg-main { background-color: var(--green-main); }
+.bg-main { background-color: var(--main); }
+.bg-main-soft { background-color: var(--main-soft); }
 
 .border-gray { border-color: var(--gray); }
-.border-main { border-color: var(--green-main); }
+.border-main { border-color: var(--main); }
+.border-main-soft { border-color: var(--main-soft-border); }
 
 /* Hover states */
-.hover-text-main:hover { color: var(--green-main); }
+.hover-text-main:hover { color: var(--main-hover); }
+.hover-bg-main:hover { background-color: var(--main-hover); }
+
+/* Focus helpers */
+.focus-ring-main:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(43, 140, 158, 0.35);
+}
+
+.focus-border-main:focus {
+  border-color: var(--main);
+}

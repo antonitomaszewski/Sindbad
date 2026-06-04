@@ -63,10 +63,10 @@ export default function OfferCard({ offer, coverUrl, organizerName }: OfferCardP
         )}
 
         <div className="flex items-center justify-between pt-2 border-t">
-          <div className="text-blue-600 font-semibold text-lg">{price}</div>
+          <div className="text-main font-semibold text-lg">{price}</div>
           <Link 
             href={`/oferta/${offer.id}`} 
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            className="bg-main text-white px-4 py-2 rounded hover-bg-main transition-colors"
           >
             Szczegóły
           </Link>
