@@ -16,5 +16,6 @@ export const OFFER_LABELS = {
   ORGANIZER: "Organizator",
   SEND_RESERVATION: "Wyślij rezerwację",
   ASK_QUESTION: "Zadaj pytanie",
+  NOTIFY_SIMILAR: "Powiadom o podobnych rejsach",
   PER_PERSON: "za osobę"
 } as const;

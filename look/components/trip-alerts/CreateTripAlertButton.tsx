@@ -8,9 +8,19 @@ import { TripAlertForm } from './TripAlertForm';
 
 interface CreateTripAlertButtonProps {
   offer: Offer;
+  label?: string;
+  showIcon?: boolean;
+  className?: string;
+  fullWidth?: boolean;
 }
 
-export function CreateTripAlertButton({ offer }: CreateTripAlertButtonProps) {
+export function CreateTripAlertButton({
+  offer,
+  label = 'Powiadom o podobnych rejsach',
+  showIcon = true,
+  className = '',
+  fullWidth = false,
+}: CreateTripAlertButtonProps) {
   const currentUser = getCurrentUser();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -27,13 +37,13 @@ export function CreateTripAlertButton({ offer }: CreateTripAlertButtonProps) {
 
   return (
     <>
-      <div className="mt-6">
+      <div className={fullWidth ? 'flex-1' : 'mt-6'}>
         <button
           type="button"
           onClick={handleOpen}
-          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-50"
+          className={`inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-50 ${fullWidth ? 'w-full' : ''} ${className}`}
         >
-          🔔 Powiadom o podobnych rejsach
+          {showIcon ? `🔔 ${label}` : label}
         </button>
         {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
       </div>
