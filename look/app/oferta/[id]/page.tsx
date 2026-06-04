@@ -196,15 +196,6 @@ export default function OfertaPage({ params }: OfferPageProps) {
             onSuccess={handleQuestionSuccess}
           />
         )}
-
-        <div className="mt-6 text-center">
-          <Link 
-            href="/kalendarz"
-            className="text-main hover:text-green-dark font-medium"
-          >
-            {OFFER_MESSAGES.BACK_TO_CALENDAR}
-          </Link>
-        </div>
       </div>
     </div>
   );

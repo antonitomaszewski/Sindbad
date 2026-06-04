@@ -479,12 +479,6 @@ export default function MapaPage() {
           )}
         </>
       )}
-
-      <div className="mt-6">
-        <Link href="/szukaj" className="text-blue-600 hover:underline">
-          Przejdź do wyszukiwarki
-        </Link>
-      </div>
     </div>
   );
 }
