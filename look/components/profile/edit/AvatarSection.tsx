@@ -99,7 +99,7 @@ export default function AvatarSection({ user, formData, setFormData, loading }: 
                 type="button"
                 onClick={handleDeleteAvatar}
                 disabled={loading || deleting}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-error text-white rounded-lg font-semibold hover-bg-error transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {deleting ? 'Usuwanie...' : 'Usuń zdjęcie'}
               </button>

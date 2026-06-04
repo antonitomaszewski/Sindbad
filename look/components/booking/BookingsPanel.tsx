@@ -43,7 +43,7 @@ export function BookingsPanel({ offerId }: BookingsPanelProps) {
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <div className="mt-8 bg-main-soft border border-main-soft rounded-lg p-6">
       <h2 className="text-xl font-bold text-gray-900 mb-4">
         Panel organizatora - Rezerwacje ({bookings.length})
       </h2>
@@ -98,7 +98,7 @@ function BookingItem({ booking, onStatusChange }: BookingItemProps) {
               {user ? (
                 <Link 
                   href={`/profil/${booking.user_id}`}
-                  className="font-semibold text-blue-600 hover:underline"
+                  className="font-semibold text-main hover:underline"
                 >
                   {user.name || 'Użytkownik'}
                 </Link>
@@ -129,13 +129,13 @@ function BookingItem({ booking, onStatusChange }: BookingItemProps) {
         <div className="flex gap-2">
           <button
             onClick={() => onStatusChange(booking.id, 'confirmed')}
-            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+            className="flex-1 px-4 py-2 bg-success text-white rounded-lg hover-bg-success font-medium"
           >
             ✓ Potwierdź
           </button>
           <button
             onClick={() => onStatusChange(booking.id, 'rejected')}
-            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+            className="flex-1 px-4 py-2 bg-error text-white rounded-lg hover-bg-error font-medium"
           >
             ✕ Anuluj
           </button>

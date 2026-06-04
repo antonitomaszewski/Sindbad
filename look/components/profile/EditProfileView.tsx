@@ -202,7 +202,7 @@ export default function EditProfileView({
                 <div>
                   <input
                     type="email"
-                    value={accountData.email}
+                    value=""
                     onChange={(e) => setAccountData((prev) => ({ ...prev, email: e.target.value }))}
                     placeholder="Nowy email"
                     disabled={accountLoading}

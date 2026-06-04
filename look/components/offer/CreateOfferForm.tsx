@@ -176,7 +176,7 @@ export default function CreateOfferForm({ countries }: Props) {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition shadow-lg hover:shadow-xl"
+          className="flex-1 px-6 py-3 bg-main text-white rounded-lg font-semibold hover-bg-main disabled:bg-gray-400 disabled:cursor-not-allowed transition shadow-lg hover:shadow-xl"
         >
           {loading ? 'Tworzenie...' : 'Utwórz ofertę'}
         </button>

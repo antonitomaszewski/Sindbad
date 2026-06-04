@@ -27,7 +27,7 @@ export default function BasicInfoSection({ formData, setFormData, loading, error
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           placeholder="Jan Kowalski"
           disabled={loading}
-          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${errors?.name ? 'border-red-400' : 'border-gray-300'}`}
+          className={`w-full px-4 py-2 border rounded-lg focus-ring-main focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${errors?.name ? 'border-red-400' : 'border-gray-300'}`}
         />
         {errors?.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
       </div>
@@ -47,7 +47,7 @@ export default function BasicInfoSection({ formData, setFormData, loading, error
           maxLength={MAX_BIO_LENGTH}
           placeholder="Np. 5 lat na Bałtyku i Adriatyku, styl: chill/regatowy, najchętniej Mazury i Chorwacja."
           disabled={loading}
-          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed ${errors?.bio ? 'border-red-400' : 'border-gray-300'}`}
+          className={`w-full px-4 py-2 border rounded-lg focus-ring-main focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed ${errors?.bio ? 'border-red-400' : 'border-gray-300'}`}
         />
         <div className="mt-1 flex justify-between">
           {errors?.bio

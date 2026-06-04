@@ -57,7 +57,7 @@ export default function CertificationsSection({
                 className={`
                   flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition
                   ${isSelected 
-                    ? 'border-blue-500 bg-blue-50' 
+                    ? 'border-main bg-main-soft' 
                     : 'border-gray-200 hover:border-gray-300 bg-white'
                   }
                   ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
@@ -68,7 +68,7 @@ export default function CertificationsSection({
                   checked={isSelected}
                   onChange={() => !disabled && toggleCertification(cert.id)}
                   disabled={disabled}
-                  className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                  className="w-5 h-5 text-main rounded focus-ring-main"
                 />
                 <div className="flex-1">
                   <p className="font-medium text-gray-900">
@@ -82,8 +82,8 @@ export default function CertificationsSection({
       )}
 
       {localSelected.size > 0 && (
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
+        <div className="mt-4 p-3 bg-main-soft border border-main-soft rounded-lg">
+          <p className="text-sm text-main">
             Wybrano: <strong>{localSelected.size}</strong> {localSelected.size === 1 ? 'certyfikat' : 'certyfikaty'}
           </p>
         </div>
