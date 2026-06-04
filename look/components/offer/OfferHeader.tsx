@@ -63,7 +63,7 @@ export function OfferHeader({
       </div>
 
       {seatsAvailable !== undefined && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-main-soft border border-main-soft rounded-lg p-4">
           <p className="text-main font-medium">
             {getSeatsLabel(seatsAvailable)}
           </p>

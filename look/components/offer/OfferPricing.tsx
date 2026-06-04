@@ -22,7 +22,7 @@ export default function OfferPricing({ price, currency, onPriceChange, onCurrenc
             onChange={(e) => onPriceChange(e.target.value)}
             min="0"
             step="0.01"
-            className={`flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
+            className={`flex-1 px-4 py-3 border rounded-lg focus:outline-none focus-ring-main transition ${
               errors?.price_per_person ? 'border-red-300' : 'border-gray-300'
             }`}
             placeholder="0"
@@ -30,7 +30,7 @@ export default function OfferPricing({ price, currency, onPriceChange, onCurrenc
           <select
             value={currency}
             onChange={(e) => onCurrencyChange(e.target.value as any)}
-            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus-ring-main transition"
           >
             {CURRENCIES.map((c) => (
               <option key={c.code} value={c.code}>

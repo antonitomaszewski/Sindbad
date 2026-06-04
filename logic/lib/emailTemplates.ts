@@ -35,7 +35,7 @@ export function newBookingTemplate({
         ${message ? `<strong>Wiadomość:</strong> ${message}` : ''}
       </div>
       
-      ${bookingLink ? `<a href="${bookingLink}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zarządzaj rezerwacją</a>` : ''}
+      ${bookingLink ? `<a href="${bookingLink}" style="background: #2b8c9e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zarządzaj rezerwacją</a>` : ''}
       
       <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
     </div>
@@ -116,7 +116,7 @@ export function bookingRejectedTemplate({
       </div>
 
       <p>Możesz przeglądać inne dostępne rejsy w naszej aplikacji:</p>
-      <a href="${process.env.NEXT_PUBLIC_BASE_URL}/szukaj" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Przeglądaj rejsy</a>
+      <a href="${process.env.NEXT_PUBLIC_BASE_URL}/szukaj" style="background: #2b8c9e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Przeglądaj rejsy</a>
       
       <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
     </div>
@@ -145,7 +145,7 @@ export function questionToOrganizerTemplate({
         <div style="margin-top: 8px; white-space: pre-wrap;">${question}</div>
       </div>
 
-      ${offerLink ? `<a href="${offerLink}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zobacz ofertę</a>` : ''}
+      ${offerLink ? `<a href="${offerLink}" style="background: #2b8c9e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zobacz ofertę</a>` : ''}
 
       <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
     </div>
@@ -172,7 +172,7 @@ export function questionConfirmationTemplate({
         <div style="margin-top: 8px; white-space: pre-wrap;">${question}</div>
       </div>
 
-      ${offerLink ? `<a href="${offerLink}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zobacz ofertę</a>` : ''}
+      ${offerLink ? `<a href="${offerLink}" style="background: #2b8c9e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zobacz ofertę</a>` : ''}
 
       <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
     </div>

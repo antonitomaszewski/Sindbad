@@ -39,7 +39,7 @@ export function SailedWithSection({ contacts, commonContactIds = [] }: SailedWit
             type="checkbox"
             checked={onlyCommon}
             onChange={(e) => setOnlyCommon(e.target.checked)}
-            className="h-4 w-4 rounded border border-gray-300 text-blue-600"
+            className="h-4 w-4 rounded border border-gray-300 text-main"
           />
           Pokaż tylko wspólne kontakty
         </label>
@@ -56,7 +56,7 @@ export function SailedWithSection({ contacts, commonContactIds = [] }: SailedWit
               <div className="flex items-start justify-between gap-3">
                 <Link
                   href={`/profil/${contact.userId}`}
-                  className="text-blue-600 hover:underline font-medium"
+                  className="text-main hover:underline font-medium"
                 >
                   {contact.name}
                 </Link>
@@ -74,7 +74,7 @@ export function SailedWithSection({ contacts, commonContactIds = [] }: SailedWit
                   <ul className="mt-2 space-y-1 pl-4 list-disc">
                     {contact.trips.map((trip) => (
                       <li key={`${contact.userId}-${trip.offerId}`} className="text-sm text-gray-700">
-                        <Link href={`/oferta/${trip.offerId}`} className="text-blue-600 hover:underline">
+                        <Link href={`/oferta/${trip.offerId}`} className="text-main hover:underline">
                           {trip.title}
                         </Link>
                       </li>

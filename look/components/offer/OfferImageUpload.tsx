@@ -41,7 +41,7 @@ export default function OfferImageUpload({ images, onImagesChange, errors }: Pro
           accept="image/*"
           multiple
           onChange={handleFileChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus-ring-main transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-main-soft file:text-main hover:file:bg-main-soft"
         />
         {errors?.images && <p className="mt-1 text-sm text-red-600">{errors.images}</p>}
       </div>

@@ -73,7 +73,7 @@ export default function MyBookingsList({ bookings: initialBookings }: { bookings
               <div>
                 <Link
                   href={`/oferta/${booking.offer_id}`}
-                  className="font-medium text-blue-600 hover:underline"
+                  className="font-medium text-main hover:underline"
                 >
                   {booking.offer?.title ?? 'Rejs'}
                 </Link>

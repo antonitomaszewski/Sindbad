@@ -187,7 +187,7 @@ export default function OfferLocation({
           id="country"
           value={country}
           onChange={(e) => onCountryChange(e.target.value)}
-          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
+          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus-ring-main transition ${
             errors?.country ? 'border-red-300' : 'border-gray-300'
           }`}
         >
@@ -210,7 +210,7 @@ export default function OfferLocation({
           type="text"
           value={port}
           onChange={(e) => onPortChange(e.target.value)}
-          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
+          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus-ring-main transition ${
             errors?.port ? 'border-red-300' : 'border-gray-300'
           }`}
           placeholder="np. Gdańsk, Wilkasy, Split"
@@ -219,7 +219,7 @@ export default function OfferLocation({
       </div>
 
       <div>
-        <p className="block text-sm font-medium text-gray-700 mb-2">Pozycja na mapie (MVP)</p>
+        <p className="block text-sm font-medium text-gray-700 mb-2">Pozycja na mapie</p>
         <p className="mb-2 text-xs text-gray-500">Kliknij na mapie, aby ustawić punkt wypłynięcia.</p>
         <div ref={mapContainerRef} className="h-72 w-full rounded-lg border border-gray-300" />
       </div>
@@ -235,7 +235,7 @@ export default function OfferLocation({
             step="0.000001"
             value={geoLat}
             onChange={(e) => onGeoLatChange(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus-ring-main transition"
             placeholder="np. 54.352025"
           />
         </div>
@@ -250,7 +250,7 @@ export default function OfferLocation({
             step="0.000001"
             value={geoLon}
             onChange={(e) => onGeoLonChange(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus-ring-main transition"
             placeholder="np. 18.646639"
           />
         </div>

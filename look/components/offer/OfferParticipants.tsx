@@ -24,7 +24,7 @@ export function OfferParticipants({ participants, isLoading }: OfferParticipants
             <li key={participant.userId}>
               <Link
                 href={`/profil/${participant.userId}`}
-                className="text-blue-600 hover:underline font-medium"
+                className="text-main hover:underline font-medium"
               >
                 {participant.name}
               </Link>

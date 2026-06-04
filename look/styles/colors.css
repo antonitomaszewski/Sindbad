@@ -10,6 +10,12 @@
   --main-soft: #eef8fa;
   --main-soft-border: #c5e3e8;
 
+  /* Status colors - same intensity as main color */
+  --success: #4a9e7d;
+  --success-hover: #3d8a6e;
+  --error: #a24848;
+  --error-hover: #8c3a3a;
+
   /* Backward compatibility */
   --green-main: var(--main);
 }
@@ -24,6 +30,8 @@
 .bg-black { background-color: var(--black); }
 .bg-main { background-color: var(--main); }
 .bg-main-soft { background-color: var(--main-soft); }
+.bg-success { background-color: var(--success); }
+.bg-error { background-color: var(--error); }
 
 .border-gray { border-color: var(--gray); }
 .border-main { border-color: var(--main); }
@@ -32,6 +40,8 @@
 /* Hover states */
 .hover-text-main:hover { color: var(--main-hover); }
 .hover-bg-main:hover { background-color: var(--main-hover); }
+.hover-bg-success:hover { background-color: var(--success-hover); }
+.hover-bg-error:hover { background-color: var(--error-hover); }
 
 /* Focus helpers */
 .focus-ring-main:focus {

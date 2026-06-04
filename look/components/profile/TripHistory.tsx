@@ -26,7 +26,7 @@ export default function TripHistory({
         <ul className="space-y-3">
           {trips.map((t) => (
             <li key={t.id} className="flex justify-between items-center">
-              <Link href={`/oferta/${t.id}`} className="text-blue-600 hover:underline">
+              <Link href={`/oferta/${t.id}`} className="text-main hover:underline">
                 <span className="font-medium">{t.title ?? 'Szczegóły rejsu'}</span>
               </Link>
               <span className="text-sm text-gray-500">
