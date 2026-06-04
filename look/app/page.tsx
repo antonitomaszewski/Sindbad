@@ -26,12 +26,10 @@ type HomeStats = {
 };
 
 export default function HomePage() {
-  const [isHydrated, setIsHydrated] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [stats, setStats] = useState<HomeStats | null>(null);
 
   useEffect(() => {
-    setIsHydrated(true);
     setIsLoggedIn(pb.authStore.isValid);
 
     const unsubscribe = pb.authStore.onChange(() => {
@@ -101,14 +99,12 @@ export default function HomePage() {
             >
               Szukaj rejsów
             </Link>
-            {isHydrated && isLoggedIn && (
-              <Link
-                href="/oferta/nowa"
-                className="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
-              >
-                Dodaj ofertę
-              </Link>
-            )}
+            <Link
+              href={isLoggedIn ? '/oferta/nowa' : '/logowanie'}
+              className="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+            >
+              Dodaj ofertę
+            </Link>
           </div>
         </div>
       </section>
@@ -146,35 +142,6 @@ export default function HomePage() {
             </p>
             <p className="mt-2 text-sm text-slate-600">Potwierdzone rezerwacje</p>
           </article>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-sky-200 bg-sky-50 p-8 sm:p-10">
-          <h2 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
-            Masz pomysł na rejs? Dodaj ofertę w 2 minuty.
-          </h2>
-          <p className="mt-3 max-w-2xl text-slate-600">
-            Uzupełnij podstawowe informacje i opublikuj rejs dla załogi.
-          </p>
-
-          <div className="mt-6">
-            {isHydrated && isLoggedIn ? (
-              <Link
-                href="/oferta/nowa"
-                className="inline-flex rounded-lg bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-700"
-              >
-                Dodaj ofertę
-              </Link>
-            ) : (
-              <Link
-                href="/logowanie"
-                className="inline-flex rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-              >
-                Zaloguj się i dodaj ofertę
-              </Link>
-            )}
-          </div>
         </div>
       </section>
     </main>

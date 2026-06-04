@@ -1,14 +1,17 @@
 'use client';
 
+import type { ValidationErrors } from '../../../../logic/types/form';
+
 interface Props {
   formData: { name: string; bio: string; avatar: File | null };
   setFormData: (data: any) => void;
   loading: boolean;
+  errors?: ValidationErrors;
 }
 
 const MAX_BIO_LENGTH = 1000;
 
-export default function BasicInfoSection({ formData, setFormData, loading }: Props) {
+export default function BasicInfoSection({ formData, setFormData, loading, errors }: Props) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
       <h2 className="text-xl font-semibold text-gray-900">Podstawowe informacje</h2>
@@ -24,8 +27,9 @@ export default function BasicInfoSection({ formData, setFormData, loading }: Pro
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           placeholder="Jan Kowalski"
           disabled={loading}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${errors?.name ? 'border-red-400' : 'border-gray-300'}`}
         />
+        {errors?.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
       </div>
 
       <div>
@@ -43,11 +47,14 @@ export default function BasicInfoSection({ formData, setFormData, loading }: Pro
           maxLength={MAX_BIO_LENGTH}
           placeholder="Np. 5 lat na Bałtyku i Adriatyku, styl: chill/regatowy, najchętniej Mazury i Chorwacja."
           disabled={loading}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed ${errors?.bio ? 'border-red-400' : 'border-gray-300'}`}
         />
-        <p className="text-xs text-gray-500 mt-1">
-          {formData.bio.length} / {MAX_BIO_LENGTH} znaków
-        </p>
+        <div className="mt-1 flex justify-between">
+          {errors?.bio
+            ? <p className="text-xs text-red-600">{errors.bio}</p>
+            : <span />}
+          <p className="text-xs text-gray-500">{formData.bio.length} / {MAX_BIO_LENGTH} znaków</p>
+        </div>
       </div>
     </div>
   );
