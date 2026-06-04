@@ -39,19 +39,6 @@ export default function EditProfilePage({ params }: Props) {
     });
   }, [id, user, userLoading]);
 
-  if (userError || !user) {
-      return (
-        <NotFoundState
-          title="404"
-          message="Profil nie jest dostępny"
-          description="Nie masz dostępu do tego profilu lub profil nie istnieje."
-          backUrl="/kalendarz"
-          backText="Powrót do kalendarza"
-        />
-      );
-    }
-
-
   if (userLoading || dataLoading) {
     return <LoadingState message="Ładowanie ..." />;
   }
