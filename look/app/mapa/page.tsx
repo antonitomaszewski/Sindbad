@@ -283,9 +283,7 @@ export default function MapaPage() {
           zoomOutTitle: 'Oddal',
         }).addTo(mapRef.current);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: 'Mapa: &copy; OpenStreetMap, autorzy danych',
-        }).addTo(mapRef.current);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(mapRef.current);
 
         setMapReady(true);
 
@@ -373,9 +371,6 @@ export default function MapaPage() {
     <div className="p-4 sm:p-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-main">Mapa rejsów</h1>
-        <p className="mt-2 text-gray-600">
-          Klastery rozbijają się na mniejsze podczas przybliżania mapy.
-        </p>
       </div>
 
       {loadError && (
