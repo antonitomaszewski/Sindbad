@@ -223,6 +223,10 @@ export default function MapaPage() {
     let isMapInitialized = false;
 
     async function initializeMap() {
+      if (loading) {
+        return;
+      }
+
       if (!mapContainerRef.current || mapRef.current) {
         console.log('EXITING')
         return;
@@ -307,7 +311,7 @@ export default function MapaPage() {
         clusterLayerRef.current = null;
       }
     };
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     if (!mapReady || !mapRef.current) {
@@ -354,6 +358,14 @@ export default function MapaPage() {
       }
     };
   }, [filteredOffersWithGeo, offersWithGeo, mapReady]);
+
+  useEffect(() => {
+    if (!loading && mapReady && mapRef.current) {
+      setTimeout(() => {
+        mapRef.current?.invalidateSize();
+      }, 50);
+    }
+  }, [loading, mapReady]);
 
   useEffect(() => {
     return () => {
