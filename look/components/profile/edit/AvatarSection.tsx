@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { User } from '../../../../logic/types/user';
 import { deleteUserAvatar } from '../../../../logic/lib/users';
+import { validateAvatar } from '../../../../logic/lib/validation';
 
 interface Props {
   user: User;
@@ -14,17 +15,26 @@ interface Props {
 export default function AvatarSection({ user, formData, setFormData, loading }: Props) {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [avatarError, setAvatarError] = useState('');
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) {
-      setFormData({ ...formData, avatar: file });
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    const error = validateAvatar(file);
+    if (error) {
+      setAvatarError(error);
+      e.target.value = '';
+      return;
     }
+
+    setAvatarError('');
+    setFormData({ ...formData, avatar: file });
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   }
 
   async function handleDeleteAvatar() {
@@ -61,8 +71,8 @@ export default function AvatarSection({ user, formData, setFormData, loading }: 
             className="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
           />
         ) : (
-          <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center border-4 border-gray-100">
-            <span className="text-3xl font-bold text-blue-600">{initials}</span>
+          <div className="w-24 h-24 rounded-full bg-main-soft flex items-center justify-center border-4 border-gray-100">
+            <span className="text-3xl font-bold text-main">{initials}</span>
           </div>
         )}
 
@@ -78,7 +88,7 @@ export default function AvatarSection({ user, formData, setFormData, loading }: 
           <div className="flex gap-3">
             <label
               htmlFor="avatar"
-              className={`px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer text-sm ${
+              className={`px-4 py-2 bg-main text-white rounded-lg font-semibold hover-bg-main transition cursor-pointer text-sm ${
                 (loading || deleting) ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -95,9 +105,10 @@ export default function AvatarSection({ user, formData, setFormData, loading }: 
               </button>
             )}
           </div>
-          <p className="text-xs text-gray-500">
-            Maksymalny rozmiar: 5MB. Format: JPG, PNG, GIF
-          </p>
+          {avatarError
+            ? <p className="text-xs text-red-600">{avatarError}</p>
+            : <p className="text-xs text-gray-500">Maksymalny rozmiar: 5MB. Format: JPG, PNG, GIF</p>
+          }
         </div>
       </div>
     </div>

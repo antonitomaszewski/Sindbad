@@ -11,6 +11,12 @@ import {
   updateProfileVisibility,
 } from '../../../logic/lib/users';
 import { updateUserCertifications, type Certification } from '../../../logic/lib/certifications';
+import { useFormValidation } from '../../../logic/hooks/useFormValidation';
+import {
+  validateProfileForm,
+  validateEmailChange,
+  validatePasswordChange,
+} from '../../../logic/lib/validation';
 import AvatarSection from './edit/AvatarSection';
 import BasicInfoSection from './edit/BasicInfoSection';
 import CertificationsSection from './edit/CertificationsSection';
@@ -38,6 +44,9 @@ export default function EditProfileView({
   const [accountLoading, setAccountLoading] = useState(false);
   const [accountError, setAccountError] = useState('');
   const [accountSuccess, setAccountSuccess] = useState('');
+  const { errors: profileErrors, validate: validateProfile, clearErrors: clearProfileErrors } = useFormValidation(validateProfileForm);
+  const { errors: emailErrors, validate: validateEmail, clearErrors: clearEmailErrors } = useFormValidation(validateEmailChange);
+  const { errors: passwordErrors, validate: validatePassword, clearErrors: clearPasswordErrors } = useFormValidation(validatePasswordChange);
   const [isOAuthAccount, setIsOAuthAccount] = useState(false);
   const [profileVisibility, setProfileVisibility] = useState<'public' | 'private'>(
     (user.profile_visibility as 'public' | 'private') || 'public'
@@ -61,8 +70,14 @@ export default function EditProfileView({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    clearProfileErrors();
+
+    if (!validateProfile(formData)) {
+      return;
+    }
+
+    setLoading(true);
 
     try {
       // 1. Zaktualizuj profil (name, bio, avatar)
@@ -86,6 +101,12 @@ export default function EditProfileView({
   async function handleEmailChange() {
     setAccountError('');
     setAccountSuccess('');
+    clearEmailErrors();
+
+    if (!validateEmail(accountData)) {
+      return;
+    }
+
     setAccountLoading(true);
 
     try {
@@ -102,6 +123,12 @@ export default function EditProfileView({
   async function handlePasswordChange() {
     setAccountError('');
     setAccountSuccess('');
+    clearPasswordErrors();
+
+    if (!validatePassword(accountData)) {
+      return;
+    }
+
     setAccountLoading(true);
 
     try {
@@ -147,10 +174,11 @@ export default function EditProfileView({
             loading={loading} 
           />
           
-          <BasicInfoSection 
-            formData={formData} 
-            setFormData={setFormData} 
-            loading={loading} 
+          <BasicInfoSection
+            formData={formData}
+            setFormData={setFormData}
+            loading={loading}
+            errors={profileErrors}
           />
 
           {!isOAuthAccount && (
@@ -171,24 +199,30 @@ export default function EditProfileView({
 
               <div className="space-y-3">
                 <h3 className="font-medium text-gray-800">Zmiana emaila</h3>
-                <input
-                  type="email"
-                  value={accountData.email}
-                  onChange={(e) => setAccountData((prev) => ({ ...prev, email: e.target.value }))}
-                  placeholder="Nowy email"
-                  disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
-                />
-                <input
-                  type="password"
-                  value={accountData.currentPasswordForEmail}
-                  onChange={(e) =>
-                    setAccountData((prev) => ({ ...prev, currentPasswordForEmail: e.target.value }))
-                  }
-                  placeholder="Aktualne hasło"
-                  disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
-                />
+                <div>
+                  <input
+                    type="email"
+                    value={accountData.email}
+                    onChange={(e) => setAccountData((prev) => ({ ...prev, email: e.target.value }))}
+                    placeholder="Nowy email"
+                    disabled={accountLoading}
+                    className={`w-full px-4 py-2 border rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100 ${emailErrors?.email ? 'border-red-400' : 'border-gray-300'}`}
+                  />
+                  {emailErrors?.email && <p className="mt-1 text-xs text-red-600">{emailErrors.email}</p>}
+                </div>
+                <div>
+                  <input
+                    type="password"
+                    value={accountData.currentPasswordForEmail}
+                    onChange={(e) =>
+                      setAccountData((prev) => ({ ...prev, currentPasswordForEmail: e.target.value }))
+                    }
+                    placeholder="Aktualne hasło"
+                    disabled={accountLoading}
+                    className={`w-full px-4 py-2 border rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100 ${emailErrors?.currentPasswordForEmail ? 'border-red-400' : 'border-gray-300'}`}
+                  />
+                  {emailErrors?.currentPasswordForEmail && <p className="mt-1 text-xs text-red-600">{emailErrors.currentPasswordForEmail}</p>}
+                </div>
                 <button
                   type="button"
                   onClick={handleEmailChange}
@@ -201,32 +235,41 @@ export default function EditProfileView({
 
               <div className="space-y-3">
                 <h3 className="font-medium text-gray-800">Zmiana hasła</h3>
-                <input
-                  type="password"
-                  value={accountData.currentPassword}
-                  onChange={(e) => setAccountData((prev) => ({ ...prev, currentPassword: e.target.value }))}
-                  placeholder="Aktualne hasło"
-                  disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
-                />
-                <input
-                  type="password"
-                  value={accountData.newPassword}
-                  onChange={(e) => setAccountData((prev) => ({ ...prev, newPassword: e.target.value }))}
-                  placeholder="Nowe hasło (min. 8 znaków)"
-                  disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
-                />
-                <input
-                  type="password"
-                  value={accountData.newPasswordConfirm}
-                  onChange={(e) =>
-                    setAccountData((prev) => ({ ...prev, newPasswordConfirm: e.target.value }))
-                  }
-                  placeholder="Potwierdź nowe hasło"
-                  disabled={accountLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100"
-                />
+                <div>
+                  <input
+                    type="password"
+                    value={accountData.currentPassword}
+                    onChange={(e) => setAccountData((prev) => ({ ...prev, currentPassword: e.target.value }))}
+                    placeholder="Aktualne hasło"
+                    disabled={accountLoading}
+                    className={`w-full px-4 py-2 border rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100 ${passwordErrors?.currentPassword ? 'border-red-400' : 'border-gray-300'}`}
+                  />
+                  {passwordErrors?.currentPassword && <p className="mt-1 text-xs text-red-600">{passwordErrors.currentPassword}</p>}
+                </div>
+                <div>
+                  <input
+                    type="password"
+                    value={accountData.newPassword}
+                    onChange={(e) => setAccountData((prev) => ({ ...prev, newPassword: e.target.value }))}
+                    placeholder="Nowe hasło (min. 8 znaków)"
+                    disabled={accountLoading}
+                    className={`w-full px-4 py-2 border rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100 ${passwordErrors?.newPassword ? 'border-red-400' : 'border-gray-300'}`}
+                  />
+                  {passwordErrors?.newPassword && <p className="mt-1 text-xs text-red-600">{passwordErrors.newPassword}</p>}
+                </div>
+                <div>
+                  <input
+                    type="password"
+                    value={accountData.newPasswordConfirm}
+                    onChange={(e) =>
+                      setAccountData((prev) => ({ ...prev, newPasswordConfirm: e.target.value }))
+                    }
+                    placeholder="Potwierdź nowe hasło"
+                    disabled={accountLoading}
+                    className={`w-full px-4 py-2 border rounded-lg focus-ring-main focus-border-main disabled:bg-gray-100 ${passwordErrors?.newPasswordConfirm ? 'border-red-400' : 'border-gray-300'}`}
+                  />
+                  {passwordErrors?.newPasswordConfirm && <p className="mt-1 text-xs text-red-600">{passwordErrors.newPasswordConfirm}</p>}
+                </div>
                 <button
                   type="button"
                   onClick={handlePasswordChange}

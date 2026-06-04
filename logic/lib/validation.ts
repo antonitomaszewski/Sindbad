@@ -1,6 +1,23 @@
 import { OfferFormData } from '../types/offer';
 import type { ValidationErrors } from '../types/form';
 
+export interface ProfileFormData {
+  name: string;
+  bio: string;
+  avatar: File | null;
+}
+
+export interface EmailChangeData {
+  email: string;
+  currentPasswordForEmail: string;
+}
+
+export interface PasswordChangeData {
+  currentPassword: string;
+  newPassword: string;
+  newPasswordConfirm: string;
+}
+
 // Constants
 const VALIDATION_RULES = {
   TITLE_MIN_LENGTH: 3,
@@ -8,6 +25,12 @@ const VALIDATION_RULES = {
   DESCRIPTION_MAX_LENGTH: 1000,
   MAX_IMAGE_SIZE_MB: 5,
   MAX_IMAGE_SIZE_BYTES: 5 * 1024 * 1024,
+  MAX_AVATAR_SIZE_MB: 5,
+  MAX_AVATAR_SIZE_BYTES: 5 * 1024 * 1024,
+  NAME_MIN_LENGTH: 2,
+  NAME_MAX_LENGTH: 100,
+  BIO_MAX_LENGTH: 1000,
+  PASSWORD_MIN_LENGTH: 8,
 } as const;
 
 const VALIDATION_MESSAGES = {
@@ -112,4 +135,70 @@ export function validateOfferForm(data: OfferFormData): ValidationErrors {
   }
 
   return errors;
+}
+
+export function validateProfileForm(data: ProfileFormData): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (!data.name.trim()) {
+    errors.name = 'Imię i nazwisko jest wymagane';
+  } else if (data.name.trim().length < VALIDATION_RULES.NAME_MIN_LENGTH) {
+    errors.name = `Imię i nazwisko musi mieć minimum ${VALIDATION_RULES.NAME_MIN_LENGTH} znaki`;
+  } else if (data.name.length > VALIDATION_RULES.NAME_MAX_LENGTH) {
+    errors.name = `Imię i nazwisko może mieć maksymalnie ${VALIDATION_RULES.NAME_MAX_LENGTH} znaków`;
+  }
+
+  if (data.bio.length > VALIDATION_RULES.BIO_MAX_LENGTH) {
+    errors.bio = `Opis może mieć maksymalnie ${VALIDATION_RULES.BIO_MAX_LENGTH} znaków`;
+  }
+
+  return errors;
+}
+
+export function validateEmailChange(data: EmailChangeData): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (!data.email.trim()) {
+    errors.email = 'Email jest wymagany';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.email = 'Podaj poprawny adres email';
+  }
+
+  if (!data.currentPasswordForEmail.trim()) {
+    errors.currentPasswordForEmail = 'Aktualne hasło jest wymagane';
+  }
+
+  return errors;
+}
+
+export function validatePasswordChange(data: PasswordChangeData): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  if (!data.currentPassword) {
+    errors.currentPassword = 'Aktualne hasło jest wymagane';
+  }
+
+  if (!data.newPassword) {
+    errors.newPassword = 'Nowe hasło jest wymagane';
+  } else if (data.newPassword.length < VALIDATION_RULES.PASSWORD_MIN_LENGTH) {
+    errors.newPassword = `Hasło musi mieć minimum ${VALIDATION_RULES.PASSWORD_MIN_LENGTH} znaków`;
+  }
+
+  if (!data.newPasswordConfirm) {
+    errors.newPasswordConfirm = 'Potwierdzenie hasła jest wymagane';
+  } else if (data.newPassword !== data.newPasswordConfirm) {
+    errors.newPasswordConfirm = 'Hasła nie są identyczne';
+  }
+
+  return errors;
+}
+
+export function validateAvatar(file: File): string | null {
+  if (!file.type.startsWith('image/')) {
+    return 'Wybrany plik nie jest zdjęciem.';
+  }
+  if (file.size > VALIDATION_RULES.MAX_AVATAR_SIZE_BYTES) {
+    return `Zdjęcie jest za duże. Maksymalny rozmiar to ${VALIDATION_RULES.MAX_AVATAR_SIZE_MB}MB.`;
+  }
+  return null;
 }
