@@ -91,7 +91,7 @@ export default function SearchPanel() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Szukaj rejsów po nazwie lub opisie..."
-          className="w-full md:w-2/3 p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full md:w-2/3 p-3 rounded-lg border focus-ring-main focus-border-main"
         />
       </div>
 
@@ -106,7 +106,7 @@ export default function SearchPanel() {
               <select 
                 value={filters.country} 
                 onChange={(e) => setFilters({ ...filters, country: e.target.value })} 
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus-ring-main focus-border-main"
               >
                 <option value="">Wszystkie</option>
                 {countries.map((c) => (
@@ -121,7 +121,7 @@ export default function SearchPanel() {
                 value={filters.port}
                 onChange={(e) => setFilters({ ...filters, port: e.target.value })}
                 placeholder="np. Gdańsk"
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus-ring-main focus-border-main"
               />
             </div>
 
@@ -130,7 +130,7 @@ export default function SearchPanel() {
               <select 
                 value={filters.organizerId} 
                 onChange={(e) => setFilters({ ...filters, organizerId: e.target.value })} 
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus-ring-main focus-border-main"
               >
                 <option value="">Wszyscy</option>
                 {users.map((u) => (
@@ -156,14 +156,14 @@ export default function SearchPanel() {
                   placeholder="min"
                   value={filters.priceMin}
                   onChange={(e) => setFilters({ ...filters, priceMin: e.target.value })}
-                  className="w-1/2 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-1/2 p-2 border rounded focus-ring-main focus-border-main"
                 />
                 <input
                   type="number"
                   placeholder="max"
                   value={filters.priceMax}
                   onChange={(e) => setFilters({ ...filters, priceMax: e.target.value })}
-                  className="w-1/2 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-1/2 p-2 border rounded focus-ring-main focus-border-main"
                 />
               </div>
             </div>

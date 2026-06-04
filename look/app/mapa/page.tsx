@@ -20,6 +20,11 @@ type OfferWithGeo = {
   geo: GeoPoint;
 };
 
+const DEFAULT_MAP_CENTER: [number, number] = [52.1, 19.4];
+const DEFAULT_MAP_ZOOM = 6;
+const MAP_INIT_DELAY_MS = 50;
+const MAP_INVALIDATE_DELAY_MS = 100;
+
 function parseGeo(geoRaw: unknown): GeoPoint | null {
   let geo = geoRaw;
 
@@ -147,6 +152,21 @@ export default function MapaPage() {
     setDateToFilter(null);
   }
 
+  function destroyMap() {
+    if (!mapRef.current) {
+      return;
+    }
+
+    try {
+      mapRef.current.remove();
+    } catch (error) {
+      console.warn('Error removing map:', error);
+    }
+
+    mapRef.current = null;
+    clusterLayerRef.current = null;
+  }
+
   const offersWithGeo = useMemo<OfferWithGeo[]>(() => {
     return offers
       .map((offer) => {
@@ -220,7 +240,6 @@ export default function MapaPage() {
 
   useEffect(() => {
     let cancelled = false;
-    let isMapInitialized = false;
 
     async function initializeMap() {
       if (loading) {
@@ -228,14 +247,11 @@ export default function MapaPage() {
       }
 
       if (!mapContainerRef.current || mapRef.current) {
-        console.log('EXITING')
         return;
       }
 
       try {
-        console.log('[mapa] importing leaflet');
         const L = (await import('leaflet')).default;
-        console.log('[mapa] leaflet loaded', L.version);
 
         delete (L.Icon.Default.prototype as any)._getIconUrl;
         L.Icon.Default.mergeOptions({
@@ -250,19 +266,15 @@ export default function MapaPage() {
 
         (window as any).L = L;
         await import('leaflet.markercluster');
-        console.log('[mapa] markercluster loaded');
 
         if (cancelled || !mapContainerRef.current) {
-          console.log('[mapa] cancelled or no container');
           return;
         }
 
-        console.log('[mapa] container height:', mapContainerRef.current.clientHeight);
-
         mapRef.current = L.map(mapContainerRef.current, {
           zoomControl: false,
-          center: [52.1, 19.4],
-          zoom: 6,
+          center: DEFAULT_MAP_CENTER,
+          zoom: DEFAULT_MAP_ZOOM,
         });
 
         L.control.zoom({
@@ -275,15 +287,13 @@ export default function MapaPage() {
           attribution: 'Mapa: &copy; OpenStreetMap, autorzy danych',
         }).addTo(mapRef.current);
 
-        isMapInitialized = true;
         setMapReady(true);
-        console.log('[mapa] map initialized successfully');
 
         setTimeout(() => {
           if (mapRef.current && !cancelled) {
             mapRef.current.invalidateSize();
           }
-        }, 100);
+        }, MAP_INVALIDATE_DELAY_MS);
       } catch (err) {
         console.error('Map initialization error:', err);
         if (!cancelled) {
@@ -296,20 +306,12 @@ export default function MapaPage() {
       if (!cancelled && !mapRef.current) {
         initializeMap();
       }
-    }, 50);
+    }, MAP_INIT_DELAY_MS);
 
     return () => {
       cancelled = true;
       clearTimeout(timer);
-      if (mapRef.current && isMapInitialized) {
-        try {
-          mapRef.current.remove();
-        } catch (error) {
-          console.warn('Error removing map:', error);
-        }
-        mapRef.current = null;
-        clusterLayerRef.current = null;
-      }
+      destroyMap();
     };
   }, [loading]);
 
@@ -348,7 +350,7 @@ export default function MapaPage() {
       );
       mapRef.current.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
     } else if (offersWithGeo.length > 0) {
-      mapRef.current.setView([52.1, 19.4], 6);
+      mapRef.current.setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM);
     }
 
     return () => {
@@ -363,19 +365,9 @@ export default function MapaPage() {
     if (!loading && mapReady && mapRef.current) {
       setTimeout(() => {
         mapRef.current?.invalidateSize();
-      }, 50);
+      }, MAP_INIT_DELAY_MS);
     }
   }, [loading, mapReady]);
-
-  useEffect(() => {
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-        clusterLayerRef.current = null;
-      }
-    };
-  }, []);
 
   return (
     <div className="p-4 sm:p-8">

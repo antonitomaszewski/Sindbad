@@ -142,7 +142,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors shadow-lg hover:shadow-xl"
+            className="w-full bg-main text-white py-3 px-4 rounded-lg font-semibold hover-bg-main disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors shadow-lg hover:shadow-xl"
           >
             {loading ? 'Tworzenie konta...' : 'Zarejestruj się'}
           </button>
@@ -170,7 +170,7 @@ export default function RegisterPage() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Masz już konto?{' '}
-            <Link href="/logowanie" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+            <Link href="/logowanie" className="text-main hover-text-main font-medium hover:underline">
               Zaloguj się
             </Link>
           </p>
