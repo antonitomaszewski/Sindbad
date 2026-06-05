@@ -21,7 +21,14 @@ export default function LoginPage() {
       await loginUser(email, password);
       router.push('/');
     } catch (err: any) {
-      setError(err.message || 'Nieprawidłowy email lub hasło');
+      const errorMsg = err.message || '';
+      if (errorMsg.includes('Invalid credentials')) {
+        setError('Nieprawidłowy email lub hasło');
+      } else if (errorMsg.includes('record not found')) {
+        setError('Konto nie istnieje');
+      } else {
+        setError(errorMsg || 'Błąd logowania. Spróbuj ponownie.');
+      }
     } finally {
       setLoading(false);
     }
