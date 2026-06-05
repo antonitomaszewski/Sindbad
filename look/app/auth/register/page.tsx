@@ -58,7 +58,7 @@ export default function RegisterPage() {
       setName('');
     } catch (err: any) {
       const errorMsg = err.message || '';
-      setError('Błąd rejestracji. Spróbuj ponownie.');
+      setError('Konto na podany email już istnieje.');
     } finally {
       setLoading(false);
     }
