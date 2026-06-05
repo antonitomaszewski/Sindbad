@@ -40,9 +40,9 @@ Co udało się zrealizować.
 Co działa najlepiej.
 Co wymaga dalszych prac.
 
-Wstęp
-Cel i zakres pracy
-Analiza problemu i istniejących rozwiązań
+<!-- Wstęp -->
+<!-- Cel i zakres pracy -->
+<!-- 06 Analiza problemu i istniejących rozwiązań: istniejące rozwiązania. Tutaj mam notatki, ale mega nie chce misię robić -->
 Analiza wymagań systemu
 Projekt systemu
 Implementacja aplikacji
