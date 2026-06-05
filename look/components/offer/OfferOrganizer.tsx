@@ -17,7 +17,7 @@ export function OfferOrganizer({ organizerId, organizerName, isLoading }: OfferO
       ) : (
         <Link
           href={`/profil/${organizerId}`}
-          className="text-main font-medium hover:underline"
+          className="text-gray-900 font-medium hover:underline"
         >
           {organizerName || 'Ładowanie...'}
         </Link>

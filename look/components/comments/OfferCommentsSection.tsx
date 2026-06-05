@@ -113,7 +113,7 @@ export function OfferCommentsSection({ offer }: { offer: Offer }) {
                 <div className="flex items-start justify-between gap-4">
                   <Link
                     href={`/profil/${comment.user_id}`}
-                    className="font-semibold text-gray-900 hover:text-main"
+                    className="font-semibold text-gray-900 hover:underline"
                   >
                     {comment.author_name || 'Użytkownik'}
                   </Link>
