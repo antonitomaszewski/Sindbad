@@ -141,6 +141,30 @@ function BookingItem({ booking, onStatusChange }: BookingItemProps) {
           </button>
         </div>
       )}
+
+      {booking.status === 'confirmed' && (
+        <div className="space-y-2">
+          <p className="text-xs text-gray-500">Zmień status rezerwacji:</p>
+          <button
+            onClick={() => onStatusChange(booking.id, 'rejected')}
+            className="w-full px-4 py-2 bg-error text-white rounded-lg hover-bg-error font-medium"
+          >
+            ✕ Cofnij potwierdzenie (odrzuć)
+          </button>
+        </div>
+      )}
+
+      {booking.status === 'rejected' && (
+        <div className="space-y-2">
+          <p className="text-xs text-gray-500">Zmień status rezerwacji:</p>
+          <button
+            onClick={() => onStatusChange(booking.id, 'confirmed')}
+            className="w-full px-4 py-2 bg-success text-white rounded-lg hover-bg-success font-medium"
+          >
+            ✓ Przywróć i potwierdź
+          </button>
+        </div>
+      )}
     </div>
   );
 }
