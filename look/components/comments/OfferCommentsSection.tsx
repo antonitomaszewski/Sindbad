@@ -86,7 +86,7 @@ export function OfferCommentsSection({ offer }: { offer: Offer }) {
       <div className="space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Komentarze i opinie</h3>
+            <h3 className="text-xl font-bold text-main">Komentarze i opinie</h3>
             <p className="text-sm text-gray-600">Komentarze są publiczne dla zakończonych rejsów.</p>
           </div>
           {canComment && (

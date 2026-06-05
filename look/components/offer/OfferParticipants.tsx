@@ -10,7 +10,7 @@ interface OfferParticipantsProps {
 export function OfferParticipants({ participants, isLoading }: OfferParticipantsProps) {
   return (
     <Card>
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">Zapisani użytkownicy</h3>
+      <h3 className="text-lg font-semibold text-main mb-3">Zapisani użytkownicy</h3>
 
       {isLoading && <p className="text-gray-500">Ładowanie uczestników...</p>}
 

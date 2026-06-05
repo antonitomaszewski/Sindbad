@@ -20,6 +20,16 @@ export default function RegisterPage() {
     setError('');
     setSuccess('');
 
+    if (!name.trim()) {
+      setError('Imię i nazwisko są wymagane');
+      return;
+    }
+
+    if (!email.trim()) {
+      setError('Email jest wymagany');
+      return;
+    }
+
     if (password !== passwordConfirm) {
       setError('Hasła nie są identyczne');
       return;
@@ -47,7 +57,8 @@ export default function RegisterPage() {
       setPasswordConfirm('');
       setName('');
     } catch (err: any) {
-      setError(err.message || 'Błąd rejestracji. Spróbuj ponownie.');
+      const errorMsg = err.message || '';
+      setError('Konto na podany email już istnieje.');
     } finally {
       setLoading(false);
     }
@@ -83,6 +94,7 @@ export default function RegisterPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
               autoComplete="name"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus-ring-main focus:border-transparent transition"
               placeholder="Jan Kowalski"
