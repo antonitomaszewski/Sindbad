@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { BookingWithOffer, BookingStatus } from '@/logic/types/booking';
+import { Card } from '@/look/components/ui/Card';
 
 const statusLabels = {
   pending: 'Oczekuje',
@@ -36,15 +37,15 @@ export default function MyBookingsList({ bookings: initialBookings }: { bookings
 
   if (initialBookings.length === 0) {
     return (
-      <section className="bg-white border border-gray-100 rounded-lg p-4">
+      <Card className="mb-0">
         <h3 className="text-lg font-medium mb-3">Moje rezerwacje</h3>
         <p className="text-gray-600 text-sm">Brak nadchodzących rezerwacji.</p>
-      </section>
+      </Card>
     );
   }
 
   return (
-    <section className="bg-white border border-gray-100 rounded-lg p-4">
+    <Card className="mb-0">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-lg font-medium">Moje rezerwacje</h3>
 
@@ -91,6 +92,6 @@ export default function MyBookingsList({ bookings: initialBookings }: { bookings
           ))}
         </ul>
       )}
-    </section>
+    </Card>
   );
 }
