@@ -15,15 +15,12 @@ export function OfferOrganizer({ organizerId, organizerName, isLoading }: OfferO
       {isLoading ? (
         <p className="text-gray">{OFFER_MESSAGES.ORGANIZER_LOADING}</p>
       ) : (
-        <div className="space-y-3">
-          <p className="text-gray font-medium">{organizerName || 'Ładowanie...'}</p>
-          <Link 
-            href={`/profil/${organizerId}`}
-            className="text-main hover:text-green-dark font-medium text-sm"
-          >
-            {OFFER_MESSAGES.VIEW_ORGANIZER}
-          </Link>
-        </div>
+        <Link
+          href={`/profil/${organizerId}`}
+          className="text-main font-medium hover:underline"
+        >
+          {organizerName || 'Ładowanie...'}
+        </Link>
       )}
     </Card>
   );

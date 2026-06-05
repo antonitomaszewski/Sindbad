@@ -26,7 +26,7 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
     e.preventDefault();
 
     if (!canReserve) {
-      setError('Brak dostępnych miejsc');
+      setError('Rezerwacja jest niedostępna dla tego rejsu');
       return;
     }
 
@@ -141,7 +141,7 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
               disabled={loading || !canReserve}
               className="flex-1 py-3 px-6 rounded-lg font-semibold bg-main text-white hover:bg-green-dark disabled:opacity-50"
             >
-              {loading ? 'Wysyłanie...' : canReserve ? 'Potwierdź' : 'Brak miejsc'}
+              {loading ? 'Wysyłanie...' : canReserve ? 'Potwierdź' : 'Rezerwacja niedostępna'}
             </button>
             <button
               type="button"

@@ -1,6 +1,5 @@
 'use client';
 import { use, useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useOffer } from '@/look/hooks/useOffer';
 import { useUser } from '@/look/hooks/useUser';
 import { OfferHeader } from '@/look/components/offer/OfferHeader';
@@ -25,6 +24,20 @@ import type { OfferParticipant } from '@/logic/types/booking';
 
 interface OfferPageProps {
   params: Promise<{ id: string }>;
+}
+
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function canBookOfferByDate(dateFrom?: string): boolean {
+  const start = String(dateFrom || '').slice(0, 10);
+
+  if (!start) {
+    return true;
+  }
+
+  return start > todayIso();
 }
 
 export default function OfertaPage({ params }: OfferPageProps) {
@@ -128,7 +141,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
 
   // Tutaj offer na pewno istnieje
   const isOrganizer = isCurrentUserOrganizer(offer);
-  const canReserve = (offer.seats_available ?? 1) > 0;
+  const canReserve = (offer.seats_available ?? 1) > 0 && canBookOfferByDate(offer.date_from);
 
   return (
     <div className="min-h-screen bg-gray-50">
