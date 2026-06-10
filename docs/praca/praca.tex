@@ -1,0 +1,423 @@
+% Opcje klasy 'iithesis' opisane sa w komentarzach w pliku klasy. Za ich pomoca
+% ustawia sie przede wszystkim jezyk oraz rodzaj (lic/inz/mgr) pracy.
+\documentclass[shortabstract]{iithesis}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{enumitem}
+\setlist[itemize]{nosep, topsep=0pt, partopsep=0pt, parsep=0pt, itemsep=0pt}
+
+%%%%% DANE DO STRONY TYTUÅOWEJ
+% Niezaleznie od jezyka pracy wybranego w opcjach klasy, tytul i streszczenie
+% pracy nalezy podac zarowno w jezyku polskim, jak i angielskim.
+% Pamietaj o madrym (zgodnym z logicznym rozbiorem zdania oraz estetyka) recznym
+% zlamaniu wierszy w temacie pracy, zwlaszcza tego w jezyku pracy. Uzyj do tego
+% polecenia \fmlinebreak.
+\polishtitle    {Platforma rezerwacyjna do rejsów na jeziorach i morzach}
+\englishtitle {A booking platform for lake and sea cruises}
+\polishabstract {Praca dotyczy projektu aplikacji wspierającej wyszukiwanie rejsów żeglarskich oraz kojarzenie załóg i organizatorów. Celem było stworzenie rozwiązania, które oprócz przeglądania ofert ułatwia budowanie zaufania między użytkownikami poprzez profil, historię aktywności i wspólne kontakty.}
+\englishabstract{This project involves designing an application that supports the search for sailing trips and the matching of crews and organizers. The goal was to create a solution that, in addition to browsing offers, facilitates building trust between users through profiles, activity history, and shared contacts.}
+% w pracach wielu autorow nazwiska mozna oddzielic poleceniem \and
+\author         {Antoni Tomaszewski}
+% w przypadku kilku promotorow, lub koniecznosci podania ich afiliacji, linie
+% w ponizszym poleceniu mozna zlamac poleceniem \fmlinebreak
+\advisor        {dr Marcin Młotkowski}
+%\date          {}                     % Data zlozenia pracy
+% Dane do oswiadczenia o autorskim wykonaniu
+%\transcriptnum {}                     % Numer indeksu
+%\advisorgen    {dr. Jana Kowalskiego} % Nazwisko promotora w dopelniaczu
+%%%%%
+
+%%%%% WLASNE DODATKOWE PAKIETY
+%
+%\usepackage{graphicx,listings,amsmath,amssymb,amsthm,amsfonts,tikz}
+%
+%%%%% WÅASNE DEFINICJE I POLECENIA
+%
+%\theoremstyle{definition} \newtheorem{definition}{Definition}[chapter]
+%\theoremstyle{remark} \newtheorem{remark}[definition]{Observation}
+%\theoremstyle{plain} \newtheorem{theorem}[definition]{Theorem}
+%\theoremstyle{plain} \newtheorem{lemma}[definition]{Lemma}
+%\renewcommand \qedsymbol {\ensuremath{\square}}
+% ...
+%%%%%
+
+\begin{document}
+
+%%%%% POCZÄ„TEK ZASADNICZEGO TEKSTU PRACY
+
+\chapter{Wprowadzenie}
+
+Poszukiwanie rejsu żeglarskiego lub kompletowanie załogi to nie tylko kwestia dostępności miejsca, ale przede wszystkim zaufania i wzajemnego dopasowania. Obecnie żeglarze najczęściej korzystają z grup na Facebooku, forów internetowych lub kontaktów bezpośrednich. Te metody są rozproszone, nie zapewniają żadnej weryfikacji uczestników i nie pozwalają na budowanie trwałych relacji opartych na wspólnych rejsach. W rezultacie często dochodzi do nieporozumień lub sytuacji konfliktowych na pokładzie.
+
+Celem pracy jest zaprojektowanie i implementacja aplikacji webowej, która ułatwi żeglarzom zarówno znajdowanie rejsów, jak i kompletowanie załogi. Aplikacja będzie oferować następujące funkcjonalności:
+
+Użytkownik będzie mógł przeglądać oferty rejsów z możliwością filtrowania według własnych oczekiwań (termin, lokalizacja, cena, organizator). Ponadto system umożliwi ustawienie powiadomień o nowych ofertach spełniających zadane kryteria – podobnie jak w sklepach internetowych funkcja „powiadom mnie gdy dostępne”. Dzięki temu użytkownicy nie będą musieli regularnie monitorować strony.
+
+Zalogowani użytkownicy będą mogli tworzyć własne oferty rejsów (jako organizatorzy) oraz zarządzać napływającymi rezerwacjami (potwierdzanie lub odrzucanie zgłoszeń). Inni użytkownicy będą mogli rezerwować miejsca na wybranych rejsach.
+
+Po zakończonym rejsie uczestnicy będą mogli wystawić ocenę organizatorowi – opinia ta będzie widoczna na profilu oraz przy ofercie. System będzie również przechowywać historię wspólnych rejsów, co pozwoli wyświetlać informację o tym, z kim dana osoba już żeglowała (rodzaj „wspólnego znajomego”). Mechanizmy te mają na celu budowanie zaufania między użytkownikami – szczególnie istotne w żeglarstwie, gdzie ludzie spędzają wiele dni w ograniczonej przestrzeni.
+
+\chapter{Przegląd istniejących rozwiązań}
+\section{Find a Crew}
+Find a Crew \cite{findacrew} to międzynarodowa platforma łącząca żeglarzy poszukujących załogi oraz właścicieli jachtów oferujących miejsce na pokładzie. Około 80\% ofert od kapitanów opiera się na zasadzie koleżeńskiej – w zamian za pomoc w żeglowaniu uczestnicy pokrywają część kosztów dziennych. Część ofert ma charakter prywatny (np. właściciel jachtu szuka towarzyszki rejsu) lub dotyczy tzw. delivery – transportu jachtu z portu A do B, często wiążącego się z utrudnieniami (np. nowy jacht przewożony na sprzedaż, wymagający szczególnej ostrożności). System jest rozbudowany, ale pod względem wizualnym sprawia wrażenie starszego systemu.
+
+\section{Crewly}
+Crewly \cite{crewly} to polska strona internetowa, która pojawiła się na rynku w marcu bierzącego roku. Umożliwia organizatorom publikowanie ofert rejsów. System jest relatywnie nowy i widać, że znajduje się w fazie rozwoju – brakuje w nim modułu opinii oraz relacji między użytkownikami (choć możliwe, że twórca doda te funkcje w przyszłości).
+
+\section{Grupy na Facebooku}
+Bardzo popularnym miejscem poszukiwania załogi i rejsów są grupy facebookowe, np. Sailing Crew Finder Whole World oraz Wolna koja - rejsy i informacje o żeglarstwie \cite{fbcrewfinder,fbzeglarskie}. Autor pracy, będąc kapitanem podczas rejsu w Chorwacji, z powodzeniem skompletował załogę za pośrednictwem takiej grupy – załoga okazała się sympatyczna, a jeden z uczestników, mimo że jak się później okazało miał przeszłość kryminalną, był znakomitym kompanem. Przykład ten pokazuje, że grupy facebookowe, jako przestrzeń bezpośredniej komunikacji „od ludzi do ludzi”, mogą być skuteczne, choć nie oferują żadnych mechanizmów weryfikacji, budowania długotrwałego zaufania ani nie są wygodnym rozwiązaniem dla komercyjnych organizatorów rejsów.
+
+\section{Inne platformy}
+Warte uwagi są również serwisy takie jak: Wolna Koja, Coboaters, Sailties i Crewbay
+\cite{wolnakoja,coboaters,sailties,crewbay}.
+
+\section{Podsumowanie porównania}
+Żadne z wymienionych rozwiązań nie zdominowało dotychczas rynku – co jest sytuacją nietypową, ponieważ w przestrzeni online zazwyczaj jeden sprawdzony model szybko przyciąga większość użytkowników. Autor nie rozpoznaje wyraźnego lidera ani zwycięzcy w tym wyścigu. Większość platform koncentruje się na warstwie ogłoszeniowej, pomijając mechanizmy budowania zaufania (historia rejsów, weryfikacja uczestników, system ocen), który najlepiej spełniają kontakty z facebooka.
+
+
+\chapter{Instrukcja użytkownika}
+
+\section{Wprowadzenie do interfejsu}
+Program, to internetowa platforma (nazwana przez autora Sinbdad), która ma pomóc w organizacji rejsów. Jest przeznaczona dla osób chcących zorganizować rejs, dołączyć się do załogi niezależnie od doświadczenia i umiejętności oraz chętnych do poznania nowych zaufanych ludzi i bycia częścią społeczności. Ma ułatwić planowanie wakacji i sprawić że będziemy się czuć bezpieczniej.
+
+\section{Role użytkowników}
+Mamy de facto 2 różne możliwe typy uzytkowników.
+Niezalogowany (gość) - ma dostęp do wszystkich ofert rejsów, ale nie do profili użytkowników.
+Może wysłać zapytania do organizatora, ale by dokonać rezerwacji musi zarejestrować konto w serwisie.
+Zalogowany (użytkownik) - ma dodatkowo możliwość wysłania rezerwacji, tworzenia oferty rejsu, dostęp do profili publicznych, oraz prywatnych z którymi był już na wspólnym rejsie
+Użytkownik, który utworzył ofertę rejsu ma możliwość przyjmowania i odrzucania rezerwacji.
+
+\section{Strona główna}
+
+Strona główna pełni funkcję strony powitalnej. Wyświetla liczbę dostępnych rejsów oraz liczbę zarejestrowanych użytkowników.
+
+Użytkownik może przejść do wyszukiwania rejsów lub dodać nową ofertę
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{img/X.03 strona glowna.png}
+\caption{Widok strony głównej aplikacji}
+\label{fig:home-screen}
+\end{figure}
+
+\section{Rejestracja i Logowanie}
+Funkcje logowania i rejestracji są dostępne w górnej części interfejsu, po prawej stronie paska nawigacyjnego.
+
+Podczas rejestracji użytkownik może utworzyć konto na dwa sposoby: poprzez podanie adresu e-mail i hasła lub za pomocą  konta Google.
+
+System przeprowadza walidację danych wprowadzanych w formularzu. W przypadku wykrycia błędów wyświetlany jest odpowiedni komunikat, np. gdy podane hasła nie są identyczne, konto dla wskazanego adresu e-mail już istnieje lub hasło nie spełnia wymagań dotyczących długości.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{img/X.04 logowanie.png}
+\caption{Formularz logowania użytkownika}
+\label{fig:home-screen}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{img/X.04 rejestracja.png}
+\caption{Formularz rejestracji użytkownika}
+\label{fig:home-screen}
+\end{figure}
+
+\section{Wyszukiwanie ofert}
+
+System udostępnia trzy widoki wyszukiwania ofert: listę ofert, mapę oraz kalendarz. Do każdego z nich jest dostęp z paska nawigacyjnego.
+
+Główny widok wyszukiwania to lista ofert. Oferty prezentowane są w formie kafelków wraz z rozbudowanym zestawem filtrów.
+
+Widoki mapy i kalendarza stanowią alternatywny sposób przeglądania ofert. Zawierają uproszczony zestaw filtrów, ponieważ ich głównym celem jest wizualna prezentacja danych. W widoku mapy oferty przedstawiane są w postaci pinezek na mapie, a filtrowanie jest możliwe między innymi według daty i ceny.
+
+Z każdego widoku użytkownik może przejść do szczegółów wybranej oferty.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/X.05 mapa.png}
+\caption{Widok mapy rejsów}
+\label{fig:home-screen}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/X.05 wyszukiwanie.png}
+\caption{Widok wyszukiwania rejsów}
+\label{fig:home-screen}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/X.05 kalendarz.png}
+\caption{Widok kalendarza rejsów}
+\label{fig:home-screen}
+\end{figure}
+
+\section{ Szczegóły oferty}
+Widok szczegółów oferty zawiera informacje o rejsie, takie jak tytuł, opis, termin, lokalizacja, liczba dostępnych miejsc oraz cena.
+
+Na stronie prezentowane są również informacje o organizatorze i zapisanych uczestnikach. Jeżeli profil użytkownika jest publiczny, możliwe jest przejście do jego profilu. Dodatkowo dostępna jest galeria zdjęć związanych z ofertą.
+
+W dolnej części strony znajdują się opcje wysłania zgłoszenia rezerwacyjnego, zadania pytania organizatorowi oraz utworzenia powiadomienia o podobnych wydarzeniach.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/X.06 szczegoly oferty.png}
+\caption{Widok szczegółów oferty rejsu}
+\label{fig:home-screen}
+\end{figure}
+
+\section{Rezerwacja miejsca i kontakt z organizatorem}
+Formularze rezerwacji i zadawania pytań dostępne są z poziomu widoku szczegółów oferty. Użytkownik podaje swoje imię, nazwisko, adres e-mail oraz treść wiadomości. Po wysłaniu formularza organizator otrzymuje powiadomienie e-mail z danymi zgłoszenia, a użytkownik dostaje potwierdzenie wysłania.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{img/X.07 pytanie.png}
+\caption{Formularz zadania pytania do organizatora}
+\label{fig:home-screen}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{img/X.07 rezerwacja.png}
+\caption{Formularz wysyłania rezerwacji}
+\label{fig:home-screen}
+\end{figure}
+
+
+\section{Tworzenie i zarządzanie ofertą (dla organizatora)}
+Ofertę może utworzyć każdy zalogowany użytkownik. Formularz wymaga podania podstawowych informacji, takich jak tytuł, termin, cena oraz lokalizacja rejsu. W przypadku braku wymaganych danych system wyświetla odpowiednie komunikaty walidacyjne.
+Po utworzeniu oferta jest dostępna do wyszukania.
+
+Organizator zarządza rezerwacyjnymi w widoku danej oferty. Wiadomości e-mail dotyczące rezerwacji zawierają odnośnik do odpowiedniej oferty, co ułatwia ich obsługę.
+
+Każde zgłoszenie może zostać zaakceptowane lub odrzucone. Po podjęciu decyzji system automatycznie wysyła wiadomość e-mail do uczestnika z informacją o wyniku rezerwacji.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/X.08 tworzenie oferty.png}
+\caption{Formularz tworzenia nowej oferty rejsu}
+\label{fig:home-screen}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/X.08 zarządzanie rezerwacjami.png}
+\caption{Panel organizatora do zarządzania rezerwacjami}
+\label{fig:home-screen}
+\end{figure}
+
+\section{Profil użytkownika i funkcje społecznościowe}
+Profil użytkownika zawiera podstawowe informacje o danej osobie, takie jak opis, zdjęcia oraz posiadane uprawnienia żeglarskie.
+
+Prezentowana jest również historia aktywności użytkownika zawierająca: zorganizowane rejsy, opinie oraz informacje o uczestnikach, z którymi żeglował, wraz z rejsami, podczas których nawiązano te relacje.
+Po zakończonym rejsie uczestnicy mogą dodać opinię o rejsie i organizatorze – opinia ta jest widoczna zarówno na stronie oferty, jak i na profilu organizatora.
+
+Informacje te pozwalają budować społeczność - możemy żeglować z  osobami co do których czujemy się pewnie. Jest to szczególnie istotne, ponieważ w żeglarstwie ludzie często spędzają razem wiele dni lub tygodni w ograniczonej przestrzeni.
+
+Właściciel profilu może go edytować oraz zarządzać ustawieniami prywatności. Profil publiczny jest widoczny dla wszystkich zalogowanych użytkowników, natomiast profil prywatny jest dostępny wyłącznie dla osób, z którymi był wcześniej na rejsie. Ma również dostęp do konfiguracji powiadomień interesujących go rejsów w przyszłości.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/X.09 profil.png}
+\caption{Widok profilu użytkownika}
+\label{fig:home-screen}
+\end{figure}
+
+\section{Szablony maili}
+System wysyła wiadomości e-mail przy złożeniu rezerwacji, zmianie jej statusu oraz przy pytaniu do organizatora. W zależności od sytuacji odbiorcą jest organizator, uczestnik lub oboje.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/X.10 szablony maili - nowa rezerwacja.png}
+\caption{Szablon wiadomości e-mail o nowej rezerwacji}
+\label{fig:home-screen}
+\end{figure}
+
+\section{Podsumowanie rozdziału}
+
+Rozdział ten przedstawił funkcjonalności aplikacji Sindbad z perspektywy użytkownika. Program jest dostępny pod linkiem \href{https://dsadsa.boats}{dsadsa.boats}, a kod źródłowy na GitHubie: \href{https://github.com/antonitomaszewski/Sindbad}{GitHub}.
+
+
+\chapter{Szczegóły implementacji}
+
+\section{Użyte technologie}
+
+\subsection{Frontend}
+Do budowy warstwy prezentacji aplikacji wykorzystałem React wraz z frameworkiem Next.js, które znałem z wcześniejszych projektów. Next.js porządkuje strukturę widoków i nawigację, natomiast główna logika backendowa oraz operacje na danych realizowane są poza nim. Interfejs został zaprojektowany jako przejrzysty i spójny wizualnie; dominują w nim kolory błękitu i bieli, nawiązujące do tematyki morskiej. Do stylowania zastosowałem Tailwind CSS, który jest obecnie dominującym narzędziem css, co pozwoliło szybko budować komponenty i utrzymać jednolitą stylistykę całej aplikacji.
+
+Do implementacji wybranych funkcji wykorzystałem dodatkowe biblioteki:
+\begin{itemize}
+  \setlength{\itemsep}{0pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+  \item kalendarz rejsów -- \texttt{fullcalendar/react},
+  \item galeria zdjęć -- \texttt{yet-another-react-lightbox},
+  \item mapa rejsów -- \texttt{Leaflet},
+  \item wybór daty w formularzach -- \texttt{react-datepicker}.
+\end{itemize}
+
+Walidacja formularzy (np. podczas rezerwacji oraz dodawania oferty) jest realizowana po stronie frontendu, dzięki czemu użytkownik otrzymuje komunikat o błędzie natychmiast, bez oczekiwania na odpowiedź serwera.
+
+\subsection{Backend}
+Warstwę backendową projektu zrealizowałem z użyciem PocketBase - było to dla mnie nowe narzędzie, chciałem poznać jego możliwości. Zależało mi na szybkim uruchomieniu stabilnego zaplecza z gotową autoryzacją, panelem administracyjnym i API. PocketBase obsługuje logowanie użytkowników i rozszerzanie o oAuth, przechowywanie danych aplikacji (oferty, rezerwacje, profile, komentarze) oraz reguły dostępu do rekordów. Jako silnik bazy danych wykorzystywana jest SQLite, co w tym projekcie było wystarczające i uprościło utrzymanie środowiska.
+
+Logika biznesowa została dopisana po stronie aplikacji (m.in. walidacje rezerwacji, kontrola statusów, reguły relacji między użytkownikami). Jako operatora wysyłki maili użyłem Resend – darmowa wersja pozwala na 100 wysyłek dziennie, co było w zupełności wystarczające dla potrzeb aplikacji.
+
+Był to mój pierwszy projekt z wykorzystaniem PocketBase. Po tych doświadczeniach uważam, że jest to świetna opcja do budowania aplikacji o niekorporacyjnym rozmachu.
+
+\section{Hosting i środowisko produkcyjne}
+
+Frontend aplikacji wdrożono na platformie Vercel ze względu na jej doskonałą integrację z Next.js, możliwość zakupu i konfiguracji domeny w jednym miejscu oraz intuicyjny proces wdrażania zmian w aplikacji.
+
+Instancja PocketBase została uruchomiona na platformie Railway, zgodnie z oficjalną instrukcją [1]. Do tak postawionej instancji wystarczy zaimportować schemat bazy danych – nie ma potrzeby ręcznej konfiguracji serwera.
+
+\section{Struktura projektu}
+Struktura projektu została podzielona na trzy główne części, co ułatwia utrzymanie kodu i rozdzielenie odpowiedzialności.
+
+Katalog \texttt{look/} zawiera warstwę prezentacji aplikacji: widoki, strony, komponenty React oraz style interfejsu. To tutaj znajduje się cała logika związana z renderowaniem UI, obsługą interakcji użytkownika i stylistyką. Routing między stronami realizowany jest przez domyślny mechanizm Next.js (folder app/), który importuje komponenty z \texttt{look/}.
+
+Katalog \texttt{logic/} odpowiada za warstwę biznesową. Zawiera funkcje realizujące reguły działania systemu (np. rezerwacje, oferty, profile, komentarze), definicje typów danych oraz moduły komunikujące aplikację z PocketBase.
+
+Dane aplikacji utrzymywane są w osobnej instancji PocketBase, rozwijanej niezależnie od kodu. Struktura bazy jest wersjonowana za pomocą migracji, co pozwala kontrolować zmiany schematu i odtwarzać środowisko w sposób powtarzalny.
+
+\section{Baza danych – schemat i relacje}
+
+W projekcie zastosowano dwa sposoby modelowania powiązań między kolekcjami: relacje natywne PocketBase (pola typu relation) oraz zwykłe pola tekstowe \texttt{X\_id}. Główna różnica między tymi podejściami widoczna jest w panelu administracyjnym PocketBase – przy relacjach natywnych można wygodnie przeglądać powiązane rekordy, dodawać je i modyfikować bez ręcznego wpisywania identyfikatorów. Relacje natywne wymuszają również spójność danych – nie można wskazać nieistniejącego rekordu.
+Zdecydowałem się użyc obu opcji, by przetestować ich działanie i zalecam korzystanie z wbudowanej funkcjonalności.
+Główne kolekcje systemu to:
+\begin{itemize}
+  \setlength{\itemsep}{0pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+  \item users – przechowuje konta użytkowników, dane profilu, certyfikaty oraz ustawienia prywatności
+  \item offers – opisuje rejsy publikowane przez organizatorów (termin, lokalizacja, cena, liczba miejsc)
+  \item bookings – odpowiada za zgłoszenia rezerwacyjne i ich statusy (oczekujące, potwierdzone, odrzucone)
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/pb_diagram.png}
+\caption{Schemat bazy danych}
+\label{fig:home-screen}
+\end{figure}
+
+\section{Testowanie i jakość kodu}
+
+Testowanie aplikacji zrealizowano z użyciem frameworka Vitest. Napisane zostały testy jednostkowe dla każdej kolekcji w bazie danych oraz dla kluczowych funkcji walidacyjnych frontendu (e.g. sprawdzanie poprawności formularzy rezerwacji i dodawania oferty). Testy uruchamiane są lokalnie poleceniem npm test. Dodatkowo, spójność stylu kodowania i wykrywanie błędów zapewnia linter ESLint z konfiguracją Next.js.
+
+\section{Instrukcja instalacji i uruchomienia}
+
+Aplikacja jest dostępna online pod domeną \texttt{https://dsadsa.boats/}. Jeżeli jednak użytkownik chciałby uruchomić system lokalnie, może skorzystać z poniższej instrukcji.
+Poniższa instrukcja opisuje lokalne uruchomienie systemu krok po kroku.
+
+\begin{enumerate}
+    \item Pobranie projektu
+    \begin{itemize}
+        \item Sklonuj repozytorium:
+        \item \texttt{git clone https://github.com/antonitomaszewski/Sindbad}
+        \item \texttt{cd Sindbad}
+    \end{itemize}
+
+    \item Pobranie i uruchomienie PocketBase
+    \begin{itemize}
+        \item Pobierz PocketBase zgodnie z dokumentacją \cite{pocketbase-docs}.
+        \item Uruchom bazę: \texttt{./pocketbase serve}
+        \item Uzupełnij adres bazy w pliku \texttt{.env NEXT\_PUBLIC\_PB\_URL}.
+    \end{itemize}
+
+    \item Import bazy danych do PocketBase
+    \begin{itemize}
+        \item Zaloguj się do panelu administracyjnego PocketBase.
+        \item Zaimportuj plik eksportu bazy (JSON) dostępny w repozytorium.
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.9\textwidth]{img/inst import.png}
+            \caption{Import pliku bazy do pocketbase}
+            \label{fig:home-screen}
+            \end{figure}
+    \end{itemize}
+
+    \item Konfiguracja Google OAuth
+    \begin{itemize}
+        \item Utwórz dane OAuth w Google Cloud Console \cite{google-cloud-console}.
+        \item Skonfiguruj poprawnie URI przekierowań dla środowiska lokalnego i produkcyjnego.
+        \item Wklej \texttt{Client ID} i \texttt{Client Secret} do ustawień OAuth w PocketBase (kolekcja \texttt{users}).
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.9\textwidth]{img/inst google.png}
+            \caption{Konfiguracja Google oAuth}
+            \label{fig:home-screen}
+            \end{figure}
+    \end{itemize}
+
+    \item Konfiguracja Resend
+    \begin{itemize}
+        \item Załóż konto w Resend i wygeneruj klucz API dla aplikacji.
+        \item Uzupełnij konfigurację Resend w pliku \texttt{.env} projektu.
+        \item Uzupełnij ustawienia \texttt{SMTP/Mail} w panelu PocketBase.
+        \item Aby wysyłać wiadomości na zewnętrzne skrzynki (nie tylko adres rejestracyjny), skonfiguruj własną domenę w Resend.
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.9\textwidth]{img/inst mail.png}
+            \caption{konfiguracja wysyłki maili}
+            \label{fig:home-screen}
+            \end{figure}
+    \end{itemize}
+
+    \item Instalacja zależności i uruchomienie aplikacji
+    \begin{itemize}
+        \item \texttt{npm install}
+        \item \texttt{npm run dev}
+    \end{itemize}
+\end{enumerate}
+
+
+
+
+\chapter{Podsumowanie}
+
+\section{Wnioski z realizacji projektu}
+
+W trakcie realizacji projektu nauczyłem się korzystać z PocketBase – uważam je za bardzo potężne narzędzie do budowania backendu w indywidualnych projektach lub małych startupach. Zapewnia gotowe API, autoryzację, panel administracyjny i migracje, co pozwala skupić się na logice biznesowej zamiast na pisaniu typowego kodu CRUD.
+Uważam też, że warto w pełni korzystać z funkcjonalności oferowanych przez to narzędzie, takich jak natywne relacje w bazie danych
+
+Pierwszy raz konfigurowałem autoryzację przez Google OAuth oraz wysyłkę maili przez Resend – są to proste procesy, ale wymagają uwagi przy integracji.
+
+Podział kodu na look/ i logic/ bardzo ułatwił utrzymanie i testowanie – warstwa prezentacji jest całkowicie odseparowana od logiki biznesowej.
+
+Następnym razem skonfigurowałbym na początku projektu pre-commit hook, który zawsze sprawdzałby jakość kodu (lint) oraz poprawność testów – by ewentualne błędy wykrywać na bierząco.
+
+\section{Potencjalne rozszerzenia aplikacji}
+
+W trakcie pracy nad projektem rozważałem dalszy rozwój aplikacji o następujące funkcje:
+
+\subsection{Opcja "Zapisz rejs" (ulubione)}
+użytkownik mógłby dodawać interesujące rejsy do listy ulubionych, co ułatwiłoby śledzenie ofert bez konieczności każdorazowego wyszukiwania.
+
+\subsection{Strefa relacji (Strava activities dla żeglarzy)}
+Zainspirowany aplikacjami sportowymi takimi jak Strava czy Hevy, które nie tylko pomagają w treningu, ale też łączą społeczność, chciałbym dodać do Sindbada moduł „Dzienniczek żeglarski”. Użytkownicy mogliby wrzucać relacje ze swoich rejsów (zdjęcia, opisy, trasy), a znajomi mogliby je komentować i lajkować. To wzmocniłoby społecznościowy charakter platformy.
+
+\subsection{Integracja z kalendarzem Google}
+Dodanie rejsu do osobistego kalendarza użytkownika bezpośrednio z poziomu oferty.
+
+
+%%%% BIBLIOGRAFIA
+
+\begin{thebibliography}{1}
+\bibitem{https://railway.com/deploy/pocketbase-1} https://railway.com/deploy/pocketbase-1
+\bibitem[]{https://pocketbase-uml.github.io/}
+\bibitem{findacrew} Find a Crew, \url{https://www.findacrew.com/}
+\bibitem{crewly} Crewly, \url{https://crewly.pl/}
+\bibitem{fbcrewfinder} Sailing Crew Finder Whole World, \url{https://www.facebook.com/groups/SailingCrewFinderWholeWorld/}
+\bibitem{fbzeglarskie} Wolna koja - rejsy i informacje o żeglarstwie, \url{https://www.facebook.com/groups/262932323873709/}
+\bibitem{wolnakoja} Wolna Koja, \url{https://wolna-koja.pl/}
+\bibitem{coboaters} Coboaters, \url{https://www.coboaters.com/en/}
+\bibitem{sailties} Sailties, \url{https://sailties.net/}
+\bibitem{crewbay} Crewbay, \url{https://www.crewbay.com/boats/professional?keyword=professional&group=boats}
+\bibitem{pocketbase-docs} PocketBase, \textit{PocketBase Documentation}, \url{https://pocketbase.io/docs/}
+\bibitem{google-cloud-console} Google Cloud, \textit{Google Cloud Console}, \url{https://console.cloud.google.com/welcome}
+\end{thebibliography}
+
+\end{document}
