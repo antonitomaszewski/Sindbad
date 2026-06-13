@@ -56,7 +56,7 @@ Poszukiwanie rejsu żeglarskiego lub kompletowanie załogi to nie tylko kwestia 
 Find a Crew \cite{findacrew} to międzynarodowa platforma łącząca żeglarzy poszukujących załogi oraz właścicieli jachtów oferujących miejsce na pokładzie. Około 80\% ofert od kapitanów opiera się na zasadzie koleżeńskiej – w zamian za pomoc w żeglowaniu uczestnicy pokrywają część kosztów dziennych. Część ofert ma charakter prywatny (np. właściciel jachtu szuka towarzyszki rejsu) lub dotyczy tzw. delivery – transportu jachtu z portu A do B, często wiążącego się z utrudnieniami (np. nowy jacht przewożony na sprzedaż, wymagający szczególnej ostrożności). System jest rozbudowany, ale pod względem wizualnym sprawia wrażenie starszego systemu.
 
 \section{Crewly}
-Crewly \cite{crewly} to polska strona internetowa, która pojawiła się na rynku w marcu bierzącego roku. Umożliwia organizatorom publikowanie ofert rejsów. System jest relatywnie nowy i widać, że znajduje się w fazie rozwoju – brakuje w nim modułu opinii oraz relacji między użytkownikami (choć możliwe, że twórca doda te funkcje w przyszłości).
+Crewly \cite{crewly} to polska strona internetowa, która pojawiła się na rynku w marcu bieżącego roku. Umożliwia organizatorom publikowanie ofert rejsów. System jest relatywnie nowy i widać, że znajduje się w fazie rozwoju – brakuje w nim modułu opinii oraz relacji między użytkownikami (choć możliwe, że twórca doda te funkcje w przyszłości).
 
 \section{Grupy na Facebooku}
 Bardzo popularnym miejscem poszukiwania załogi i rejsów są grupy facebookowe, np. Sailing Crew Finder Whole World oraz Wolna koja - rejsy i informacje o żeglarstwie \cite{fbcrewfinder,fbzeglarskie}. Autor pracy, będąc kapitanem podczas rejsu w Chorwacji, z powodzeniem skompletował załogę za pośrednictwem takiej grupy – załoga okazała się sympatyczna, a jeden z uczestników, mimo że jak się później okazało miał przeszłość kryminalną, był znakomitym kompanem. Przykład ten pokazuje, że grupy facebookowe, jako przestrzeń bezpośredniej komunikacji „od ludzi do ludzi”, mogą być skuteczne, choć nie oferują żadnych mechanizmów weryfikacji, budowania długotrwałego zaufania ani nie są wygodnym rozwiązaniem dla komercyjnych organizatorów rejsów.
@@ -66,7 +66,7 @@ Warte uwagi są również serwisy takie jak: Wolna Koja, Coboaters, Sailties i C
 \cite{wolnakoja,coboaters,sailties,crewbay}.
 
 \section{Podsumowanie porównania}
-Żadne z wymienionych rozwiązań nie zdominowało dotychczas rynku – co jest sytuacją nietypową, ponieważ w przestrzeni online zazwyczaj jeden sprawdzony model szybko przyciąga większość użytkowników. Autor nie rozpoznaje wyraźnego lidera ani zwycięzcy w tym wyścigu.Większość platform koncentruje się na warstwie ogłoszeniowej, pomijając mechanizmy budowania zaufania (historia rejsów, weryfikacja uczestników, system ocen). Tymczasem to właśnie bezpośrednie kontakty na Facebooku najlepiej wypełniają tę lukę – choć bez systemowego wsparcia.
+Żadne z wymienionych rozwiązań nie zdominowało dotychczas rynku – co jest sytuacją nietypową, ponieważ w przestrzeni online zazwyczaj jeden sprawdzony model szybko przyciąga większość użytkowników. Nie rozpoznaję wyraźnego lidera ani zwycięzcy w tym wyścigu. Większość platform koncentruje się na warstwie ogłoszeniowej, pomijając mechanizmy budowania zaufania (historia rejsów, weryfikacja uczestników, system ocen). Tymczasem to właśnie bezpośrednie kontakty na Facebooku najlepiej wypełniają tę lukę – choć bez systemowego wsparcia.
 
 
 \chapter{Analiza wymagań}
@@ -74,14 +74,14 @@ Warte uwagi są również serwisy takie jak: Wolna Koja, Coboaters, Sailties i C
 \section{Wymagania funkcjonalne}
 Poniżej przedstawiono kluczowe wymagania funkcjonalne systemu w formie historyjek użytkownika (\textit{user stories}).
 
-\subsection{Wyszukiwanie rejsów i powiadomienia email}
-Jako użytkownik chcę móc przeglądać oferty rejsów i filtrować je według terminu, lokalizacji oraz ceny, aby znaleźć rejs odpowiadający moim oczekiwaniom. Jeżeli nie znajdę rejsu spełniającego moje kryteria, chcę móc utworzyć powiadomienie -- system powiadomi mnie gdy taka oferta pojawi się w przyszłości.
+\subsection{Wyszukiwanie rejsów i powiadomienia e-mail}
+Jako użytkownik chcę móc przeglądać oferty rejsów i filtrować je według terminu, lokalizacji oraz ceny, aby znaleźć rejs odpowiadający moim oczekiwaniom. Jeżeli nie znajdę rejsu spełniającego moje kryteria, chcę móc utworzyć powiadomienie -- system powiadomi mnie, gdy taka oferta pojawi się w przyszłości.
 
 \subsection{Rezerwacja miejsca i kontakt z organizatorem}
 Jako zalogowany użytkownik chcę móc wysłać rezerwację na wybrany rejs, aby zarezerwować miejsce na pokładzie. Jeżeli nie jestem pewny uczestnictwa i chcę wcześniej o coś zapytać, chcę mieć możliwość napisania wiadomości do organizatora bez składania rezerwacji.
 
 \subsection{Zarządzanie rezerwacjami przez organizatora}
-Jako organizator (twórca oferty rejsu) chcę móc przeglądać napływające rezerwacje oraz potwierdzać je lub odrzucać. Użytkownik, który wysłał rezerwację, ma otrzymać powiadomienie podjętej decyzji.
+Jako organizator (twórca oferty rejsu) chcę móc przeglądać napływające rezerwacje oraz potwierdzać je lub odrzucać. Użytkownik, który wysłał rezerwację, ma otrzymać powiadomienie o podjętej decyzji.
 
 \subsection{Tworzenie oferty rejsu}
 Jako zalogowany użytkownik chcę móc dodać ofertę rejsu z opisem, terminem, ceną, lokalizacją i zdjęciami. Po utworzeniu oferta ma być natychmiast dostępna w wynikach wyszukiwania.
@@ -98,29 +98,29 @@ Jako użytkownik chcę, aby system przechowywał informację o tym, z kim odbył
 \section{Wymagania niefunkcjonalne}
 
 \subsection{Dostępność przez przeglądarkę}
-System działa jako aplikacja webowa i jest dostępny przez nowoczesną przeglądarkę internetową (Chrome, Safari), bez konieczności instalowania dodatkowego oprogramowania po stronie użytkownika.
+Wymagam, aby system działał jako aplikacja webowa i był dostępny przez nowoczesną przeglądarkę internetową (Chrome, Safari), bez konieczności instalowania dodatkowego oprogramowania po stronie użytkownika.
 
 \subsection{Responsywność interfejsu}
-Intuicyjny interfejs użytkownika dostosowuje się do różnych rozdzielczości ekranów (komputer, telefon), zachowując czytelność i pełną funkcjonalność kluczowych widoków.
+Wymagam, aby intuicyjny interfejs użytkownika dostosowywał się do różnych rozdzielczości ekranów (komputer, telefon), zachowując czytelność i pełną funkcjonalność kluczowych widoków.
 
 \subsection{Bezpieczeństwo i autentykacja}
-System musi zapewniać bezpieczne logowanie użytkowników, w tym logowanie zewnętrzne przez Google OAuth, oraz egzekwować reguły dostępu do danych (np. profile prywatne widoczne tylko dla uprawnionych użytkowników).
+Wymagam, aby system zapewniał bezpieczne logowanie użytkowników, w tym logowanie zewnętrzne przez Google OAuth, oraz egzekwował reguły dostępu do danych (np. profile prywatne widoczne tylko dla uprawnionych użytkowników).
 
 \subsection{Utrzymywalność kodu}
-Kod aplikacji powinien pozostawać czytelny i łatwy w rozwoju dzięki podziałowi na warstwę prezentacji (\texttt{look/}) oraz warstwę logiki biznesowej (\texttt{logic/}), a także dzięki stosowaniu lintingu i testów automatycznych.
+Wymagam, aby kod aplikacji pozostawał czytelny i łatwy w rozwoju dzięki podziałowi na warstwę prezentacji (\texttt{look/}) oraz warstwę logiki biznesowej (\texttt{logic/}), a także dzięki stosowaniu lintingu i testów automatycznych.
 
 
 \chapter{Instrukcja użytkownika}
 
 \section{Wprowadzenie do interfejsu}
-W ramach pracy powstała internetowa platforma Sindbad, która ma pomóc w organizacji rejsów. Jest przeznaczona dla osób chcących zorganizować rejs, dołączyć się do załogi niezależnie od doświadczenia i umiejętności oraz chętnych do poznania nowych zaufanych ludzi i bycia częścią społeczności. Ma ułatwić planowanie wakacji i sprawić że będziemy się czuć bezpieczniej.
+W ramach pracy stworzyłem internetową platformę Sindbad, która ma pomóc w organizacji rejsów. Jest przeznaczona dla osób chcących zorganizować rejs, dołączyć do załogi niezależnie od doświadczenia i umiejętności oraz poznać nowych, zaufanych ludzi i stać się częścią społeczności. Ma ułatwić planowanie wakacji i sprawić, że będziemy czuć się bezpieczniej.
 
 \section{Role użytkowników}
-W aplikacji są dwa typy użytkowników.
-Niezalogowany (gość) - ma dostęp do wszystkich ofert rejsów, ale nie do profili użytkowników.
-Może wysłać zapytania do organizatora, ale by dokonać rezerwacji musi zarejestrować konto w serwisie.
-Zalogowany (użytkownik) - ma dodatkowo możliwość wysłania rezerwacji, tworzenia oferty rejsu, dostęp do profili publicznych, oraz prywatnych z którymi był już na wspólnym rejsie.
-Użytkownik, który utworzył ofertę rejsu ma możliwość przyjmowania i odrzucania rezerwacji.
+W aplikacji wyróżniam dwa typy użytkowników.
+Niezalogowany użytkownik (gość) ma dostęp do wszystkich ofert rejsów, ale nie do profili użytkowników.
+Może wysyłać zapytania do organizatora, ale aby dokonać rezerwacji, musi zarejestrować konto w serwisie.
+Zalogowany użytkownik ma dodatkowo możliwość wysłania rezerwacji, tworzenia oferty rejsu oraz dostęp do profili publicznych i prywatnych, z którymi był już na wspólnym rejsie.
+Użytkownik, który utworzył ofertę rejsu, ma możliwość przyjmowania i odrzucania rezerwacji.
 
 \section{Strona główna}
 
@@ -294,7 +294,7 @@ Do implementacji wybranych funkcji wykorzystałem dodatkowe biblioteki:
 Walidacja formularzy (np. podczas rezerwacji oraz dodawania oferty) jest realizowana po stronie frontendu, dzięki czemu użytkownik otrzymuje komunikat o błędzie natychmiast, bez oczekiwania na odpowiedź serwera.
 
 \subsection{Backend}
-Warstwę backendową projektu zrealizowałem z użyciem PocketBase - było to dla mnie nowe narzędzie, chciałem poznać jego możliwości. Zależało mi na szybkim uruchomieniu stabilnego zaplecza z gotową autoryzacją, panelem administracyjnym i API. PocketBase obsługuje logowanie użytkowników i rozszerzanie o oAuth, przechowywanie danych aplikacji (oferty, rezerwacje, profile, komentarze) oraz reguły dostępu do rekordów. Jako silnik bazy danych wykorzystywana jest SQLite, co w tym projekcie było wystarczające i uprościło utrzymanie środowiska \cite{pocketbase-docs,sqlite-docs}.
+Warstwę backendową projektu zrealizowałem z użyciem PocketBase -- było to dla mnie nowe narzędzie i chciałem poznać jego możliwości. Zależało mi na szybkim uruchomieniu stabilnego zaplecza z gotową autoryzacją, panelem administracyjnym i API. PocketBase obsługuje logowanie użytkowników i rozszerzanie o OAuth, przechowywanie danych aplikacji (oferty, rezerwacje, profile, komentarze) oraz reguły dostępu do rekordów. Jako silnik bazy danych wykorzystałem SQLite, co w tym projekcie było wystarczające i uprościło utrzymanie środowiska \cite{pocketbase-docs,sqlite-docs}.
 
 Logika biznesowa została dopisana po stronie aplikacji (m.in. walidacje rezerwacji, kontrola statusów, reguły relacji między użytkownikami). Jako operatora wysyłki maili użyłem Resend – darmowa wersja pozwala na 100 wysyłek dziennie, co było w zupełności wystarczające dla potrzeb aplikacji \cite{resend-docs}.
 
@@ -380,7 +380,7 @@ Poniższa instrukcja opisuje lokalne uruchomienie systemu krok po kroku.
         \begin{figure}[H]
             \centering
             \includegraphics[width=0.9\textwidth]{img/inst google.png}
-            \caption{Konfiguracja Google oAuth}
+            \caption{Konfiguracja Google OAuth}
             \label{fig:home-screen}
             \end{figure}
     \end{itemize}
@@ -420,7 +420,7 @@ Uważam też, że warto w pełni korzystać z funkcjonalności oferowanych przez
 
 Pierwszy raz konfigurowałem autoryzację przez Google OAuth oraz wysyłkę maili przez Resend – są to proste procesy, ale wymagają uwagi przy integracji.
 
-Podział kodu na look/ i logic/ bardzo ułatwił utrzymanie i testowanie - czułem się z takim podziałem najbardziej komfortowo podczas pracy nad kodem, była to dobra decyzja.
+Podział kodu na \texttt{look/} i \texttt{logic/} bardzo ułatwił utrzymanie i testowanie -- czułem się z takim podziałem najbardziej komfortowo podczas pracy nad kodem i uważam, że była to dobra decyzja.
 
 Następnym razem skonfigurowałbym na początku projektu pre-commit hook, który zawsze sprawdzałby jakość kodu oraz poprawność testów – by ewentualne błędy wykrywać na bieżąco.
 
