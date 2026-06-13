@@ -117,10 +117,10 @@ W ramach pracy stworzyłem internetową platformę Sindbad, która ma pomóc w o
 
 \section{Role użytkowników}
 W aplikacji wyróżniam dwa typy użytkowników.
-Niezalogowany użytkownik (gość) ma dostęp do wszystkich ofert rejsów, ale nie do profili użytkowników.
-Może wysyłać zapytania do organizatora, ale aby dokonać rezerwacji, musi zarejestrować konto w serwisie.
-Zalogowany użytkownik ma dodatkowo możliwość wysłania rezerwacji, tworzenia oferty rejsu oraz dostęp do profili publicznych i prywatnych, z którymi był już na wspólnym rejsie.
-Użytkownik, który utworzył ofertę rejsu, ma możliwość przyjmowania i odrzucania rezerwacji.
+\begin{enumerate}
+    \item \textbf{Niezalogowany użytkownik (gość)} ma dostęp do wszystkich ofert rejsów, ale nie do profili użytkowników. Może wysyłać zapytania do organizatora, ale aby dokonać rezerwacji, musi zarejestrować konto w serwisie.
+    \item \textbf{Zalogowany użytkownik} ma dodatkowo możliwość wysłania rezerwacji, tworzenia oferty rejsu oraz dostęp do profili publicznych i prywatnych, z którymi był już na wspólnym rejsie. Użytkownik, który utworzył ofertę rejsu, ma możliwość przyjmowania i odrzucania rezerwacji.
+\end{enumerate}
 
 \section{Strona główna}
 
@@ -146,14 +146,14 @@ System przeprowadza walidację danych wprowadzanych w formularzu. W przypadku wy
 \centering
 \includegraphics[width=0.4\textwidth]{img/X.04 logowanie.png}
 \caption{Formularz logowania użytkownika}
-\label{fig:home-screen}
+\label{fig:login-form}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.4\textwidth]{img/X.04 rejestracja.png}
 \caption{Formularz rejestracji użytkownika}
-\label{fig:home-screen}
+\label{fig:register-form}
 \end{figure}
 
 \section{Wyszukiwanie ofert}
@@ -170,21 +170,21 @@ Z każdego widoku użytkownik może przejść do szczegółów wybranej oferty.
 \centering
 \includegraphics[width=0.9\textwidth]{img/X.05 mapa.png}
 \caption{Widok mapy rejsów}
-\label{fig:home-screen}
+\label{fig:map-view}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{img/X.05 wyszukiwanie.png}
 \caption{Widok wyszukiwania rejsów}
-\label{fig:home-screen}
+\label{fig:search-view}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{img/X.05 kalendarz.png}
 \caption{Widok kalendarza rejsów}
-\label{fig:home-screen}
+\label{fig:calendar-view}
 \end{figure}
 
 \section{ Szczegóły oferty}
@@ -198,7 +198,7 @@ W dolnej części strony znajdują się opcje wysłania zgłoszenia rezerwacyjne
 \centering
 \includegraphics[width=0.9\textwidth]{img/X.06 szczegoly oferty.png}
 \caption{Widok szczegółów oferty rejsu}
-\label{fig:home-screen}
+\label{fig:offer-details}
 \end{figure}
 
 \section{Rezerwacja miejsca i kontakt z organizatorem}
@@ -208,14 +208,14 @@ Formularze rezerwacji i zadawania pytań dostępne są z poziomu widoku szczegó
 \centering
 \includegraphics[width=0.49\textwidth]{img/X.07 pytanie.png}
 \caption{Formularz zadania pytania do organizatora}
-\label{fig:home-screen}
+\label{fig:question-form}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.49\textwidth]{img/X.07 rezerwacja.png}
 \caption{Formularz wysyłania rezerwacji}
-\label{fig:home-screen}
+\label{fig:reservation-form}
 \end{figure}
 
 
@@ -223,7 +223,7 @@ Formularze rezerwacji i zadawania pytań dostępne są z poziomu widoku szczegó
 Ofertę może utworzyć każdy zalogowany użytkownik. Formularz wymaga podania podstawowych informacji, takich jak tytuł, termin, cena oraz lokalizacja rejsu. W przypadku braku wymaganych danych system wyświetla odpowiednie komunikaty walidacyjne.
 Po utworzeniu oferta jest dostępna do wyszukania.
 
-Organizator zarządza rezerwacyjnymi w widoku danej oferty. Wiadomości e-mail dotyczące rezerwacji zawierają odnośnik do odpowiedniej oferty, co ułatwia ich obsługę.
+Organizator zarządza rezerwacjami w widoku danej oferty. Wiadomości e-mail dotyczące rezerwacji zawierają odnośnik do odpowiedniej oferty, co ułatwia ich obsługę.
 
 Każde zgłoszenie może zostać zaakceptowane lub odrzucone. Po podjęciu decyzji system automatycznie wysyła wiadomość e-mail do uczestnika z informacją o wyniku rezerwacji.
 
@@ -231,14 +231,14 @@ Każde zgłoszenie może zostać zaakceptowane lub odrzucone. Po podjęciu decyz
 \centering
 \includegraphics[width=0.9\textwidth]{img/X.08 tworzenie oferty.png}
 \caption{Formularz tworzenia nowej oferty rejsu}
-\label{fig:home-screen}
+\label{fig:offer-create-form}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{img/X.08 zarządzanie rezerwacjami.png}
 \caption{Panel organizatora do zarządzania rezerwacjami}
-\label{fig:home-screen}
+\label{fig:bookings-management-panel}
 \end{figure}
 
 \section{Profil użytkownika i funkcje społecznościowe}
@@ -255,7 +255,7 @@ Właściciel profilu może go edytować oraz zarządzać ustawieniami prywatnoś
 \centering
 \includegraphics[width=0.9\textwidth]{img/X.09 profil.png}
 \caption{Widok profilu użytkownika}
-\label{fig:home-screen}
+\label{fig:profile-view}
 \end{figure}
 
 \section{Szablony maili}
@@ -265,7 +265,7 @@ System wysyła wiadomości e-mail przy złożeniu rezerwacji, zmianie jej status
 \centering
 \includegraphics[width=0.9\textwidth]{img/X.10 szablony maili - nowa rezerwacja.png}
 \caption{Szablon wiadomości e-mail o nowej rezerwacji}
-\label{fig:home-screen}
+\label{fig:email-template-new-booking}
 \end{figure}
 
 \section{Podsumowanie rozdziału}
@@ -318,7 +318,7 @@ Dane aplikacji utrzymywane są w osobnej instancji PocketBase, rozwijanej niezal
 \section{Baza danych – schemat i relacje}
 
 W projekcie zastosowano dwa sposoby modelowania powiązań między kolekcjami: relacje natywne PocketBase (pola typu relation) oraz zwykłe pola tekstowe \texttt{X\_id}. Główna różnica między tymi podejściami widoczna jest w panelu administracyjnym PocketBase – przy relacjach natywnych można wygodnie przeglądać powiązane rekordy, dodawać je i modyfikować bez ręcznego wpisywania identyfikatorów. Relacje natywne wymuszają również spójność danych – nie można wskazać nieistniejącego rekordu.
-Zdecydowałem się użyc obu opcji, by przetestować ich działanie i zalecam korzystanie z wbudowanej funkcjonalności.
+Zdecydowałem się użyć obu opcji, by przetestować ich działanie i zalecam korzystanie z wbudowanej funkcjonalności.
 Główne kolekcje systemu to:
 \begin{itemize}
   \setlength{\itemsep}{0pt}
@@ -333,7 +333,7 @@ Główne kolekcje systemu to:
 \centering
 \includegraphics[width=0.9\textwidth]{img/pb_diagram.png}
 \caption{Schemat bazy danych}
-\label{fig:home-screen}
+\label{fig:database-schema}
 \end{figure}
 
 \section{Testowanie i jakość kodu}
@@ -368,7 +368,7 @@ Poniższa instrukcja opisuje lokalne uruchomienie systemu krok po kroku.
             \centering
             \includegraphics[width=0.9\textwidth]{img/inst import.png}
             \caption{Import pliku bazy do pocketbase}
-            \label{fig:home-screen}
+            \label{fig:install-pb-import}
             \end{figure}
     \end{itemize}
 
@@ -381,7 +381,7 @@ Poniższa instrukcja opisuje lokalne uruchomienie systemu krok po kroku.
             \centering
             \includegraphics[width=0.9\textwidth]{img/inst google.png}
             \caption{Konfiguracja Google OAuth}
-            \label{fig:home-screen}
+            \label{fig:install-google-oauth}
             \end{figure}
     \end{itemize}
 
@@ -395,7 +395,7 @@ Poniższa instrukcja opisuje lokalne uruchomienie systemu krok po kroku.
             \centering
             \includegraphics[width=0.9\textwidth]{img/inst mail.png}
             \caption{konfiguracja wysyłki maili}
-            \label{fig:home-screen}
+            \label{fig:install-mail-settings}
             \end{figure}
     \end{itemize}
 
