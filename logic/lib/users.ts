@@ -3,9 +3,6 @@ import type { User } from '../types/user';
 import { ERRORS } from './messages';
 import type { OAuthProvider } from '../types/auth';
 
-/**
- * Pobierz użytkownika po ID z rozszerzeniem certyfikatów
- */
 export async function getUser(id: string): Promise<User | null> {
   try {
     const record: any = await pb.collection('users').getOne(id);
@@ -20,9 +17,6 @@ export async function getUser(id: string): Promise<User | null> {
   }
 }
 
-/**
- * Pobierz certyfikaty użytkownika (nazwy zamiast ID)
- */
 export async function getUserCertifications(userId: string): Promise<string[]> {
   try {
     const record: any = await pb.collection('users').getOne(userId, { expand: 'certifications' });
@@ -193,9 +187,6 @@ export async function registerUser(
   }
 }
 
-/**
- * Zaloguj przez Google OAuth
- */
 export async function loginWithOAuth(provider: OAuthProvider) {
   try {
     const authData = await pb.collection('users').authWithOAuth2({ 
@@ -209,19 +200,10 @@ export async function loginWithOAuth(provider: OAuthProvider) {
   }
 }
 
-// Backward compatibility
-export const loginWithGoogle = () => loginWithOAuth('google');
-
-/**
- * Wyloguj użytkownika (wyczyść sesję)
- */
-export async function logoutUser() {
+export function logoutUser() {
   pb.authStore.clear();
 }
 
-/**
- * Pobierz aktualnie zalogowanego użytkownika
- */
 export function getCurrentUser(): User | null {
   return pb.authStore.record as User | null;
 }
@@ -273,20 +255,7 @@ export async function updateUserProfile(
 
     const record = await pb.collection('users').update(userId, formData);
 
-    return {
-      id: record.id,
-      password: record.password,
-      tokenKey: record.tokenKey,
-      email: record.email,
-      emailVisibility: record.emailVisibility,
-      verified: record.verified,
-      name: record.name,
-      avatar: record.avatar,
-      created: record.created,
-      updated: record.updated,
-      bio: record.bio,
-      certifications: record.certifications || [],
-    } as User;
+    return record as unknown as User;
   } catch (error: any) {
     console.error('Update profile error:', error);
     throw new Error('Nie udało się zaktualizować profilu');
@@ -358,20 +327,7 @@ export async function deleteUserAvatar(userId: string): Promise<User> {
       avatar: null,
     });
 
-    return {
-      id: record.id,
-      password: record.password,
-      tokenKey: record.tokenKey,
-      email: record.email,
-      emailVisibility: record.emailVisibility,
-      verified: record.verified,
-      name: record.name,
-      avatar: record.avatar,
-      created: record.created,
-      updated: record.updated,
-      bio: record.bio,
-      certifications: record.certifications || [],
-    } as User;
+    return record as unknown as User;
   } catch (error: any) {
     console.error('Delete avatar error:', error);
     throw new Error('Nie udało się usunąć avatara');

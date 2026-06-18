@@ -2,7 +2,7 @@ import pb from './pocketbase';
 import type { Offer, OfferFormData } from '../types/offer';
 import type { BookingStatus } from '../types/booking';
 import { sendTripAlertNotifications } from './tripAlerts';
-import { todayIso } from '@/look/utils/dateFormatter';
+import { todayIso } from '../../look/utils/dateFormatter';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
@@ -205,7 +205,8 @@ export async function updateOffer(id: string, data: Partial<Offer>): Promise<Off
   }
 }
 
-// Usuń ofertę
+// tego ostatecznie nie uzywam,
+// nie dodałem funkcji usuwania oferty dla organizatora
 export async function deleteOffer(id: string): Promise<boolean> {
   try {
     await pb.collection('offers').delete(id);

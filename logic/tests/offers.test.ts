@@ -1,7 +1,13 @@
-import { describe, it, expect } from "vitest";
-import { createOffer, getOffers, getOfferById, updateOffer, deleteOffer } from "../lib/offers";
+import { describe, it, expect, vi } from "vitest";
+import { createOffer, getOffers, getOfferById, updateOffer, deleteOffer, validateSeatsAvailable } from "../lib/offers";
 import { loginUser, registerUser } from "../lib/users";
 import { ERRORS } from "../lib/messages";
+
+vi.mock('resend', () => ({
+  Resend: vi.fn().mockImplementation(() => ({
+    emails: { send: vi.fn().mockResolvedValue({ id: 'mock-id' }) },
+  })),
+}));
 
 // Pomocnicze dane testowe
 const testLocation = {
@@ -48,9 +54,10 @@ describe("offers logic", () => {
 
     // UPDATE
     const updatedTitle = "Zmieniona oferta";
-    const updated = await updateOffer(offer.id, { title: updatedTitle });
+    const updated = await updateOffer(offer.id, { title: updatedTitle, seats_available: 0});
     expect(updated).toBeDefined();
     expect(updated?.title).toBe(updatedTitle);
+    expect(() => validateSeatsAvailable(updated!)).toThrow('Brak dostępnych miejsc');
 
     // DELETE
     const deleted = await deleteOffer(offer.id);

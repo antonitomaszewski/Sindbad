@@ -1,6 +1,6 @@
 import { Card } from '@/look/components/ui/Card';
 import { OFFER_LABELS } from '@/look/constants/offer';
-import { formatDateRange } from '@/look/utils/dateFormatter';
+import { formatDateRange, getDuration } from '@/look/utils/dateFormatter';
 import { getCountryName } from '@/logic/constants/countries';
 
 interface OfferHeaderProps {
@@ -51,6 +51,7 @@ export function OfferHeader({
         <div className="bg-gray-50 rounded-lg p-4">
           <h3 className="font-semibold text-gray mb-2">{OFFER_LABELS.TERM}</h3>
           <p className="text-main font-medium">{formatDateRange(dateFrom, dateTo)}</p>
+          <p className="text-main font-medium">{getDuration(dateFrom, dateTo)} Dni</p>
         </div>
 
         <div className="bg-gray-50 rounded-lg p-4">
