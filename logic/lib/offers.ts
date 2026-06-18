@@ -124,19 +124,20 @@ export async function haveCommonOffers(userId1: string, userId2: string): Promis
   }
 }
 
+export async function getFinishedOffersCount() {
+  const today = new Date().toISOString().slice(0, 10);
+  return pb.collection('offers').getList(1, 1, {filter: `date_to < "${today}"`})
+  
+}
+
 // Wyszukaj oferty (nowa funkcja z brancha szukaj)
 export async function searchOffers(params: { 
-  q?: string; 
   dateFrom?: string; 
   dateTo?: string; 
   onlyFuture?: boolean;
 }) {
   const parts: string[] = [];
   
-  if (params.q) {
-    parts.push(`(title ~= "${params.q}" || description ~= "${params.q}")`);
-  }
-
   const filter = parts.length ? parts.join(' && ') : undefined;
 
   try {

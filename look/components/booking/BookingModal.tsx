@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { createBooking } from '@/logic/lib/bookings';
 import pb from '@/logic/lib/pocketbase';
 
+const MAX_MESSAGE_LENGTH = 200;
+
 interface BookingModalProps {
   offerId: string;
   onClose: () => void;
@@ -47,6 +49,12 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
           setLoading(false);
           return;
         }
+
+        if (remaining < 0) {
+          setError('Zbyt długa wiadomość');
+          setLoading(false);
+          return
+        }
         await createBooking(offerId, message, {
           name: guestName,
           email: guestEmail || undefined,
@@ -60,6 +68,8 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
       setLoading(false);
     }
   };
+
+   const remaining = MAX_MESSAGE_LENGTH - message.length;
 
   return (
     <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
@@ -131,6 +141,13 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
               placeholder="Np. Mam pytanie o..."
             />
+            <p className={
+  remaining < 20
+    ? "text-red-500"
+    : "text-gray-500"
+}>
+              {message.length} / {MAX_MESSAGE_LENGTH}
+            </p>
           </div>
 
           {error && <div className="text-red-600 text-sm">{error}</div>}

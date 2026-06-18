@@ -9,6 +9,7 @@ import { filterOffers } from '../../../logic/lib/filtering';
 import { loadOfferImages, loadOrganizerNames } from '../../../logic/lib/offerData';
 import { Offer } from '../../../logic/types/offer';
 import { DateRangePicker } from '@/look/components/ui/DateRangePicker';
+import { Button } from '../ui/Button';
 
 interface Filters {
   country: string;
@@ -19,8 +20,9 @@ interface Filters {
   organizerId: string;
 }
 
+type sortByType =  'date_asc' | 'date_desc' | 'price_asc' | 'price_desc';
+
 export default function SearchPanel() {
-  const [q, setQ] = useState('');
   const [dateFrom, setDateFrom] = useState<Date | null>(null);
   const [dateTo, setDateTo] = useState<Date | null>(null);
   const [onlyFuture, setOnlyFuture] = useState(true);
@@ -40,6 +42,7 @@ export default function SearchPanel() {
   const [users, setUsers] = useState<{ id: string; name: string; email: string }[]>([]);
   const [offerImages, setOfferImages] = useState<Map<string, string>>(new Map());
   const [organizers, setOrganizers] = useState<Map<string, string>>(new Map());
+  const [sortBy, setSortBy] = useState<sortByType>("date_asc");
 
   useEffect(() => {
     let mounted = true;
@@ -55,17 +58,38 @@ export default function SearchPanel() {
   useEffect(() => {
     const timer = setTimeout(() => fetchResults(), 350);
     return () => clearTimeout(timer);
-  }, [q, dateFrom, dateTo, onlyFuture]);
+  }, [dateFrom, dateTo, onlyFuture]);
 
   useEffect(() => {
-    setFilteredResults(filterOffers(allResults, filters, countries));
-  }, [allResults, filters, countries]);
+    const result = filterOffers(allResults, filters);
+    result.sort((a,b) => {
+      if (sortBy === 'date_asc')  return (a.date_from || '').localeCompare(b.date_from || '');
+      if (sortBy === 'date_desc') return (b.date_from || '').localeCompare(a.date_from || '');
+      if (sortBy === 'price_asc')  return (a.price_per_person || 0) - (b.price_per_person || 0);
+      if (sortBy === 'price_desc') return (b.price_per_person || 0) - (a.price_per_person || 0);
+      return 0;
+    });
+    setFilteredResults(result);
+  }, [allResults, filters, sortBy]);
+
+  const handleClear = () => {
+    setDateFrom(null);
+    setDateTo(null);
+    setOnlyFuture(true);
+    setFilters({
+      country: '',
+      port: '',
+      priceMin: '',
+      priceMax: '',
+      onlyFree: true,
+      organizerId: '',
+    });
+  }
 
   async function fetchResults() {
     setLoading(true);
 
     const data = await searchOffers({
-      q: q || undefined,
       dateFrom: dateToString(dateFrom),
       dateTo: dateToString(dateTo),
       onlyFuture,
@@ -90,6 +114,27 @@ export default function SearchPanel() {
         <div className="col-span-1">
           <div className="bg-white p-4 rounded shadow space-y-3 sticky top-4">
             <h4 className="font-semibold">Filtry</h4>
+
+            {(dateFrom || dateTo || !onlyFuture ||
+  filters.country || filters.port || filters.priceMin ||
+  filters.priceMax || !filters.onlyFree || filters.organizerId) &&
+            (<Button onClick={handleClear} variant='secondary'>
+              Wyczyść filtry
+            </Button>)}
+
+            <div>
+              <label className="block mb-1 text-sm font-medium">Sortowanie</label>
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value as sortByType)} 
+                className="w-full p-2 border rounded focus-ring-main focus-border-main"
+              >
+                <option value="date_asc">Data od najwcześniejszej</option>
+                <option value="date_desc">Data od najpóźnieszej</option>
+                <option value="price_asc">Cena od najniższej</option>
+                <option value="price_desc">Cena od najwyższej</option>
+              </select>
+            </div>
 
             <div>
               <label className="block mb-1 text-sm font-medium">Kraj</label>

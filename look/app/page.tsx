@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import pb from '../../logic/lib/pocketbase';
+import {getFinishedOffersCount} from '../../logic/lib/offers';
 
 const steps = [
   {
@@ -23,6 +24,7 @@ type HomeStats = {
   activeOffers: number;
   organizers: number;
   confirmedBookings: number;
+  finishedOffers: number;
 };
 
 export default function HomePage() {
@@ -48,8 +50,9 @@ export default function HomePage() {
       pb.collection('bookings').getList(1, 1, {
         filter: 'status = "confirmed"',
       }),
+      getFinishedOffersCount(),
     ])
-      .then(([activeOffersResult, offers, confirmedBookingsResult]) => {
+      .then(([activeOffersResult, offers, confirmedBookingsResult, finishedOffers]) => {
         const organizerIds = new Set(
           (offers as Array<{ organizer_id?: string }>)
             .map((offer) => offer.organizer_id)
@@ -60,6 +63,7 @@ export default function HomePage() {
           activeOffers: activeOffersResult.totalItems,
           organizers: organizerIds.size,
           confirmedBookings: confirmedBookingsResult.totalItems,
+          finishedOffers: finishedOffers.totalItems,
         });
       })
       .catch(() => {
@@ -67,6 +71,7 @@ export default function HomePage() {
           activeOffers: 0,
           organizers: 0,
           confirmedBookings: 0,
+          finishedOffers: 0,
         });
       });
 
@@ -123,7 +128,7 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 lg:px-8">
         <h2 className="mb-6 text-2xl font-semibold text-slate-900">Zaufali nam</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-4">
           <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <p className="text-3xl font-bold text-slate-900">
               {stats ? stats.activeOffers : '...'}
@@ -141,6 +146,12 @@ export default function HomePage() {
               {stats ? stats.confirmedBookings : '...'}
             </p>
             <p className="mt-2 text-sm text-slate-600">Potwierdzone rezerwacje</p>
+          </article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-3xl font-bold text-slate-900">
+              {stats ? stats.finishedOffers : '...'}
+            </p>
+            <p className="mt-2 text-sm text-slate-600">Zakończone</p>
           </article>
         </div>
       </section>

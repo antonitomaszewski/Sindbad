@@ -12,8 +12,6 @@ interface FilterOptions {
 export function filterOffers(
   offers: Offer[],
   filters: FilterOptions,
-  // Argument countries zachowany dla zgodności ze starymi call-sites, nie jest już używany.
-  _countries?: { code: string; name: string; namePL: string }[]
 ): Offer[] {
   let results = offers;
 
