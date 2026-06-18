@@ -3,6 +3,7 @@ import { getOfferById } from '../lib/offers';
 import { loginUser, logoutUser, registerUser } from '../lib/users';
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import pb from '../lib/pocketbase';
+import { todayIso } from '@/look/utils/dateFormatter';
 
 describe('Bookings', () => {
   const testEmail = `test-bookings-${Date.now()}@example.com`;
@@ -79,8 +80,7 @@ describe('Bookings', () => {
       }
     }
 
-    const today = new Date().toISOString().slice(0, 10);
-    const shouldBeVisible = !offer?.date_from || offer.date_from.slice(0, 10) >= today;
+    const shouldBeVisible = !offer?.date_from || offer.date_from.slice(0, 10) >= todayIso();
     const createdBooking = bookings.find((item) => item.id === booking.id);
 
     if (shouldBeVisible) {

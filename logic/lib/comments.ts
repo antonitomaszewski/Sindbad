@@ -6,6 +6,7 @@ import type {
   OrganizerReviewRatingFilter,
   OrganizerReviewsSummary,
 } from '../types/comment';
+import { todayIso } from '@/look/utils/dateFormatter';
 
 const COMMENTS_COLLECTION = 'offer_comments';
 
@@ -28,10 +29,6 @@ function mapRecordToComment(record: any): OfferComment {
     author_name: String(expandedUser?.name || expandedUser?.email || 'Użytkownik'),
     offer_title: expandedOffer?.title ? String(expandedOffer.title) : undefined,
   };
-}
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
 }
 
 export function isOfferFinished(offer: Offer): boolean {

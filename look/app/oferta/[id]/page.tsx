@@ -22,13 +22,10 @@ import {
   getConfirmedParticipants,
 } from '@/logic/lib/bookings';
 import type { OfferParticipant } from '@/logic/types/booking';
+import { todayIso } from '@/look/utils/dateFormatter';
 
 interface OfferPageProps {
   params: Promise<{ id: string }>;
-}
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
 }
 
 function canBookOfferByDate(dateFrom?: string): boolean {
@@ -167,7 +164,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
             country={offer.country}
             port={offer.port}
             seatsAvailable={offer.seats_available}
-            seatsTotal={offer.seats_total}
+            yachtName={offer.yacht_name}
           />
           <Button onClick={handleCopied} variant="secondary" className="shrink-0 mt-1">
             {copied ? 'Skopiowano!' : 'Kopiuj link'}

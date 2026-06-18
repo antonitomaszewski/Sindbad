@@ -2,6 +2,7 @@ import pb from './pocketbase';
 import type { Offer, OfferFormData } from '../types/offer';
 import type { BookingStatus } from '../types/booking';
 import { sendTripAlertNotifications } from './tripAlerts';
+import { todayIso } from '@/look/utils/dateFormatter';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
@@ -125,8 +126,7 @@ export async function haveCommonOffers(userId1: string, userId2: string): Promis
 }
 
 export async function getFinishedOffersCount() {
-  const today = new Date().toISOString().slice(0, 10);
-  return pb.collection('offers').getList(1, 1, {filter: `date_to < "${today}"`})
+  return pb.collection('offers').getList(1, 1, {filter: `date_to < "${todayIso()}"`})
   
 }
 
@@ -182,10 +182,9 @@ export async function searchOffers(params: {
     }
 
     if (params.onlyFuture) {
-      const now = new Date().toISOString().slice(0, 10);
       results = results.filter((o: any) => {
         if (!o.date_from) return false;
-        return o.date_from.slice(0, 10) >= now;
+        return o.date_from.slice(0, 10) >= todayIso();
       });
     }
 
@@ -233,7 +232,9 @@ export function convertFormDataToOffer(
     currency: formData.currency,
   };
 
-  // Opcjonalne pola
+  if (formData.yacht_name?.trim()){
+    offer.yacht_name = formData.yacht_name.trim();
+  }
   if (formData.description?.trim()) {
     offer.description = formData.description.trim();
   }

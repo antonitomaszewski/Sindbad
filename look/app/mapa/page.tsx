@@ -441,6 +441,7 @@ export default function MapaPage() {
               startLabel="Termin od"
               endLabel="Termin do"
               fieldClassName="max-w-[240px]"
+              // bez tego wybór daty kolidował z mapą - i nie dało się wybrać terminów
               popperClassName="map-datepicker-popper"
             />
           </div>

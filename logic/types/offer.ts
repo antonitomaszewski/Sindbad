@@ -15,6 +15,7 @@ export interface Offer {
   seats_available?: number;
   created: string;            // ISO date string
   updated: string;            // ISO date string
+  yacht_name?: string;
 }
 
 export interface OfferFormData {
@@ -31,6 +32,7 @@ export interface OfferFormData {
   seats_total: string;
   seats_available: string;
   images: File[];
+  yacht_name: string;
 }
 
 export type Currency = 'PLN' | 'EUR' | 'USD';

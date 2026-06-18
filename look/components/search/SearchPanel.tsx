@@ -118,7 +118,7 @@ export default function SearchPanel() {
             {(dateFrom || dateTo || !onlyFuture ||
   filters.country || filters.port || filters.priceMin ||
   filters.priceMax || !filters.onlyFree || filters.organizerId) &&
-            (<Button onClick={handleClear} variant='secondary'>
+            (<Button onClick={handleClear} variant="secondary">
               Wyczyść filtry
             </Button>)}
 

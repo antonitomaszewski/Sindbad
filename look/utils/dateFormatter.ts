@@ -10,3 +10,7 @@ export function formatDateRange(startDate: Date | string, endDate?: Date | strin
   
   return start.toLocaleDateString();
 }
+
+export function todayIso(): string {
+  return new Date().toISOString().slice(0, 10);
+}

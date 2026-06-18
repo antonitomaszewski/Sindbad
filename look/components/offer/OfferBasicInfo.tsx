@@ -5,16 +5,20 @@ import Textarea from '../ui/Textarea';
 interface Props {
   title: string;
   description: string;
+  yacht_name: string;
   onTitleChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
+  onYachtNameChange: (value: string) => void;
   errors?: { title?: string };
 }
 
 export default function OfferBasicInfo({ 
   title, 
   description, 
+  yacht_name,
   onTitleChange, 
   onDescriptionChange, 
+  onYachtNameChange,
   errors 
 }: Props) {
   return (
@@ -42,6 +46,16 @@ export default function OfferBasicInfo({
           rows={6}
           placeholder="Np. Start w Gdańsku, 3 dni po Zatoce, postoje na kąpiel i wieczorne wejścia do portów."
         />
+      </FormField>
+
+      <FormField label="Nazwa Jachtu">
+        <Input
+        id="yacht_name"
+        type="text"
+        value={yacht_name}
+        onChange={(e) => onYachtNameChange(e.target.value)}
+        placeholder="Np. Joanna"
+        ></Input>
       </FormField>
     </div>
   );

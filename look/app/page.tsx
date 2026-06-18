@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import pb from '../../logic/lib/pocketbase';
 import {getFinishedOffersCount} from '../../logic/lib/offers';
+import { todayIso } from '../utils/dateFormatter';
 
 const steps = [
   {
@@ -38,11 +39,9 @@ export default function HomePage() {
       setIsLoggedIn(pb.authStore.isValid);
     });
 
-    const today = new Date().toISOString().slice(0, 10);
-
     Promise.all([
       pb.collection('offers').getList(1, 1, {
-        filter: `date_to >= "${today}"`,
+        filter: `date_to >= "${todayIso()}"`,
       }),
       (pb.collection('offers') as any).getFullList({
         fields: 'organizer_id',

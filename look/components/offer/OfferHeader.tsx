@@ -12,7 +12,7 @@ interface OfferHeaderProps {
   country?: string;
   port?: string;
   seatsAvailable?: number;
-  seatsTotal?: number;
+  yachtName?: string;
 }
 
 export function OfferHeader({ 
@@ -24,7 +24,7 @@ export function OfferHeader({
   country,
   port,
   seatsAvailable,
-  seatsTotal
+  yachtName
 }: OfferHeaderProps) {
   const getSeatsLabel = (available?: number) => {
     if (available === undefined) return '';
@@ -47,7 +47,7 @@ export function OfferHeader({
         </div>
       </div>
       
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className={`grid ${yachtName ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-4`}>
         <div className="bg-gray-50 rounded-lg p-4">
           <h3 className="font-semibold text-gray mb-2">{OFFER_LABELS.TERM}</h3>
           <p className="text-main font-medium">{formatDateRange(dateFrom, dateTo)}</p>
@@ -55,11 +55,18 @@ export function OfferHeader({
 
         <div className="bg-gray-50 rounded-lg p-4">
           <h3 className="font-semibold text-gray mb-2">{OFFER_LABELS.LOCATION}</h3>
-          <div className="space-y-1">
-            {country && <p className="text-main">{getCountryName(country)}</p>}
-            {port && <p className="text-main">{port}</p>}
+          <div className="text-main">
+            {country && <p>{getCountryName(country)}</p>}
+            {port && <p>{port}</p>}
           </div>
         </div>
+
+        {yachtName && (
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="font-semibold text-gray mb-2">Jacht</h3>
+            <p className="text-main font-medium">{yachtName}</p>
+          </div>
+        )}
       </div>
 
       {seatsAvailable !== undefined && (
