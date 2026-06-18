@@ -42,3 +42,5 @@ podepnij repo Sindbad,
 ustaw NEXT_PUBLIC_PB_URL na adres z Railway,
 ustaw NEXT_PUBLIC_BASE_URL na adres z Vercel,
 dodaj RESEND_API_KEY.
+
+
