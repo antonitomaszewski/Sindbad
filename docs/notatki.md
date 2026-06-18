@@ -28,3 +28,19 @@ nie jesteśmy w stanie zamieścić nasz folder look/app jako katalog ściezek, 
 
 przekierowywania: jeśli klik i zawsze wynikiem jest A to uzywamy next/Link
 gdy klik i moze się wydarzyć A lub B lub C to uzywamy useRouter
+
+
+
+Na Railway:
+utwórz nowy projekt,
+podepnij to repo,
+ustaw, żeby budował z katalogu pocketbase,
+dodaj persistent volume na /pb/pb_data,
+uruchom deploy.
+Na Vercel:
+podepnij repo Sindbad,
+ustaw NEXT_PUBLIC_PB_URL na adres z Railway,
+ustaw NEXT_PUBLIC_BASE_URL na adres z Vercel,
+dodaj RESEND_API_KEY.
+
+

@@ -19,7 +19,7 @@ export const CALENDAR_CONFIG = {
     right: 'dayGridMonth'
   },
   EVENT_COLORS: {
-    BACKGROUND: 'var(--green-main)',
-    BORDER: 'var(--green-main)'
+    BACKGROUND: 'var(--main)',
+    BORDER: 'var(--main)'
   }
 } as const;

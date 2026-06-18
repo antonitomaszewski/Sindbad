@@ -10,7 +10,6 @@ export default function Footer() {
       <Container>
         <div className="flex flex-col md:flex-row justify-between items-start gap-8">
           
-          {/* Logo i opis */}
           <div className="flex flex-col gap-4">
             <Logo size="text-2xl" />
             <p className="text-gray max-w-sm">
@@ -18,14 +17,12 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Linki */}
           <div className="flex gap-12">
             <FooterLinkSection title={TEXTS.ACTIVITIES_SECTION} links={ACTIVITIES_LINKS} />
             <FooterLinkSection title={TEXTS.HELP_SECTION} links={HELP_LINKS} />
           </div>
         </div>
-
-        {/* Copyright */}
+        
         <div className="border-t border-gray mt-8 pt-6 text-center">
           <p className="text-gray text-sm">{TEXTS.COPYRIGHT}</p>
         </div>
