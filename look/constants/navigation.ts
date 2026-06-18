@@ -1,4 +1,3 @@
-// look/constants/navigation.ts
 import { LinkItem } from '../types/common';
 
 export const MAIN_NAVIGATION: LinkItem[] = [

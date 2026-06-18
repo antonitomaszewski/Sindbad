@@ -1,26 +1,19 @@
 :root {
-  /* Podstawowe kolory */
   --white: #ffffff;
   --black: #000000;
-  --gray: #6b7280;        /* do tekstu pomocniczego, granic */
+  --gray: #6b7280;
 
-  /* Główny kolor aplikacji */
   --main: #2b8c9e;
   --main-hover: #24798a;
   --main-soft: #eef8fa;
   --main-soft-border: #c5e3e8;
 
-  /* Status colors - same intensity as main color */
   --success: #4a9e7d;
   --success-hover: #3d8a6e;
   --error: #a24848;
   --error-hover: #8c3a3a;
-
-  /* Backward compatibility */
-  --green-main: var(--main);
 }
 
-/* Utility classes */
 .text-white { color: var(--white); }
 .text-black { color: var(--black); }
 .text-gray { color: var(--gray); }
@@ -37,13 +30,11 @@
 .border-main { border-color: var(--main); }
 .border-main-soft { border-color: var(--main-soft-border); }
 
-/* Hover states */
 .hover-text-main:hover { color: var(--main-hover); }
 .hover-bg-main:hover { background-color: var(--main-hover); }
 .hover-bg-success:hover { background-color: var(--success-hover); }
 .hover-bg-error:hover { background-color: var(--error-hover); }
 
-/* Focus helpers */
 .focus-ring-main:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(43, 140, 158, 0.35);
