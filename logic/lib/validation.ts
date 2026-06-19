@@ -1,3 +1,11 @@
+// tu są reguły walidacji formularzy
+// 1 zmian na profilu uzytkownika
+// 2. tworzenie oferty. to takie nasze 2 podstawowe formularze w których się poruszamy
+// maks rozmiar zdjęć w pb to 5mb, stąd wymagany max_size
+// są używane właśnie w komonentach należących do jednego z tyych dwóch rodzajów
+// (formularza oferty i komponenty formularza zmiany na profilu uzytkownika)
+
+
 import { OfferFormData } from '../types/offer';
 import type { ValidationErrors } from '../types/form';
 

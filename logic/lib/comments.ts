@@ -36,7 +36,7 @@ export function isOfferFinished(offer: Offer): boolean {
   return Boolean(end) && end < todayIso();
 }
 
-async function hasConfirmedBooking(offerId: string, userId: string): Promise<boolean> {
+export async function hasConfirmedBooking(offerId: string, userId: string): Promise<boolean> {
   const list = await pb.collection('bookings').getList(1, 1, {
     filter: `offer_id = "${offerId}" && user_id = "${userId}" && status = "confirmed"`,
   });

@@ -9,10 +9,3 @@ export interface TripAlert {
   created: string;
   updated: string;
 }
-
-export interface TripAlertNotification {
-  id: string;
-  alert_id: string;
-  offer_id: string;
-  created: string;
-}

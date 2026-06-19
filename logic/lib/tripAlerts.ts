@@ -1,5 +1,5 @@
 import pb from './pocketbase';
-import type { TripAlert, TripAlertNotification } from '../types/tripAlert';
+import type { TripAlert } from '../types/tripAlert';
 import type { Offer } from '../types/offer';
 import { sendEmail } from './emails';
 
