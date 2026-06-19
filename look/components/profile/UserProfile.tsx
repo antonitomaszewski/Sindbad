@@ -13,7 +13,6 @@ import Link from 'next/link';
 export default function UserProfile({
   user,
   organizedTrips,
-  participatedTrips,
   isOwnProfile = false,
   myBookings = [],
   userContacts = [],
@@ -22,7 +21,6 @@ export default function UserProfile({
 }: {
   user: User;
   organizedTrips: { id: string; title?: string; date?: string }[];
-  participatedTrips: { id: string; title?: string; date?: string }[];
   isOwnProfile?: boolean;
   myBookings?: BookingWithOffer[];
   userContacts?: UserContact[];
@@ -47,7 +45,6 @@ export default function UserProfile({
           <SailedWithSection contacts={userContacts} commonContactIds={commonContactIds} />
 
           <TripHistory title="Rejsy organizowane" trips={organizedTrips} />
-          {/* <TripHistory title="Rejsy jako załogant" trips={participatedTrips} /> */}
           {isOwnProfile && <MyBookingsList bookings={myBookings} />}
         </div>
 

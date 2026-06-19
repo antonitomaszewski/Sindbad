@@ -7,7 +7,7 @@ import {
   findMatchingAlerts,
   sendTripAlertNotifications,
 } from '../lib/tripAlerts';
-import { createOffer, deleteOffer } from '../lib/offers';
+import { createOffer } from '../lib/offers';
 import { registerUser, loginUser, logoutUser } from '../lib/users';
 import type { TripAlert } from '../types/tripAlert';
 import type { Offer } from '../types/offer';

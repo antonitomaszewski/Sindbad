@@ -89,8 +89,6 @@ function BookingItem({ booking, onStatusChange }: BookingItemProps) {
               <p className="font-semibold text-gray-900">{booking.guest_name}</p>
               <p className="text-sm text-gray-600">
                 {booking.guest_email && `📧 ${booking.guest_email}`}
-                {booking.guest_email && booking.guest_phone && ' • '}
-                {booking.guest_phone && `📞 ${booking.guest_phone}`}
               </p>
             </div>
           ) : (

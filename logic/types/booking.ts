@@ -9,7 +9,6 @@ export interface Booking {
   // Pola dla niezalogowanych gości
   guest_name?: string;
   guest_email?: string;
-  guest_phone?: string;
   created: string;
   updated: string;
 }
@@ -43,5 +42,4 @@ export interface UserContact {
 export interface GuestBookingData {
   name: string;
   email?: string;
-  phone?: string;
 }

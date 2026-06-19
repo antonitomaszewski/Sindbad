@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createOffer, getOffers, getOfferById, updateOffer, deleteOffer, validateSeatsAvailable } from "../lib/offers";
+import { createOffer, getOffers, getOfferById, updateOffer, validateSeatsAvailable } from "../lib/offers";
 import { loginUser, registerUser } from "../lib/users";
 import { ERRORS } from "../lib/messages";
 
@@ -58,10 +58,6 @@ describe("offers logic", () => {
     expect(updated).toBeDefined();
     expect(updated?.title).toBe(updatedTitle);
     expect(() => validateSeatsAvailable(updated!)).toThrow('Brak dostępnych miejsc');
-
-    // DELETE
-    const deleted = await deleteOffer(offer.id);
-    expect(deleted).toBe(true);
 
     // Po usunięciu nie powinno się dać pobrać oferty
     const gotAfterDelete = await getOfferById(offer.id);

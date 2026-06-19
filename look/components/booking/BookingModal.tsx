@@ -20,7 +20,6 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
   // Pola dla gości
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
-  const [guestPhone, setGuestPhone] = useState('');
 
   const isLoggedIn = pb.authStore.isValid;
 
@@ -44,8 +43,8 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
           setLoading(false);
           return;
         }
-        if (!guestEmail && !guestPhone) {
-          setError('Podaj email lub telefon');
+        if (!guestEmail) {
+          setError('Podaj email');
           setLoading(false);
           return;
         }
@@ -58,7 +57,6 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
         await createBooking(offerId, message, {
           name: guestName,
           email: guestEmail || undefined,
-          phone: guestPhone || undefined,
         });
       }
       onSuccess();
@@ -113,20 +111,7 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefon
-                </label>
-                <input
-                  type="tel"
-                  value={guestPhone}
-                  onChange={(e) => setGuestPhone(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-                  placeholder="+48 123 456 789"
-                />
-              </div>
-
-              <p className="text-xs text-gray-500">* Podaj email lub telefon</p>
+              <p className="text-xs text-gray-500">* Podaj email</p>
             </>
           )}
 

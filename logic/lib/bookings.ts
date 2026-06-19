@@ -21,7 +21,6 @@ type BookingCreateData = {
   user_id?: string;
   guest_name?: string;
   guest_email?: string;
-  guest_phone?: string;
 };
 
 function mapRecordToBooking(record: RecordModel): Booking {
@@ -35,7 +34,6 @@ function mapRecordToBooking(record: RecordModel): Booking {
     updated: record.updated,
     guest_name: record.guest_name,
     guest_email: record.guest_email,
-    guest_phone: record.guest_phone,
   };
 }
 
@@ -50,8 +48,8 @@ function validateBookingAccess(guestData?: GuestBookingData) {
     );
   }
 
-  if (!guestData.email && !guestData.phone) {
-    throw new Error('Podaj email lub telefon');
+  if (!guestData.email) {
+    throw new Error('Podaj email');
   }
 }
 
@@ -121,7 +119,6 @@ async function buildBookingData(
     ...data,
     guest_name: guestData?.name,
     guest_email: guestData?.email || '',
-    guest_phone: guestData?.phone || '',
   };
 }
 
@@ -140,16 +137,6 @@ async function hasConfirmedBookingForOffer(offerId: string, userId: string): Pro
   });
 
   return list.totalItems > 0;
-}
-
-async function getConfirmedOfferIdsForUser(userId: string): Promise<Set<string>> {
-  const bookings = await getUserBookings(userId);
-
-  return new Set(
-    bookings
-      .filter((booking) => booking.status === 'confirmed')
-      .map((booking) => booking.offer_id)
-  );
 }
 
 export async function getUserConfirmedBookings(userId: string): Promise<Booking[]> {
@@ -434,6 +421,9 @@ export async function getUserContacts(
   }
 }
 
+
+// tworzymy ofertę
+// 
 export async function createBooking(
   offerId: string,
   message?: string,
@@ -474,31 +464,24 @@ export async function createBooking(
   return booking;
 }
 
-export async function getUserBookings(userId: string): Promise<Booking[]> {
-  return listBookingsByFilter(`user_id = "${userId}"`);
-}
-
+// pobieramy wszystkie rezerwacje dla danej ofery - do wyswietlenia w panelu organizatora
 export async function getOfferBookings(offerId: string): Promise<Booking[]> {
   return listBookingsByFilter(`offer_id = "${offerId}"`);
 }
 
+// przy zmiani statusu rezerwacji zawsze wysyłamy maila z powiadomomieniem co i jak się zmieniło
+// musimy sprawdzić czy są dostepne miejsca jesli to potiwerdzenie rezerwacji
+// i czy status się zmienił
+// aktualizujemy liczbę miejsc, status na bazie i 
 export async function updateBookingStatus(
   bookingId: string,
   status: BookingStatus
-): Promise<Booking> {
+): Promise<void> {
   const current = await pb.collection(BOOKINGS_COLLECTION).getOne(bookingId);
   const previousStatus = current.status as BookingStatus;
 
-  console.log('[bookings][updateBookingStatus] start', {
-    bookingId,
-    offerId: current.offer_id,
-    bookingUserId: current.user_id,
-    previousStatus,
-    newStatus: status,
-  });
-
   if (previousStatus === status) {
-    return mapRecordToBooking(current);
+    return;
   }
 
   const offer = await getOfferById(current.offer_id);
@@ -511,21 +494,12 @@ export async function updateBookingStatus(
     validateSeatsAvailable(offer);
   }
 
-  const record = await pb.collection(BOOKINGS_COLLECTION).update(bookingId, {
+  await pb.collection(BOOKINGS_COLLECTION).update(bookingId, {
     status,
   });
 
-  const booking = mapRecordToBooking(record);
-
   await updateAvailableSeats({
     offer,
-    previousStatus,
-    newStatus: status,
-    bookingUserId: current.user_id ? String(current.user_id) : undefined,
-  });
-
-  console.log('[bookings][updateBookingStatus] done', {
-    bookingId,
     previousStatus,
     newStatus: status,
   });
@@ -535,8 +509,6 @@ export async function updateBookingStatus(
     offer,
     status,
   });
-
-  return booking;
 }
 
 // wyświetlamy na profilu użytkownika jego rezerwacje
@@ -544,51 +516,31 @@ export async function updateBookingStatus(
 // (Sindbad/look/components/profile/UserProfile.tsx)
 // możemy sobie potem filtrować po statusach rezerwacji
 export async function getUserBookingsWithOffers(userId: string): Promise<BookingWithOffer[]> {
-  // const records = pb.collection(BOOKINGS_COLLECTION).getFullList({
-  //   filter: `user_id = "${userId}"`,
-  //   expand: 'offer_id',
-  // });
+  const records = pb.collection(BOOKINGS_COLLECTION).getFullList({
+    filter: `user_id = "${userId}"`,
+    expand: 'offer_id',
+  });
 
-  // return (await records).map(record => ({
-  //   id: record.id,
-  //   user_id: record.user_id,
-  //   status: record.status,
-  //   offer_id: record.offer_id,
-  //   message: record.message,
-  //   guest_name: record.guest_name,
-  //   guest_email: record.guest_email,
-  //   guest_phone: record.guest_phone,
-  //   created: record.created,
-  //   updated: record.updated,
+  return (await records).map(record => ({
+    id: record.id,
+    user_id: record.user_id,
+    status: record.status,
+    offer_id: record.offer_id,
+    message: record.message,
+    guest_name: record.guest_name,
+    guest_email: record.guest_email,
+    created: record.created,
+    updated: record.updated,
 
-  //   offer: record.expand?.offer_id ?
-  //   {
-  //     id: record.expand.offer_id.id,
-  //     title: record.expand.offer_id.title,
-  //     date_from: record.expand.offer_id.date_from,
-  //     date_to: record.expand.offer_id.date_to,
-  //   } : undefined
+    offer: record.expand?.offer_id ?
+    {
+      id: record.expand.offer_id.id,
+      title: record.expand.offer_id.title,
+      date_from: record.expand.offer_id.date_from,
+      date_to: record.expand.offer_id.date_to,
+    } : undefined
 
-  // }))
-  const bookings = await getUserBookings(userId);
-
-  return Promise.all(
-    bookings.map(async (booking) => {
-      const offer = await getOfferById(booking.offer_id);
-
-      return {
-        ...booking,
-        offer: offer
-          ? {
-              id: offer.id,
-              title: offer.title,
-              date_from: offer.date_from,
-              date_to: offer.date_to,
-            }
-          : undefined,
-      };
-    })
-  );
+  }))
 }
 
 // uczestników rejsu widzi

@@ -1,4 +1,4 @@
-import { createBooking, getUserBookings, getOfferBookings, getUserBookingsWithOffers, updateBookingStatus } from '../lib/bookings';
+import { createBooking, getOfferBookings, getUserBookingsWithOffers, updateBookingStatus } from '../lib/bookings';
 import { getOfferById } from '../lib/offers';
 import { loginUser, logoutUser, registerUser } from '../lib/users';
 import { vi, describe, it, expect, beforeAll, afterAll } from "vitest";
@@ -47,12 +47,6 @@ describe('Bookings', () => {
     expect(booking.status).toBe('pending');
     expect(booking.user_id).toBe(testUserId);
     expect(booking.offer_id).toBe(testOfferId);
-  });
-
-  it('getUserBookings returns user bookings', async () => {
-    const bookings = await getUserBookings(testUserId);
-    expect(Array.isArray(bookings)).toBe(true);
-    expect(bookings.length).toBeGreaterThan(0);
   });
 
   it('getOfferBookings returns offer bookings', async () => {

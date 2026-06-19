@@ -2,7 +2,7 @@
 import { use, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { isCurrentServerUser, getCurrentUser, canAccessProfile } from '../../../../logic/lib/users';
-import { getTripsByOrganizer, getTripsByParticipant } from '../../../../logic/lib/offers';
+import { getTripsByOrganizer } from '../../../../logic/lib/offers';
 import {
   getBookingsOrganizers,
   getBookingsParticipants,
@@ -27,7 +27,6 @@ export default function ProfilPage({ params }: ProfilePageProps) {
   const searchParams = useSearchParams();
   const { user, loading: userLoading, error: userError } = useUser(id);
   const [organizedTrips, setOrganizedTrips] = useState<Trip[]>([]);
-  const [participatedTrips, setParticipatedTrips] = useState<Trip[]>([]);
   const [myBookings, setMyBookings] = useState<BookingWithOffer[]>([]);
   const [userContacts, setUserContacts] = useState<UserContact[]>([]);
   const [commonContactIds, setCommonContactIds] = useState<string[]>([]);
@@ -77,9 +76,8 @@ export default function ProfilPage({ params }: ProfilePageProps) {
           return;
         }
 
-        const [organized, participated, bookings, contacts] = await Promise.all([
+        const [organized, bookings, contacts] = await Promise.all([
           getTripsByOrganizer(id),
-          getTripsByParticipant(id),
           getUserBookingsWithOffers(id),
           getUserContacts(id),
         ]);
@@ -95,7 +93,6 @@ export default function ProfilPage({ params }: ProfilePageProps) {
           .filter((contactId) => viewerContactIdSet.has(contactId));
 
         setOrganizedTrips(organized);
-        setParticipatedTrips(participated);
         setMyBookings(bookings);
         setUserContacts(contacts);
         setCommonContactIds(commonIds);
@@ -136,7 +133,6 @@ export default function ProfilPage({ params }: ProfilePageProps) {
     <UserProfile
       user={user}
       organizedTrips={organizedTrips}
-      participatedTrips={participatedTrips}
       isOwnProfile={isOwnProfile}
       myBookings={myBookings}
       userContacts={userContacts}
