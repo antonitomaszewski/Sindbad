@@ -69,16 +69,6 @@ function validateOwnOfferBooking(offer: Offer) {
   }
 }
 
-async function getOfferOrThrow(offerId: string): Promise<Offer> {
-  const offer = await getOfferById(offerId);
-
-  if (!offer) {
-    throw new Error('Oferta nie istnieje');
-  }
-
-  return offer;
-}
-
 async function resolveCurrentUserContact() {
   const record = (pb.authStore.record || {}) as {
     id?: string;
@@ -451,7 +441,11 @@ export async function createBooking(
 ): Promise<Booking> {
   validateBookingAccess(guestData);
 
-  const offer = await getOfferOrThrow(offerId);
+  const offer = await getOfferById(offerId);
+  
+  if (!offer) {
+    throw new Error('Oferta nie istnieje');
+  }
 
   validateOwnOfferBooking(offer);
   validateSeatsAvailable(offer);
@@ -507,7 +501,11 @@ export async function updateBookingStatus(
     return mapRecordToBooking(current);
   }
 
-  const offer = await getOfferOrThrow(current.offer_id);
+  const offer = await getOfferById(current.offer_id);
+
+  if (!offer) {
+    throw new Error('Oferta nie istnieje');
+  }
 
   if (status === 'confirmed' && previousStatus !== 'confirmed') {
     validateSeatsAvailable(offer);
@@ -541,7 +539,37 @@ export async function updateBookingStatus(
   return booking;
 }
 
+// wyświetlamy na profilu użytkownika jego rezerwacje
+// widok ten jest widoczny wyłącznie dla osoby, która wchodzi na swój profil
+// (Sindbad/look/components/profile/UserProfile.tsx)
+// możemy sobie potem filtrować po statusach rezerwacji
 export async function getUserBookingsWithOffers(userId: string): Promise<BookingWithOffer[]> {
+  // const records = pb.collection(BOOKINGS_COLLECTION).getFullList({
+  //   filter: `user_id = "${userId}"`,
+  //   expand: 'offer_id',
+  // });
+
+  // return (await records).map(record => ({
+  //   id: record.id,
+  //   user_id: record.user_id,
+  //   status: record.status,
+  //   offer_id: record.offer_id,
+  //   message: record.message,
+  //   guest_name: record.guest_name,
+  //   guest_email: record.guest_email,
+  //   guest_phone: record.guest_phone,
+  //   created: record.created,
+  //   updated: record.updated,
+
+  //   offer: record.expand?.offer_id ?
+  //   {
+  //     id: record.expand.offer_id.id,
+  //     title: record.expand.offer_id.title,
+  //     date_from: record.expand.offer_id.date_from,
+  //     date_to: record.expand.offer_id.date_to,
+  //   } : undefined
+
+  // }))
   const bookings = await getUserBookings(userId);
 
   return Promise.all(
@@ -563,23 +591,10 @@ export async function getUserBookingsWithOffers(userId: string): Promise<Booking
   );
 }
 
-/**
- * Sprawdź czy dwaj użytkownicy mają wspólne booking (uczestniczą w tej samej ofercie)
- */
-export async function haveCommonBookings(userId1: string, userId2: string): Promise<boolean> {
-  try {
-    const [confirmedOfferIds1, confirmedOfferIds2] = await Promise.all([
-      getConfirmedOfferIdsForUser(userId1),
-      getConfirmedOfferIdsForUser(userId2),
-    ]);
-
-    return Array.from(confirmedOfferIds2).some((offerId) => confirmedOfferIds1.has(offerId));
-  } catch (err) {
-    console.warn('haveCommonBookings error:', err);
-    return false;
-  }
-}
-
+// uczestników rejsu widzi
+// 1. organizator
+// 2. wspólny załogant (hasConfirmedBookingForOffer)
+// oczywiscie musi być zalogowany
 export async function canViewParticipants(
   offerId: string
 ): Promise<boolean> {
@@ -602,6 +617,14 @@ export async function canViewParticipants(
   return hasConfirmedBookingForOffer(offerId, currentUserId);
 }
 
+
+// na stronie oferty, wyświetlamy uczestników rejsu
+// pojawiają się oni dla 2 kategorii użytkowników
+// 1. organizator (on/ona takze ma osobny panel do akceptowania zgłoszeń)
+// 2. uczestnik z potwierdzoną rezerwacją
+// także tutaj dla każdej oferty pobieram uzytkowników, którzy własnie mają confirmed
+// możemy sobie w takowego gościa profil wejść
+// jak ktoś się zapisze bez konta (to go nie wyświetlamy, bo nie jest użytkownikiem i tyle)
 export async function getConfirmedParticipants(
   offerId: string
 ): Promise<OfferParticipant[]> {
@@ -612,25 +635,23 @@ export async function getConfirmedParticipants(
       sort: 'created',
     });
 
-    const byUserId = new Map<string, OfferParticipant>();
+    const participants = new Map<string, OfferParticipant>();
 
     for (const record of records) {
-      const expandedUser = Array.isArray(record.expand?.user_id)
-        ? record.expand.user_id[0]
-        : record.expand?.user_id;
+      const expandedUser = record.expand?.user_id;
 
-      const userId = String(record.user_id || expandedUser?.id || '');
-      if (!userId || byUserId.has(userId)) {
+      const userId = String(record.user_id);
+      if (!userId || participants.has(userId)) {
         continue;
       }
 
-      byUserId.set(userId, {
+      participants.set(userId, {
         userId,
-        name: String(expandedUser?.name || expandedUser?.email || 'Użytkownik'),
+        name: String(expandedUser?.name || ''),
       });
     }
 
-    return Array.from(byUserId.values());
+    return Array.from(participants.values());
   } catch (err) {
     console.warn('getConfirmedParticipants error:', err);
     return [];

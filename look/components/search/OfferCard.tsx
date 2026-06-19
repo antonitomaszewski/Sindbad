@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { formatDate } from '../../../logic/lib/dates';
+import {formatDate} from '@/look/utils/dateFormatter';
 import { Offer } from '../../../logic/types/offer';
 import { CalendarIcon, LocationIcon, UsersIcon, UserIcon } from './Icons';
 import { getCountryName } from '../../../logic/constants/countries';

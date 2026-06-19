@@ -23,6 +23,7 @@ export interface BookingWithOffer extends Booking {
   };
 }
 
+// używam do wyświetlania osób na ofercie
 export interface OfferParticipant {
   userId: string;
   name: string;

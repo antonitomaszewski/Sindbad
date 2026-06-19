@@ -39,7 +39,7 @@ export default function MyBookingsList({ bookings: initialBookings }: { bookings
     return (
       <Card className="mb-0">
         <h3 className="text-lg font-medium mb-3">Moje rezerwacje</h3>
-        <p className="text-gray-600 text-sm">Brak nadchodzących rezerwacji.</p>
+        <p className="text-gray-600 text-sm">Brak rezerwacji.</p>
       </Card>
     );
   }

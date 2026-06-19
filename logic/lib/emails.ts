@@ -3,7 +3,7 @@
 import { Resend } from 'resend';
 import type { Offer } from '../types/offer';
 import type { BookingStatus, GuestBookingData } from '../types/booking';
-import { formatDateRange } from './dates';
+import { formatDateRange } from '@/look/utils/dateFormatter';
 import {
   newBookingTemplate,
   bookingConfirmationTemplate,

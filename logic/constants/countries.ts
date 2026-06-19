@@ -1,13 +1,13 @@
-/**
- * Statyczna lista krajów do rejsów.
- * W bazie danych przechowujemy WYŁĄCZNIE code (np. "PL", "HR").
- * Używamy tego jako jedynego source of truth w całym projekcie.
- */
+// list awszystkich krajów, które zakodowałem,
+// w celu rozszrzenia - trzeba tutaj dodać
+// ostatecznie korzystamy jedynie z polskich nazw.
+// potrzebne też niżej są koordynaty krajów.
+// przy wyborze kraju na tworzeniu oferty, mapa przejeżdża na dane koordynaty
 
 export interface Country {
   code: string;
-  name: string; // angielska nazwa (nie używana w UI)
-  namePL: string; // polska nazwa wyświetlana w UI
+  name: string;
+  namePL: string;
 }
 
 export interface CountryMapCenter {
@@ -69,10 +69,6 @@ export const COUNTRY_MAP_CENTERS: Partial<Record<string, CountryMapCenter>> = {
   UA: { lat: 48.3794, lon: 31.1656 },
 };
 
-/**
- * Pobierz polską nazwę kraju z kodu ISO.
- * Zwraca kod jeśli kraj nie jest na liście.
- */
 export function getCountryName(code: string): string {
   if (!code) return '';
   const country = COUNTRIES.find((c) => c.code === code);

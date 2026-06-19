@@ -12,7 +12,7 @@ import { registerUser, loginUser, logoutUser } from '../lib/users';
 import type { TripAlert } from '../types/tripAlert';
 import type { Offer } from '../types/offer';
 import pb from '../lib/pocketbase';
-import {formatDate} from '../lib/dates';
+import {formatDate} from '@/look/utils/dateFormatter';
 
 describe('Trip Alerts', () => {
   let userId1: string;

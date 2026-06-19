@@ -3,7 +3,7 @@
 import { useUser } from '@/look/hooks/useUser';
 import { Card } from '@/look/components/ui/Card';
 import { Button } from '@/look/components/ui/Button';
-import { formatDateRange } from '@/logic/lib/dates';
+import { formatDateRange } from '@/look/utils/dateFormatter';
 import { getCountryName } from '@/logic/constants/countries';
 import type { TripAlert } from '@/logic/types/tripAlert';
 

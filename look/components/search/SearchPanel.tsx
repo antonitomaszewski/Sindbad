@@ -4,7 +4,7 @@ import SearchResults from './SearchResults';
 import { searchOffers } from '../../../logic/lib/offers';
 import { getAllCountries } from '../../../logic/lib/countries';
 import { getAllOrganizers } from '../../../logic/lib/users';
-import { dateToString } from '../../../logic/lib/dates';
+import { dateToString } from '@/look/utils/dateFormatter';
 import { filterOffers } from '../../../logic/lib/filtering';
 import { loadOfferImages, loadOrganizerNames } from '../../../logic/lib/offerData';
 import { Offer } from '../../../logic/types/offer';

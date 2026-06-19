@@ -6,7 +6,7 @@ import type {
   OrganizerReviewRatingFilter,
   OrganizerReviewsSummary,
 } from '../types/comment';
-import { todayIso } from '@/look/utils/dateFormatter';
+import { todayIso } from '../../look/utils/dateFormatter';
 
 const COMMENTS_COLLECTION = 'offer_comments';
 
