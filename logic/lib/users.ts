@@ -1,6 +1,6 @@
 import pb from './pocketbase';
 import type { User } from '../types/user';
-import { ERRORS } from './messages';
+import { ERRORS } from '../constants/messages';
 import type { OAuthProvider } from '../types/auth';
 
 export async function getUser(id: string): Promise<User | null> {

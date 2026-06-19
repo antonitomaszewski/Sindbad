@@ -1,3 +1,5 @@
+// tutaj zadeklarowałem intefejsy, bo nie mają nic do czynienia w bazie
+// 
 interface BookingEmailData {
   recipientName: string;
   offerTitle: string;

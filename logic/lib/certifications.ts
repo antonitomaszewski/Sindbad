@@ -1,10 +1,10 @@
-import pb from './pocketbase';
-import type { Certification } from '../types/certifications';
-
 // lekko bez sensu ze nie zrobiłem tego jak z krajami:
 // trzeba było nie tworzyć tabeli, tylko poprostu trzasnąc plik w constants/
 // mamy w bazie 5 różnych certyfikatów, ale juz nie zmieniałem takich rzeczy, tylko brnąłem dalej
 // natomiast jak dodawałem kraje, to miałem chwilowy pomysł, żeby właśnie były na bazie i naszczęście się z tego wycofałem
+
+import pb from './pocketbase';
+import type { Certification } from '../types/certification';
 
 const COLLECTION_CERTIFICATIONS = 'certifications';
 

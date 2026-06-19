@@ -10,7 +10,8 @@ import {
   updateUserProfile,
   updateProfileVisibility,
 } from '../../../logic/lib/users';
-import { updateUserCertifications, type Certification } from '../../../logic/lib/certifications';
+import { updateUserCertifications } from '../../../logic/lib/certifications';
+import type { Certification } from '@/logic/types/certification';
 import { useFormValidation } from '../../../logic/hooks/useFormValidation';
 import {
   validateProfileForm,

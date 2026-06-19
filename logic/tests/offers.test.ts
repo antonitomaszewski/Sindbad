@@ -69,6 +69,6 @@ describe("offers logic", () => {
         ...offerData,
         organizer_id: "fake_id_123456"
       })
-    ).rejects.toThrow(ERRORS.CREATE_FAILED || "Failed to create record."); // dopasuj do swojego error handlingu
+    ).rejects.toThrow(ERRORS.CREATE_FAILED);
   });
 });
