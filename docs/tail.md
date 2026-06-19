@@ -1,0 +1,1 @@
+space-y-10 odstęp między elementami w pionie

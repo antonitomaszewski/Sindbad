@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import pb from '../../logic/lib/pocketbase';
-import {getFinishedOffersCount} from '../../logic/lib/offers';
-import { todayIso } from '../utils/dateFormatter';
+import {
+  getActiveOffersCount,
+  getFinishedOffersCount,
+  getUniqueOrganizersCount,
+} from '../../logic/lib/offers';
+import { getConfirmedBookingsCount } from '../../logic/lib/bookings';
+import { isUserLoggedIn, subscribeAuthStateChange } from '../../logic/lib/users';
 
 const steps = [
   {
@@ -33,36 +37,22 @@ export default function HomePage() {
   const [stats, setStats] = useState<HomeStats | null>(null);
 
   useEffect(() => {
-    setIsLoggedIn(pb.authStore.isValid);
+    setIsLoggedIn(isUserLoggedIn());
 
-    const unsubscribe = pb.authStore.onChange(() => {
-      setIsLoggedIn(pb.authStore.isValid);
-    });
+    const unsubscribe = subscribeAuthStateChange(setIsLoggedIn);
 
     Promise.all([
-      pb.collection('offers').getList(1, 1, {
-        filter: `date_to >= "${todayIso()}"`,
-      }),
-      (pb.collection('offers') as any).getFullList({
-        fields: 'organizer_id',
-      }),
-      pb.collection('bookings').getList(1, 1, {
-        filter: 'status = "confirmed"',
-      }),
+      getActiveOffersCount(),
+      getUniqueOrganizersCount(),
+      getConfirmedBookingsCount(),
       getFinishedOffersCount(),
     ])
-      .then(([activeOffersResult, offers, confirmedBookingsResult, finishedOffers]) => {
-        const organizerIds = new Set(
-          (offers as Array<{ organizer_id?: string }>)
-            .map((offer) => offer.organizer_id)
-            .filter((id): id is string => Boolean(id))
-        );
-
+      .then(([activeOffersResult, organizersCount, confirmedBookingsResult, finishedOffers]) => {
         setStats({
           activeOffers: activeOffersResult.totalItems,
-          organizers: organizerIds.size,
-          confirmedBookings: confirmedBookingsResult.totalItems,
-          finishedOffers: finishedOffers.totalItems,
+          organizers: organizersCount,
+          confirmedBookings: confirmedBookingsResult,
+          finishedOffers: finishedOffers,
         });
       })
       .catch(() => {

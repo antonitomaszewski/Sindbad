@@ -139,6 +139,13 @@ async function hasConfirmedBookingForOffer(offerId: string, userId: string): Pro
   return list.totalItems > 0;
 }
 
+export async function getConfirmedBookingsCount() {
+  const record = pb.collection(BOOKINGS_COLLECTION).getList(1, 1, {
+    filter: 'status = "confirmed"',
+  });
+  return (await record).totalItems;
+}
+
 export async function getUserConfirmedBookings(userId: string): Promise<Booking[]> {
   const [crewBookings, organizerBookings] = await Promise.all([
     listBookingsByFilter(`user_id = "${userId}" && status = "confirmed"`),

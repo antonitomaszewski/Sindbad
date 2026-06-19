@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { createOffer, getOffers, getOfferById, updateOffer, validateSeatsAvailable } from "../lib/offers";
 import { loginUser, registerUser } from "../lib/users";
-import { ERRORS } from "../lib/messages";
+import { ERRORS } from "../constants/messages";
 
 vi.mock('resend', () => ({
   Resend: vi.fn().mockImplementation(() => ({

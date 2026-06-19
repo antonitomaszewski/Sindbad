@@ -9,6 +9,7 @@ import { sendTripAlertNotifications } from './tripAlerts';
 import { todayIso } from '../../look/utils/dateFormatter';
 import { format } from 'date-fns';
 import type {SearchOfferParams} from '../types/offer';
+import { getOfferImages, getImageUrl } from './images';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
@@ -56,8 +57,29 @@ export async function getTripsByOrganizer(organizerId: string) {
 // funkcja do wyswietlania wszystkich zakończonych rejsow na stronie głównej
 // getList(1,1, to paginacja pocketbase, jedna strona, 1 rekord na stronie)
 export async function getFinishedOffersCount() {
-  return pb.collection('offers').getList(1, 1, {filter: `date_to < "${todayIso()}"`})
-  
+  const record = pb.collection('offers').getList(1, 1, {filter: `date_to < "${todayIso()}"`})
+  return (await record).totalItems;
+}
+
+export async function getActiveOffersCount() {
+  return pb.collection('offers').getList(1, 1, {
+    filter: `date_to >= "${todayIso()}"`,
+  });
+}
+
+export async function getUniqueOrganizersCount(): Promise<number> {
+  const offers = await pb.collection('offers').getFullList({
+    fields: 'organizer_id',
+    requestKey: null,
+  });
+
+  const organizerIds = new Set(
+    (offers as Array<{ organizer_id?: string }>)
+      .map((offer) => offer.organizer_id)
+      .filter((id): id is string => Boolean(id))
+  );
+
+  return organizerIds.size;
 }
 
 // pobieram wszystkie oferty i filtruję je wedle tego co tam uzytkownik wyklikał 
@@ -243,4 +265,24 @@ export async function updateAvailableSeats({
   }
 
   await updateOffer(offer.id, updateData);
+}
+
+
+// pobieram obrazki rejsów, w panelu wyszukiwania potrzebne
+export async function loadOfferImages(offers: Offer[]): Promise<Map<string, string>> {
+  const imageMap = new Map<string, string>();
+
+  for (const offer of offers) {
+    try {
+      const images = await getOfferImages(offer.id);
+      if (images.length > 0) {
+        const url = getImageUrl(images[0]);
+        if (url) imageMap.set(offer.id, url);
+      }
+    } catch (err) {
+      console.warn('Failed to load image for offer', offer.id);
+    }
+  }
+
+  return imageMap;
 }

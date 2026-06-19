@@ -1,11 +1,15 @@
 'use client';
+// strona wyszukiwania
+// mamy tutaj  pobranie organizaotorów do dobrego filtrowania oraz dobrego podczepienia ich do ofert
+// przefiltrowanie ofert
+// 
 import { useState, useEffect } from 'react';
 import SearchResults from './SearchResults';
 import { searchOffers } from '../../../logic/lib/offers';
 import { getAllCountries } from '../../../logic/lib/countries';
 import { getAllOrganizers } from '../../../logic/lib/users';
 import { dateToString } from '@/look/utils/dateFormatter';
-import { loadOfferImages, loadOrganizerNames } from '../../../logic/lib/offerData';
+import { loadOfferImages } from '../../../logic/lib/offers';
 import { Offer } from '../../../logic/types/offer';
 import { DateRangePicker } from '@/look/components/ui/DateRangePicker';
 // import { Button } from '../ui/Button';
@@ -29,7 +33,7 @@ export default function SearchPanel() {
   const [allResults, setAllResults] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(false);
   const [countries, setCountries] = useState<{ code: string; name: string; namePL: string }[]>([]);
-  const [users, setUsers] = useState<{ id: string; name: string; email: string }[]>([]);
+  const [users, setUsers] = useState<{ id: string; name: string}[]>([]);
   const [offerImages, setOfferImages] = useState<Map<string, string>>(new Map());
   const [organizers, setOrganizers] = useState<Map<string, string>>(new Map());
   // const [sortBy, setSortBy] = useState<sortByType>("date_asc");
@@ -40,6 +44,7 @@ export default function SearchPanel() {
       if (mounted) {
         setCountries(cs);
         setUsers(us);
+        setOrganizers(new Map(us.map((u) => [u.id, u.name])))
       }
     });
     return () => { mounted = false; };
@@ -90,23 +95,22 @@ export default function SearchPanel() {
     });
 
     setAllResults(data ?? []);
-
-    const [imageMap, organizerMap] = await Promise.all([
-      loadOfferImages(data ?? []),
-      loadOrganizerNames(data ?? []),
-    ]);
+    const imageMap = await loadOfferImages(data ?? [])
 
     setOfferImages(imageMap);
-    setOrganizers(organizerMap);
     setLoading(false);
   }
 
   return (
-    <div className="space-y-6">
+    <div>
+      {/* całośc 4 kolumnowa zazwyczaj */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* część filtrów, na 1 kolumnę szeroka */}
         <div className="col-span-1">
+          {/* sticky - na początku jak przewijamy do filtry zostają widoczne
+          padding-4 od każdego boku odsunięte (passepartout) */}
           <div className="bg-white p-4 rounded shadow space-y-3 sticky top-4">
-            <h4 className="font-semibold">Filtry</h4>
+            <h3 className="font-semibold">Filtry</h3>
 
             {/* {(filters.dateFrom || filters.dateTo || !filters.onlyFuture ||
   filters.country || filters.port || filters.priceMin ||

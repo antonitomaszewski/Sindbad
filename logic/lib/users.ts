@@ -3,6 +3,16 @@ import type { User } from '../types/user';
 import { ERRORS } from '../constants/messages';
 import type { OAuthProvider } from '../types/auth';
 
+export function isUserLoggedIn(): boolean {
+  return pb.authStore.isValid;
+}
+
+export function subscribeAuthStateChange(onAuthChange: (isLoggedIn: boolean) => void) {
+  return pb.authStore.onChange(() => {
+    onAuthChange(pb.authStore.isValid);
+  });
+}
+
 export async function getUser(id: string): Promise<User | null> {
   try {
     const record: any = await pb.collection('users').getOne(id);
@@ -359,8 +369,7 @@ export async function getAllOrganizers() {
           const user = await pb.collection('users').getOne(id);
           return {
             id: user.id,
-            name: user.name || user.email || 'Organizator',
-            email: user.email,
+            name: user.name || ''
           };
         } catch {
           return null;
@@ -369,7 +378,7 @@ export async function getAllOrganizers() {
     );
 
     return organizers
-      .filter((o): o is { id: string; name: string; email: string } => o !== null)
+      .filter((o): o is { id: string; name: string } => o !== null)
       .sort((a, b) => a.name.localeCompare(b.name, 'pl'));
   } catch (err) {
     console.error('getAllOrganizers error:', err);
