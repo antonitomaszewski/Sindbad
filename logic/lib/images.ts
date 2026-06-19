@@ -1,7 +1,15 @@
+// logika uploadu i pobierania obrazków
+// dotyczy obrazków z profiu użytkownika, oraz oferty
 import pb from './pocketbase';
 import { OfferImage, CreateOfferImageData } from '../types/image';
 import { IMAGE_CONFIG } from '../../look/constants/image';
+import { User } from '../types/user';
 
+// uzywane w 2 miejscach
+// 1. w kafelkach wyszukiwania oferty - wtedy będziemy korzystać tylko z "lidera"
+// 2. w galerii na stronie oferty
+// mam taką kolumnę "order", z której praktycznie ostatecznie nie korzystam, pomyślane było, by można ustawić kolejność obrazków na stronie oferty
+// poprostu w kolejności w jakiej się wrzuci obrazki - tak będą się zawsze wyświetlać, ale uzytkownik o tym nie wie
 export async function getOfferImages(offerId: string): Promise<OfferImage[]> {
   try {
     const images = await pb.collection('images').getFullList<OfferImage>({
@@ -15,9 +23,10 @@ export async function getOfferImages(offerId: string): Promise<OfferImage[]> {
   }
 }
 
-export async function createOfferImage(data: CreateOfferImageData): Promise<OfferImage | null> {
+// tworzenie pojedynczego obrazka, wywoływane w uploadOfferImages
+export async function createOfferImage(data: CreateOfferImageData) {
   try {
-        // 1. Walidacja rozmiaru
+        // 1. Walidacja rozmiaru , maks 5mb
     if (data.image.size > IMAGE_CONFIG.MAX_FILE_SIZE) {
       throw new Error(`Plik jest za duży. Maksymalny rozmiar: ${IMAGE_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB. Twój plik: ${(data.image.size / 1024 / 1024).toFixed(1)}MB`);
     }
@@ -27,75 +36,38 @@ export async function createOfferImage(data: CreateOfferImageData): Promise<Offe
       throw new Error(`Nieprawidłowy format pliku. Dozwolone: JPG, PNG, WebP`);
     }
 
-    const formData = new FormData();
-    formData.append('offer_id', data.offer_id);
-    formData.append('image', data.image);
-    if (data.alt_text) formData.append('alt_text', data.alt_text);
-    formData.append('order', String(data.order || 0));
-
-    const image = await pb.collection('images').create<OfferImage>(formData);
-    return image;
+    await pb.collection('images').create<OfferImage>({
+      'offer_id': data.offer_id,
+      'image': data.image,
+      'order': data.order,
+    });
   } catch (error: any) {
-    if (error.message.includes('za duży') || error.message.includes('format')) {
-      throw error;
-    }
-    
-    console.error('Błąd dodawania zdjęcia:', error);
-    throw new Error('Nie udało się dodać zdjęcia. Spróbuj ponownie.');
+    throw error;
   }
 }
 
-export async function deleteOfferImage(imageId: string): Promise<boolean> {
-  try {
-    await pb.collection('images').delete(imageId);
-    return true;
-  } catch (error) {
-    console.error('Błąd usuwania zdjęcia:', error);
-    return false;
-  }
-}
 
-export async function updateImageOrder(imageId: string, newOrder: number): Promise<boolean> {
-  try {
-    await pb.collection('images').update(imageId, { order: newOrder });
-    return true;
-  } catch (error) {
-    console.error('Błąd aktualizacji kolejności:', error);
-    return false;
-  }
-}
-
+// przekazujemy tu do galerii link do obrazka: adres bazy + ścieżka do pliku
 export function getImageUrl(image: OfferImage, options?: { thumb?: string }): string {
   try {
     return pb.files.getURL(image, image.image, options);
   } catch (error) {
     console.error('Błąd generowania URL obrazu:', error);
-    return ''; // Fallback
+    return '';
   }
 }
 
+// analogicznie jak getImageUrl, tylko w niższych rozmiarach
 export function getImageThumbnailUrl(image: OfferImage, dimensions: string = '300x200'): string {
   return getImageUrl(image, { thumb: dimensions });
 }
 
-export function buildFileUrl(collection: string, recordId: string, filename?: string | null): string | null {
-  if (!filename) return null;
-  const f = String(filename);
-
-  // jeśli już jest pełny url -> zwróć
-  if (/^https?:\/\//.test(f)) return f;
-
-  // jeśli to ścieżka zaczynająca od slash -> traktuj jako public path w app
-  if (f.startsWith('/')) return f;
-
-  // normalnie: pliki PocketBase (collection, recordId, filename)
-  const base = String(pb.baseURL).replace(/\/$/, '');
-  return `${base}/api/files/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}/${encodeURIComponent(f)}`;
+// pobieram obrazek Usera
+export function getUserAvatar(user: User){
+  return pb.files.getURL(user, user.avatar || '');
 }
 
-/**
- * Upload wielu zdjęć do oferty (jako osobne rekordy w kolekcji images)
- */
+// Upload wielu zdjęć do oferty podczas jej tworzenia (jako osobne rekordy w kolekcji images)
 export async function uploadOfferImages(offerId: string, files: File[]): Promise<void> {
   if (files.length === 0) return;
 
@@ -111,7 +83,6 @@ export async function uploadOfferImages(offerId: string, files: File[]): Promise
 
     await Promise.all(uploadPromises);
   } catch (error: any) {
-    console.error('Upload images error:', error);
     throw new Error(error?.message || 'Nie udało się przesłać zdjęć');
   }
 }

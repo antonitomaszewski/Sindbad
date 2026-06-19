@@ -11,6 +11,5 @@ export interface OfferImage {
 export interface CreateOfferImageData {
   offer_id: string;
   image: File;
-  alt_text?: string;
   order?: number;
 }

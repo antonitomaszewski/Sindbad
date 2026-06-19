@@ -1,4 +1,7 @@
-// look/components/offer/OfferGallery.tsx
+// lightboxa używam do galerii obrazków
+// ten komponent jest uzywany w linku oferta/[id]
+// po kliknięciu mamy obrazek
+// komponent jest responsywny jak przybliżamy to mamy mniejszą siatkę,  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
 import { useState } from 'react';
 import { Card } from '@/look/components/ui/Card';
 import { useOfferImages } from '@/look/hooks/useOfferImages';
@@ -51,7 +54,7 @@ export function OfferGallery({ offerId }: OfferGalleryProps) {
 
   const lightboxSlides = images.map(img => ({
     src: getImageUrl(img),
-    alt: img.alt_text || 'Zdjęcie oferty'
+    alt: img.alt_text
   }));
 
   const handleImageClick = (index: number) => {
@@ -76,8 +79,8 @@ export function OfferGallery({ offerId }: OfferGalleryProps) {
           >
             <img
               src={getImageThumbnailUrl(image)}
-              alt={image.alt_text || 'Zdjęcie oferty'}
-              className="w-full aspect-video object-cover rounded"
+              alt={image.alt_text}
+              className="w-full aspect-[1/1] object-cover rounded"
               loading="lazy"
             />
           </div>
