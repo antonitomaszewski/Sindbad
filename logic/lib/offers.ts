@@ -8,6 +8,7 @@ import type { BookingStatus } from '../types/booking';
 import { sendTripAlertNotifications } from './tripAlerts';
 import { todayIso } from '../../look/utils/dateFormatter';
 import { format } from 'date-fns';
+import type {SearchOfferParams} from '../types/offer';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
@@ -60,17 +61,53 @@ export async function getFinishedOffersCount() {
 }
 
 // pobieram wszystkie oferty i filtruję je wedle tego co tam uzytkownik wyklikał 
-export async function searchOffers(params: { 
-  dateFrom?: string; 
-  dateTo?: string; 
-  onlyFuture?: boolean;
-}) {
-
+export async function searchOffers(params: SearchOfferParams = {}) {
   try {
-    const records: any[] = await (pb.collection('offers') as any).getFullList({ 
+    const filters: string[] = [];
+
+    if (params.onlyFuture) {
+      filters.push(`date_from >= "${todayIso()}"`);
+    }
+
+    if (params.dateFrom) {
+      filters.push(`date_from >= "${params.dateFrom}"`);
+    }
+
+    if (params.dateTo) {
+      filters.push(`date_to <= "${params.dateTo}"`);
+    }
+
+    if (params.country) {
+      filters.push(`country = "${params.country}"`);
+    }
+
+    if (params.port) {
+      filters.push(`port ~ "${params.port}"`);
+    }
+
+    if (params.priceMin) {
+      filters.push(`price_per_person >= ${Number(params.priceMin)}`);
+    }
+
+    if (params.priceMax) {
+      filters.push(`price_per_person <= ${Number(params.priceMax)}`);
+    }
+
+    if (params.onlyFree) {
+      filters.push('(seats_available = null || seats_available > 0)');
+    }
+
+    if (params.organizerId) {
+      filters.push(`organizer_id = "${params.organizerId}"`);
+    }
+
+    const queryFilter = filters.join(' && ');
+
+    const records: any[] = await (pb.collection('offers') as any).getFullList({
+      filter: queryFilter || undefined,
       sort: '-date_from',
     });
-    
+
     let results = records.map((t) => ({
       id: t.id,
       organizer_id: t.organizer_id,
@@ -89,27 +126,6 @@ export async function searchOffers(params: {
       created: t.created,
       updated: t.updated,
     }));
-
-    if (params.dateFrom) {
-      results = results.filter((o: any) => {
-        if (!o.date_from) return false;
-        return o.date_from.slice(0, 10) >= params.dateFrom!;
-      });
-    }
-    
-    if (params.dateTo) {
-      results = results.filter((o: any) => {
-        if (!o.date_to) return false;
-        return o.date_to.slice(0, 10) <= params.dateTo!;
-      });
-    }
-
-    if (params.onlyFuture) {
-      results = results.filter((o: any) => {
-        if (!o.date_from) return false;
-        return o.date_from.slice(0, 10) >= todayIso();
-      });
-    }
 
     return results;
   } catch (err) {

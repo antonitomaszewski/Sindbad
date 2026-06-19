@@ -2,11 +2,10 @@ export type BookingStatus = 'pending' | 'confirmed' | 'rejected';
 
 export interface Booking {
   id: string;
-  user_id?: string; // optional dla gości
+  user_id?: string;
   offer_id: string;
   status: BookingStatus;
   message?: string;
-  // Pola dla niezalogowanych gości
   guest_name?: string;
   guest_email?: string;
   created: string;
@@ -22,7 +21,6 @@ export interface BookingWithOffer extends Booking {
   };
 }
 
-// używam do wyświetlania osób na ofercie
 export interface OfferParticipant {
   userId: string;
   name: string;

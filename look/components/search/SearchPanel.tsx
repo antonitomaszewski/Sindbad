@@ -5,44 +5,34 @@ import { searchOffers } from '../../../logic/lib/offers';
 import { getAllCountries } from '../../../logic/lib/countries';
 import { getAllOrganizers } from '../../../logic/lib/users';
 import { dateToString } from '@/look/utils/dateFormatter';
-import { filterOffers } from '../../../logic/lib/filtering';
 import { loadOfferImages, loadOrganizerNames } from '../../../logic/lib/offerData';
 import { Offer } from '../../../logic/types/offer';
 import { DateRangePicker } from '@/look/components/ui/DateRangePicker';
-import { Button } from '../ui/Button';
+// import { Button } from '../ui/Button';
+import {OfferFilters} from '@/logic/types/offer';
 
-interface Filters {
-  country: string;
-  port: string;
-  priceMin: string;
-  priceMax: string;
-  onlyFree: boolean;
-  organizerId: string;
-}
-
-type sortByType =  'date_asc' | 'date_desc' | 'price_asc' | 'price_desc';
+// type sortByType =  'date_asc' | 'date_desc' | 'price_asc' | 'price_desc';
 
 export default function SearchPanel() {
-  const [dateFrom, setDateFrom] = useState<Date | null>(null);
-  const [dateTo, setDateTo] = useState<Date | null>(null);
-  const [onlyFuture, setOnlyFuture] = useState(true);
-  const [filters, setFilters] = useState<Filters>({
+  const [filters, setFilters] = useState<OfferFilters>({
     country: '',
     port: '',
     priceMin: '',
     priceMax: '',
     onlyFree: true,
     organizerId: '',
+    dateFrom: null,
+    dateTo: null,
+    onlyFuture: true,
   });
 
   const [allResults, setAllResults] = useState<Offer[]>([]);
-  const [filteredResults, setFilteredResults] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(false);
   const [countries, setCountries] = useState<{ code: string; name: string; namePL: string }[]>([]);
   const [users, setUsers] = useState<{ id: string; name: string; email: string }[]>([]);
   const [offerImages, setOfferImages] = useState<Map<string, string>>(new Map());
   const [organizers, setOrganizers] = useState<Map<string, string>>(new Map());
-  const [sortBy, setSortBy] = useState<sortByType>("date_asc");
+  // const [sortBy, setSortBy] = useState<sortByType>("date_asc");
 
   useEffect(() => {
     let mounted = true;
@@ -58,41 +48,45 @@ export default function SearchPanel() {
   useEffect(() => {
     const timer = setTimeout(() => fetchResults(), 350);
     return () => clearTimeout(timer);
-  }, [dateFrom, dateTo, onlyFuture]);
+  }, [filters]);
 
-  useEffect(() => {
-    const result = filterOffers(allResults, filters);
-    result.sort((a,b) => {
-      if (sortBy === 'date_asc')  return (a.date_from || '').localeCompare(b.date_from || '');
-      if (sortBy === 'date_desc') return (b.date_from || '').localeCompare(a.date_from || '');
-      if (sortBy === 'price_asc')  return (a.price_per_person || 0) - (b.price_per_person || 0);
-      if (sortBy === 'price_desc') return (b.price_per_person || 0) - (a.price_per_person || 0);
-      return 0;
-    });
-    setFilteredResults(result);
-  }, [allResults, filters, sortBy]);
+  // useEffect(() => {
+  //   allResults.sort((a,b) => {
+  //     if (sortBy === 'date_asc')  return (a.date_from || '').localeCompare(b.date_from || '');
+  //     if (sortBy === 'date_desc') return (b.date_from || '').localeCompare(a.date_from || '');
+  //     if (sortBy === 'price_desc')  return (a.price_per_person || 0) - (b.price_per_person || 0);
+  //     if (sortBy === 'price_asc') return (b.price_per_person || 0) - (a.price_per_person || 0);
+  //     return 0;
+  //   });
+  // }, [allResults, filters, sortBy]);
 
-  const handleClear = () => {
-    setDateFrom(null);
-    setDateTo(null);
-    setOnlyFuture(true);
-    setFilters({
-      country: '',
-      port: '',
-      priceMin: '',
-      priceMax: '',
-      onlyFree: true,
-      organizerId: '',
-    });
-  }
+  // const handleClear = () => {
+  //   setFilters({
+  //     country: '',
+  //     port: '',
+  //     priceMin: '',
+  //     priceMax: '',
+  //     onlyFree: true,
+  //     organizerId: '',
+  //     dateFrom: null,
+  //     dateTo: null,
+  //     onlyFuture: true,
+  //   });
+  // }
 
   async function fetchResults() {
     setLoading(true);
 
     const data = await searchOffers({
-      dateFrom: dateToString(dateFrom),
-      dateTo: dateToString(dateTo),
-      onlyFuture,
+      country: filters.country,
+      port: filters.port,
+      priceMin: filters.priceMin,
+      priceMax: filters.priceMax,
+      onlyFree: filters.onlyFree,
+      organizerId: filters.organizerId,
+      dateFrom: dateToString(filters.dateFrom),
+      dateTo: dateToString(filters.dateTo),
+      onlyFuture: filters.onlyFuture,
     });
 
     setAllResults(data ?? []);
@@ -110,19 +104,18 @@ export default function SearchPanel() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Filtry - lewa kolumna */}
         <div className="col-span-1">
           <div className="bg-white p-4 rounded shadow space-y-3 sticky top-4">
             <h4 className="font-semibold">Filtry</h4>
 
-            {(dateFrom || dateTo || !onlyFuture ||
+            {/* {(filters.dateFrom || filters.dateTo || !filters.onlyFuture ||
   filters.country || filters.port || filters.priceMin ||
   filters.priceMax || !filters.onlyFree || filters.organizerId) &&
             (<Button onClick={handleClear} variant="secondary">
               Wyczyść filtry
-            </Button>)}
+            </Button>)} */}
 
-            <div>
+            {/* <div>
               <label className="block mb-1 text-sm font-medium">Sortowanie</label>
               <select 
                 value={sortBy} 
@@ -134,7 +127,7 @@ export default function SearchPanel() {
                 <option value="price_asc">Cena od najniższej</option>
                 <option value="price_desc">Cena od najwyższej</option>
               </select>
-            </div>
+            </div> */}
 
             <div>
               <label className="block mb-1 text-sm font-medium">Kraj</label>
@@ -177,10 +170,11 @@ export default function SearchPanel() {
             <DateRangePicker
               startLabel="Data wyjazdu (od)"
               endLabel="Data wyjazdu (do)"
-              startDate={dateFrom}
-              endDate={dateTo}
-              onStartDateChange={setDateFrom}
-              onEndDateChange={setDateTo}
+              startDate={filters.dateFrom}
+              endDate={filters.dateTo}
+              onStartDateChange={(date) => setFilters((current) => ({ ...current, dateFrom: date }))}
+              onEndDateChange={(date) => setFilters((current) => ({ ...current, dateTo: date }))}
+              minEndDate={filters.dateFrom ?? undefined}
             />
 
             <div>
@@ -215,18 +209,17 @@ export default function SearchPanel() {
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input 
                 type="checkbox" 
-                checked={onlyFuture} 
-                onChange={(e) => setOnlyFuture(e.target.checked)} 
+                checked={filters.onlyFuture} 
+                onChange={(e) => setFilters({ ...filters, onlyFuture: e.target.checked })} 
               />
               Pomiń rejsy z przeszłości
             </label>
           </div>
         </div>
 
-        {/* Wyniki - prawa kolumna (3 szerokości) */}
         <div className="col-span-1 md:col-span-3">
           <SearchResults 
-            results={filteredResults} 
+            results={allResults} 
             loading={loading} 
             offerImages={offerImages} 
             organizers={organizers} 
