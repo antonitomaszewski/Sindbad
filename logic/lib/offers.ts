@@ -31,27 +31,15 @@ export async function createOffer(data: Partial<Offer>): Promise<Offer> {
 
 // funkcja do pobierania danej oferty, w wielu miejscach w logice uzywana
 export async function getOfferById(id: string): Promise<Offer | null> {
-  try {
-    const record = await pb.collection('offers').getOne(id);
-    return record as unknown as Offer;
-  } catch (error) {
-    return null;
-  }
+  return await pb.collection('offers').getOne(id);
 }
 
 // Pobierz rejsy organizatora
 // wyswietlamy je na UserProfile "Rejsy organizowane"
 export async function getTripsByOrganizer(organizerId: string) {
-  try {
-    const records: any[] = await (pb.collection('offers') as any).getFullList(
-      { filter: `organizer_id = "${organizerId}"`, sort: '-date_from' },
-      200
+    return await pb.collection('offers').getFullList(
+      { filter: `organizer_id = "${organizerId}"`}
     );
-    return records;
-  } catch (err) {
-    console.error('getTripsByOrganizer error', err);
-    return [];
-  }
 }
 
 // funkcja do wyswietlania wszystkich zakończonych rejsow na stronie głównej

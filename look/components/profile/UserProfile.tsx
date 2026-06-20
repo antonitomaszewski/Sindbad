@@ -57,7 +57,7 @@ export default function UserProfile({
 
       {isOwnProfile && (
         <Link
-          href={`/profil/${user.id}/edytuj`} // Zmień z /profil/edycja
+          href={`/profil/${user.id}/edytuj`}
           className="px-5 py-2 bg-main text-white rounded-lg font-semibold hover-bg-main transition shadow-md hover:shadow-lg"
         >
           Edytuj profil

@@ -1,3 +1,5 @@
+// logika rezerwacji, kontaktów miedzy uzytkownikami
+
 import pb from './pocketbase';
 import type {
   Booking,
@@ -7,10 +9,10 @@ import type {
   OfferParticipant,
   UserContact,
 } from '../types/booking';
-import { RecordModel } from 'pocketbase';
+import {getTripsByOrganizer} from './offers';
 import { getOfferById, updateAvailableSeats, validateSeatsAvailable } from './offers';
 import { sendBookingStatusEmail, sendBookingEmails } from './emails';
-import { Offer } from '../types/offer';
+import {isUserLoggedIn} from './users';
 
 const BOOKINGS_COLLECTION = 'bookings';
 
@@ -23,77 +25,33 @@ type BookingCreateData = {
   guest_email?: string;
 };
 
-function mapRecordToBooking(record: RecordModel): Booking {
-  return {
-    id: record.id,
-    user_id: record.user_id,
-    offer_id: record.offer_id,
-    status: record.status as BookingStatus,
-    message: record.message,
-    created: record.created,
-    updated: record.updated,
-    guest_name: record.guest_name,
-    guest_email: record.guest_email,
-  };
-}
 
+// rezerwację może składać:
+// 1. osoba, co jest zalogowan
+// 2. niezalogowana, co wypełniła formularz
 function validateBookingAccess(guestData?: GuestBookingData) {
-  if (pb.authStore.isValid) {
+  if (isUserLoggedIn()) {
     return;
   }
 
-  if (!guestData) {
+  if (!guestData || !guestData?.email) {
     throw new Error(
-      'Podaj dane kontaktowe lub zaloguj się'
-    );
-  }
-
-  if (!guestData.email) {
-    throw new Error('Podaj email');
-  }
-}
-
-function validateOwnOfferBooking(offer: Offer) {
-  const currentUserId = pb.authStore.record?.id;
-
-  if (!currentUserId) {
-    return;
-  }
-
-  if (offer.organizer_id === currentUserId) {
-    throw new Error(
-      'Nie możesz zarezerwować własnej oferty'
+      'Podaj email lub zaloguj się'
     );
   }
 }
 
-async function resolveCurrentUserContact() {
-  const record = (pb.authStore.record || {}) as {
-    id?: string;
-    email?: string;
-    name?: string;
-  };
-
-  let email = record.email || '';
-  let name = record.name || '';
-
-  if (pb.authStore.isValid && record?.id && !email) {
-    try {
-      const refreshed = await (pb.collection('users') as any).authRefresh();
-      email = refreshed?.record?.email || email;
-      name = refreshed?.record?.name || name;
-    } catch (err) {
-      console.warn('resolveCurrentUserContact authRefresh failed:', err);
-    }
-  }
-
+async function getCurrentUser() {
+  const record = pb.authStore.record;
   return {
-    userId: record?.id || null,
-    email,
-    name,
-  };
+    userId: record?.id,
+    email: record?.email,
+    name: record?.name,
+  }
 }
 
+// bierzemy informacje o uzytkowniku, i ofertcie, by przygotować do wysyłi maila
+// oraz zapisu w bazie
 async function buildBookingData(
   offerId: string,
   message?: string,
@@ -105,11 +63,11 @@ async function buildBookingData(
     message: message?.trim() || '',
   };
 
-  if (pb.authStore.isValid) {
-    const currentUser = await resolveCurrentUserContact();
+  if (isUserLoggedIn()) {
+    const currentUser = await getCurrentUser();
     return {
       ...data,
-      user_id: currentUser.userId || undefined,
+      user_id: currentUser.userId,
       guest_email: currentUser.email,
       guest_name: currentUser.name,
     };
@@ -122,15 +80,8 @@ async function buildBookingData(
   };
 }
 
-async function listBookingsByFilter(filter: string): Promise<Booking[]> {
-  const records = await pb.collection(BOOKINGS_COLLECTION).getFullList({
-    filter,
-    sort: '-created',
-  });
-
-  return records.map(mapRecordToBooking);
-}
-
+// sprawdzamy czy załogant będzie na tym rejsie
+// uzywamy w celu sprawdzwnia czy mozna mu wyswietlic listę załogantów
 async function hasConfirmedBookingForOffer(offerId: string, userId: string): Promise<boolean> {
   const list = await pb.collection(BOOKINGS_COLLECTION).getList(1, 1, {
     filter: `offer_id = "${offerId}" && user_id = "${userId}" && status = "confirmed"`,
@@ -139,6 +90,7 @@ async function hasConfirmedBookingForOffer(offerId: string, userId: string): Pro
   return list.totalItems > 0;
 }
 
+// do wyświetlania na stronie głównej
 export async function getConfirmedBookingsCount() {
   const record = pb.collection(BOOKINGS_COLLECTION).getList(1, 1, {
     filter: 'status = "confirmed"',
@@ -146,291 +98,94 @@ export async function getConfirmedBookingsCount() {
   return (await record).totalItems;
 }
 
-export async function getUserConfirmedBookings(userId: string): Promise<Booking[]> {
-  const [crewBookings, organizerBookings] = await Promise.all([
-    listBookingsByFilter(`user_id = "${userId}" && status = "confirmed"`),
-    listBookingsByFilter(`offer_id.organizer_id = "${userId}" && status = "confirmed"`),
-  ]);
-
-  const merged = new Map<string, Booking>();
-
-  for (const booking of [...crewBookings, ...organizerBookings]) {
-    merged.set(booking.id, booking);
-  }
-
-  return Array.from(merged.values());
+// pobieramy wszystkie oferty, dla których
+// uzytkownik był: jako załogant (1) i jako organizator (2)
+// an8g9rlfw371lia eg 3 załogant, 1 organizator
+export async function getUserOffers(userId: string, _filter:string=""): Promise<string[]>{
+  let userOffers = await pb.collection(BOOKINGS_COLLECTION).getFullList(
+    {
+      filter: `user_id = "${userId}" && status = "confirmed" ${_filter}`,
+      fields: "offer_id",
+    }
+  );
+  let organized = await getTripsByOrganizer(userId);
+  return [...userOffers.map((record) => record.offer_id), ...organized.map(record => record.id)];
 }
 
-async function getBookingOrganizer(booking: Booking): Promise<string | null> {
-  const offer = await getOfferById(booking.offer_id);
-  if (!offer?.organizer_id) {
-    return null;
-  }
 
-  return String(offer.organizer_id);
+// używam w znajdowaniu kontaktów
+// _filter = `&& user_id != "${userId}"` do wykluczenia "nas samych"
+// 3. dla każdej z ofert bierzemy wszystkie rezerwacje, które mają status confirmed
+// i stąd bierzemy wszystkich userów
+// i zwracamy czyli user + oferta
+export async function getOffersParticipants(offer_ids: string[], _filter:string = ""): Promise<{ offer_id: string; user_id: string }[]>{
+  let filter = offer_ids.map((offer_id) => `offer_id = "${offer_id}"`).join(" || ");
+  // wszsyscy załoganci
+  const bookings = (await pb.collection(BOOKINGS_COLLECTION).getFullList(
+    {
+      filter: `(${filter}) && status = "confirmed" ${_filter}`,
+      fields: "user_id, offer_id",
+    }
+  )).map(x => ({ offer_id: x['offer_id'] as string, user_id: x['user_id'] as string }));
+
+  // tu dostae organizatorów tych rejsówj
+  filter = offer_ids.map((offer_id) => `id = "${offer_id}"`).join(" || ");
+  const organizers = (await pb.collection('offers').getFullList(
+    {
+      filter: `${filter}`,
+      fields: "organizer_id, id"
+    }
+  )).map(x => ({'offer_id': x['id'], 'user_id': x['organizer_id']}));
+
+  return [...bookings, ...organizers];
 }
 
-export async function getBookingsOrganizers(bookings: Booking[]): Promise<Set<string>> {
-  const organizers = new Set<string>();
+// user : lista rejsów
+// mapowanie , do zwrócenia wo wyswietlenia na stronie profilu użytkownika
+async function mapOfferUsersToContacts(
+  rows: { offer_id: string; user_id: string }[]
+): Promise<UserContact[]> {
+  const result: UserContact[] = [];
 
-  for (const booking of bookings) {
-    const organizerId = await getBookingOrganizer(booking);
-    if (organizerId) {
-      organizers.add(organizerId);
-    }
-  }
+  for (const row of rows) {
+    const offer = await getOfferById(row.offer_id);
+    const user = await pb.collection('users').getOne(row.user_id, { fields: 'id,name' });
 
-  return organizers;
-}
-
-async function getBookingParticipants(booking: Booking): Promise<Set<string>> {
-  try {
-    const offer: any = await (pb.collection('offers') as any).getOne(booking.offer_id, {
-      expand: 'participants',
-      fields: 'id,organizer_id,participants,expand.participants.id',
-    });
-
-    const relationParticipants = new Set<string>();
-
-    if (Array.isArray(offer?.participants)) {
-      for (const participantId of offer.participants) {
-        const id = String(participantId || '');
-        if (id) {
-          relationParticipants.add(id);
-        }
-      }
+    let contact = result.find((c) => c.userId === row.user_id);
+    if (!contact) {
+      contact = { userId: row.user_id, name: user.name || 'User', trips: [] };
+      result.push(contact);
     }
 
-    if (Array.isArray(offer?.expand?.participants)) {
-      for (const participant of offer.expand.participants) {
-        const id = String(participant?.id || '');
-        if (id) {
-          relationParticipants.add(id);
-        }
-      }
-    }
-
-    if (relationParticipants.size > 0) {
-      console.log('[contacts][getBookingParticipants] source=offer.participants', {
-        offerId: booking.offer_id,
-        participantIds: Array.from(relationParticipants),
-      });
-
-      return relationParticipants;
-    }
-
-    console.log('[contacts][getBookingParticipants] offer.participants-empty-fallback-bookings', {
-      offerId: booking.offer_id,
-    });
-  } catch (err) {
-    console.warn('[contacts][getBookingParticipants] offer-read-failed-fallback-bookings', {
-      offerId: booking.offer_id,
-      err,
+    contact.trips.push({
+      offerId: row.offer_id,
+      title: offer?.title || 'Rejs',
+      date_from: offer?.date_from,
+      date_to: offer?.date_to,
     });
   }
 
-  try {
-    const records: any[] = await (pb.collection(BOOKINGS_COLLECTION) as any).getFullList({
-      filter: `offer_id = "${booking.offer_id}" && status = "confirmed" && user_id != ""`,
-      fields: 'user_id',
-    });
-
-    const bookingParticipants = new Set(
-      records
-        .map((record: any) => String(record.user_id || ''))
-        .filter(Boolean)
-    );
-
-    console.log('[contacts][getBookingParticipants] source=bookings-fallback', {
-      offerId: booking.offer_id,
-      recordsCount: records.length,
-      participantIds: Array.from(bookingParticipants),
-    });
-
-    return bookingParticipants;
-  } catch (err) {
-    console.warn('[contacts][getBookingParticipants] bookings-fallback-failed', {
-      offerId: booking.offer_id,
-      err,
-    });
-    return new Set<string>();
-  }
+  return result;
 }
 
-export async function getBookingsParticipants(bookings: Booking[]): Promise<Set<string>> {
-  const participants = new Set<string>();
-
-  for (const booking of bookings) {
-    const bookingParticipants = await getBookingParticipants(booking);
-    for (const participantId of bookingParticipants) {
-      participants.add(participantId);
-    }
-  }
-
-  return participants;
-}
-
-function addContactTrip(
-  map: Map<string, Set<string>>,
-  contactUserId: string,
-  offerId: string
-) {
-  if (!map.has(contactUserId)) {
-    map.set(contactUserId, new Set<string>());
-  }
-  map.get(contactUserId)!.add(offerId);
-}
-
-async function getUserContactTripMap(userId: string): Promise<Map<string, Set<string>>> {
-  const bookings = await getUserConfirmedBookings(userId);
-
-  console.log('[contacts][getUserContacts] user-trips', {
-    userId,
-    bookingsCount: bookings.length,
-    tripIds: bookings.map((booking) => booking.offer_id),
-  });
-
-  if (bookings.length === 0) {
-    return new Map<string, Set<string>>();
-  }
-
-  const [organizers, participants] = await Promise.all([
-    getBookingsOrganizers(bookings),
-    getBookingsParticipants(bookings),
-  ]);
-
-  console.log('[contacts][getUserContacts] trip-organizers', {
-    userId,
-    organizerIds: Array.from(organizers),
-    organizersCount: organizers.size,
-  });
-
-  console.log('[contacts][getUserContacts] trip-members', {
-    userId,
-    participantIds: Array.from(participants),
-    participantsCount: participants.size,
-  });
-
-  const contactTripMap = new Map<string, Set<string>>();
-
-  for (const booking of bookings) {
-    const offerId = booking.offer_id;
-    if (!offerId) {
-      continue;
-    }
-
-    const organizerId = await getBookingOrganizer(booking);
-    if (organizerId && organizerId !== userId) {
-      addContactTrip(contactTripMap, organizerId, offerId);
-    }
-
-    const bookingParticipants = await getBookingParticipants(booking);
-    for (const participantId of bookingParticipants) {
-      if (participantId !== userId) {
-        addContactTrip(contactTripMap, participantId, offerId);
-      }
-    }
-  }
-
-  console.log('[contacts][getUserContacts] contact-trip-map', {
-    userId,
-    contactIds: Array.from(contactTripMap.keys()),
-    pairs: Array.from(contactTripMap.entries()).map(([contactId, offerIds]) => ({
-      contactId,
-      offerIds: Array.from(offerIds),
-    })),
-  });
-
-  return contactTripMap;
-}
-
+// pobieramy listę naszych kontaktów
+// sa to osoby ktore byly z nami na rejsie jako zalogant, oraz organizator
+// zarowno na rejsach , ktore my organizowalismy i na ktorych bylismy zalogantami
 export async function getUserContacts(
   userId: string
 ): Promise<UserContact[]> {
-  try {
-    console.log('[contacts][getUserContacts] start', { userId });
-
-    const contactTripMap = await getUserContactTripMap(userId);
-    const contactIds = Array.from(contactTripMap.keys());
-
-    if (contactIds.length === 0) {
-      console.log('[contacts][getUserContacts] no-contacts', { userId });
-      return [];
-    }
-
-    const allOfferIds = Array.from(
-      new Set(
-        Array.from(contactTripMap.values()).flatMap((offerIds) => Array.from(offerIds))
-      )
-    );
-
-    const offers = await Promise.all(
-      allOfferIds.map(async (offerId) => {
-        const offer = await getOfferById(offerId);
-        return {
-          offerId,
-          title: offer?.title || 'Rejs',
-          date_from: offer?.date_from,
-          date_to: offer?.date_to,
-        };
-      })
-    );
-
-    const offerById = new Map(
-      offers.map((offer) => [offer.offerId, offer] as const)
-    );
-
-    const contacts = await Promise.all(
-      contactIds.map(async (contactUserId) => {
-        const tripIds = Array.from(contactTripMap.get(contactUserId) || []);
-        const trips = tripIds
-          .map((tripId) => offerById.get(tripId))
-          .filter(Boolean)
-          .map((trip) => ({
-            offerId: trip!.offerId,
-            title: trip!.title,
-            date_from: trip!.date_from,
-            date_to: trip!.date_to,
-          }));
-
-        try {
-          const user = await pb.collection('users').getOne(contactUserId, {
-            fields: 'id,name,email',
-          });
-
-          return {
-            userId: String(user.id),
-            name: String(user.name || user.email || 'Użytkownik'),
-            trips,
-          } as UserContact;
-        } catch {
-          return {
-            userId: contactUserId,
-            name: 'Użytkownik',
-            trips,
-          } as UserContact;
-        }
-      })
-    );
-
-    const sorted = contacts.sort((a, b) => a.name.localeCompare(b.name, 'pl'));
-
-    console.log('[contacts][getUserContacts] resolved', {
-      userId,
-      contacts: sorted,
-      contactsCount: sorted.length,
-    });
-
-    return sorted;
-  } catch (err) {
-    console.warn('getUserContacts error:', err);
-    return [];
-  }
+  // 1. wszystkie rezerwacje użytkownika potwierdzone - z nich bierzemy rejsy na których byl/bedzie
+  const userOffers = await getUserOffers(userId);
+  // const _filter = `&& user_id != "${userId}"`
+  const offersParticipants = (await getOffersParticipants(userOffers)).filter(x => x['user_id'] != userId);
+  return mapOfferUsersToContacts(offersParticipants);
 }
 
 
-// tworzymy ofertę
-// 
+// tworzymy rezerwację:
+// używane w oferta->modal rezerwacji
+// sprawdzamy 1 czy osoba może rezerwować
+// tworzymy rezerwację i wysyłamy maile (organizator, uczestnik)
 export async function createBooking(
   offerId: string,
   message?: string,
@@ -444,7 +199,6 @@ export async function createBooking(
     throw new Error('Oferta nie istnieje');
   }
 
-  validateOwnOfferBooking(offer);
   validateSeatsAvailable(offer);
 
   const data = await buildBookingData(
@@ -453,9 +207,7 @@ export async function createBooking(
     guestData
   );
 
-  const record = await pb.collection(BOOKINGS_COLLECTION).create(data);
-
-  const booking = mapRecordToBooking(record);
+  const record = await pb.collection(BOOKINGS_COLLECTION).create(data) as Booking;
 
   await sendBookingEmails({
     offer,
@@ -463,17 +215,19 @@ export async function createBooking(
     message,
     guestData,
     bookingRecipient: {
-      email: booking.guest_email,
-      name: booking.guest_name,
+      email: record.guest_email,
+      name: record.guest_name,
     },
   });
 
-  return booking;
+  return record;
 }
 
 // pobieramy wszystkie rezerwacje dla danej ofery - do wyswietlenia w panelu organizatora
 export async function getOfferBookings(offerId: string): Promise<Booking[]> {
-  return listBookingsByFilter(`offer_id = "${offerId}"`);
+  return await pb.collection(BOOKINGS_COLLECTION).getFullList({
+    filter: `offer_id = "${offerId}"`
+  });
 }
 
 // przy zmiani statusu rezerwacji zawsze wysyłamy maila z powiadomomieniem co i jak się zmieniło
@@ -554,6 +308,7 @@ export async function getUserBookingsWithOffers(userId: string): Promise<Booking
 // 1. organizator
 // 2. wspólny załogant (hasConfirmedBookingForOffer)
 // oczywiscie musi być zalogowany
+// uzywane na stronie oferty rejsu
 export async function canViewParticipants(
   offerId: string
 ): Promise<boolean> {

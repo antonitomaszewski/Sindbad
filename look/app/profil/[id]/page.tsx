@@ -1,12 +1,14 @@
+// strona wyświetlania się profilu
+// w więszkości oparta na lib/bookings czyli naszych rezerwacjach, kontaktach o nie opartych
+// rejsach, które organizujemy
+// dodatkowo z prawej strony mamy wyswietlane opinie z rejsów które organizowaliśmy
+// oraz powiadomienia na rejsy w przyszłości
 "use client";
 import { use, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { isCurrentServerUser, getCurrentUser, canAccessProfile } from '../../../../logic/lib/users';
 import { getTripsByOrganizer } from '../../../../logic/lib/offers';
 import {
-  getBookingsOrganizers,
-  getBookingsParticipants,
-  getUserConfirmedBookings,
   getUserContacts,
   getUserBookingsWithOffers,
 } from '../../../../logic/lib/bookings';
@@ -15,12 +17,11 @@ import UserProfile from '../../../components/profile/UserProfile';
 import { LoadingState } from '../../../components/common/LoadingState';
 import { NotFoundState } from '../../../components/common/NotFoundState';
 import { useUser } from '../../../hooks/useUser';
+import type { Trip } from '@/logic/types/offer';
 
 interface ProfilePageProps {
   params: Promise<{ id: string }>;
 }
-
-type Trip = { id: string; title?: string; date_from?: string, date_to?: string };
 
 export default function ProfilPage({ params }: ProfilePageProps) {
   const { id } = use(params);
@@ -32,36 +33,6 @@ export default function ProfilPage({ params }: ProfilePageProps) {
   const [commonContactIds, setCommonContactIds] = useState<string[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') {
-      return;
-    }
-
-    (window as any).debugContacts = {
-      getUserConfirmedBookings,
-      getBookingsOrganizers,
-      getBookingsParticipants,
-      getUserContacts,
-      run: async (userId: string) => {
-        const bookings = await getUserConfirmedBookings(userId);
-        const organizers = await getBookingsOrganizers(bookings);
-        const participants = await getBookingsParticipants(bookings);
-        const contacts = await getUserContacts(userId);
-
-        return {
-          bookings,
-          organizers: Array.from(organizers),
-          participants: Array.from(participants),
-          contacts,
-        };
-      },
-    };
-
-    return () => {
-      delete (window as any).debugContacts;
-    };
-  }, []);
 
   useEffect(() => {
     const loadProfileData = async () => {
@@ -120,10 +91,6 @@ export default function ProfilPage({ params }: ProfilePageProps) {
         backText="Powrót do kalendarza"
       />
     );
-  }
-
-  if (hasAccess === null) {
-    return <LoadingState message="Ładowanie profilu..." />;
   }
 
   const isOwnProfile = isCurrentServerUser(user);

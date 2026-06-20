@@ -1,13 +1,7 @@
 // ...existing code...
 import Link from 'next/link';
 import { Card } from '@/look/components/ui/Card';
-
-type Trip = {
-  id: string;
-  title?: string;
-  date_from?: string;
-  date_to?: string;
-};
+import type { Trip } from '@/logic/types/offer';
 
 export default function TripHistory({
   trips,

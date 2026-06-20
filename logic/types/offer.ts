@@ -66,3 +66,11 @@ export const CURRENCIES = [
   { code: 'EUR' as const, symbol: '€', name: 'Euro' },
   { code: 'USD' as const, symbol: '$', name: 'Dolar amerykański' },
 ] as const;
+
+// do wyświetlania (podajemy zawsze nazwę, daty i link)
+export type Trip = {
+  id: string;
+  title?: string;
+  date_from?: string;
+  date_to?: string;
+};
