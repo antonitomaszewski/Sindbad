@@ -21,7 +21,7 @@ import pb from './pocketbase';
 import { getOfferById } from './offers';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-
+// zostawiam noreply@resend.dev
 const FROM_EMAIL = process.env.RESEND_FROM || 'noreply@resend.dev';
 const DEFAULT_BOOKING_NAME = 'Rezerwujący';
 const DEFAULT_ASKER_NAME = 'Użytkowniku';

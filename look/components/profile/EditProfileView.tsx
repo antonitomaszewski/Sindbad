@@ -8,7 +8,6 @@ import {
   changeUserPassword,
   isCurrentUserOAuth,
   updateUserProfile,
-  updateProfileVisibility,
 } from '../../../logic/lib/users';
 import { updateUserCertifications } from '../../../logic/lib/certifications';
 import type { Certification } from '@/logic/types/certification';
@@ -81,14 +80,13 @@ export default function EditProfileView({
     setLoading(true);
 
     try {
-      // 1. Zaktualizuj profil (name, bio, avatar)
-      await updateUserProfile(user.id, formData);
-      
-      // 2. Zaktualizuj certyfikaty
-      await updateUserCertifications(user.id, selectedCertIds);
-
-      // 3. Zaktualizuj widoczność profilu
-      await updateProfileVisibility(user.id, profileVisibility);
+      await updateUserProfile(user.id, {
+        name: formData.name,
+        bio: formData.bio,
+        avatar: formData.avatar,
+        profile_visibility: profileVisibility,
+        certifications: selectedCertIds,
+      });
 
       router.push(`/profil/${user.id}`);
       router.refresh();

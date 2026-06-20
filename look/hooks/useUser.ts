@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUser } from '@/logic/lib/users';
+import { getUser, getUserCertifications } from '@/logic/lib/users';
 
 export function useUser(userId: string | null) {
   const [user, setUser] = useState<any>(null);
@@ -13,8 +13,8 @@ export function useUser(userId: string | null) {
     const fetchUser = async () => {
       setLoading(true);
       try {
-        const userData = await getUser(userId);
-        setUser(userData);
+        const user = await getUser(userId);
+        setUser(user)
       } catch (err) {
       } finally {
         setLoading(false);
