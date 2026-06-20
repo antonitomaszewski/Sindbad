@@ -4,7 +4,6 @@ import { getUser } from '@/logic/lib/users';
 export function useUser(userId: string | null) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) {
@@ -17,7 +16,6 @@ export function useUser(userId: string | null) {
         const userData = await getUser(userId);
         setUser(userData);
       } catch (err) {
-        setError('Nie udało się załadować danych organizatora');
       } finally {
         setLoading(false);
       }
@@ -26,5 +24,5 @@ export function useUser(userId: string | null) {
     fetchUser();
   }, [userId]);
 
-  return { user, loading, error };
+  return { user, loading };
 }

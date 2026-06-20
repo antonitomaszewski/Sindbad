@@ -1,8 +1,12 @@
+// wysyłanie emaili
+// mamy 3 rodzaje:
+// 1. zmiana statusu rezerwacji: do załoganta
+// 2. nowa rezerwacja: do załoganta i do organizaotra
+// 3. nowe zapytanie: -||-
 'use server';
-
 import { Resend } from 'resend';
 import type { Offer } from '../types/offer';
-import type { BookingStatus, GuestBookingData } from '../types/booking';
+import type { BookingStatus, GuestBookingData, Booking } from '../types/booking';
 import { formatDateRange } from '@/look/utils/dateFormatter';
 import {
   newBookingTemplate,
@@ -12,8 +16,9 @@ import {
   questionToOrganizerTemplate,
   questionConfirmationTemplate,
 } from './emailTemplates';
-import pb from './pocketbase';
 import { getUser } from './users';
+import pb from './pocketbase';
+import { getOfferById } from './offers';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -21,6 +26,8 @@ const FROM_EMAIL = process.env.RESEND_FROM || 'noreply@resend.dev';
 const DEFAULT_BOOKING_NAME = 'Rezerwujący';
 const DEFAULT_ASKER_NAME = 'Użytkowniku';
 
+// funkcja wysyłająca email, nadawca to zawsze RESEND_FROM - my
+// ustawiamy adresata, tytuł, treść
 export async function sendEmail({
   to,
   subject,
@@ -31,10 +38,8 @@ export async function sendEmail({
   html: string;
 }) {
   if (!to || !to.includes('@')) {
-    console.warn(`Invalid email: ${to}`);
     return { success: false, error: 'Invalid email' };
   }
-
   try {
     const result = await resend.emails.send({
       from: FROM_EMAIL,
@@ -44,34 +49,23 @@ export async function sendEmail({
     });
 
     if (result.error) {
-      console.error('Email send error:', result.error);
       return { success: false, error: result.error.message };
     }
-
-    console.log('Email sent:', {
-      to,
-      subject,
-      id: result.data?.id,
-    });
-
     return { success: true, id: result.data?.id };
   } catch (error) {
-    console.error('Email service error:', error);
     return { success: false, error: 'Failed to send email' };
   }
 }
 
+// funkcja używana przy zmianie statusu rezerwacji
+// pobieramy: adresata, szablon wiadomości (potwierdzona lub odrzucona)
+// dane do szablonu
 export async function sendBookingStatusEmail({
   booking,
   offer,
   status,
 }: {
-  booking: {
-    id?: string;
-    user_id?: string;
-    guest_email?: string;
-    guest_name?: string;
-  };
+  booking: Booking;
   offer: Offer;
   status: BookingStatus;
 }) {
@@ -119,6 +113,7 @@ export async function sendBookingStatusEmail({
   });
 }
 
+// mail rezerwacji
 export async function sendBookingEmails({
   offer,
   offerId,
@@ -136,9 +131,9 @@ export async function sendBookingEmails({
   };
 }) {
   const recipientEmail =
-    guestData?.email || bookingRecipient?.email || pb.authStore.record?.email;
+    guestData?.email || bookingRecipient?.email;
   const recipientName =
-    guestData?.name || bookingRecipient?.name || pb.authStore.record?.name || DEFAULT_BOOKING_NAME;
+    guestData?.name || bookingRecipient?.name || DEFAULT_BOOKING_NAME;
   const dateRange = formatDateRange(offer.date_from, offer.date_to);
 
   if (recipientEmail) {
@@ -170,6 +165,7 @@ export async function sendBookingEmails({
   }
 }
 
+// mail zapytania
 export async function sendOfferQuestionEmails({
   offer,
   question,
@@ -210,5 +206,43 @@ export async function sendOfferQuestionEmails({
       question,
       offerLink,
     }),
+  });
+}
+
+
+// uzywane w miejscu oferty, gdy zalogowany uzytkownik / lub niezalogowany uzytkownik
+// chce zadac pytanie do organizatora, nie dokonując rezerwacji
+// bierzemy treśc wiadomości oraz email i wysyłamy na adres organizatora oferty
+export async function sendOfferQuestion({
+  offerId,
+  email,
+  message,
+}: {
+  offerId: string;
+  email: string;
+  message: string;
+}): Promise<void> {
+  const normalizedEmail = email.trim().toLowerCase();
+  const trimmedMessage = message.trim();
+
+  if (!normalizedEmail || !normalizedEmail.includes('@')) {
+    throw new Error('Podaj poprawny email');
+  }
+
+  if (!trimmedMessage) {
+    throw new Error('Podaj treść pytania');
+  }
+
+  const offer = await getOfferById(offerId);
+
+  if (!offer) {
+    throw new Error('Oferta nie istnieje');
+  }
+
+  await sendOfferQuestionEmails({
+    offer,
+    question: trimmedMessage,
+    askerEmail: normalizedEmail,
+    askerName: pb.authStore.record?.name || DEFAULT_ASKER_NAME,
   });
 }

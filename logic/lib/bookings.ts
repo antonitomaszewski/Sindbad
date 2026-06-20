@@ -239,7 +239,7 @@ export async function updateBookingStatus(
   bookingId: string,
   status: BookingStatus
 ): Promise<void> {
-  const current = await pb.collection(BOOKINGS_COLLECTION).getOne(bookingId);
+  const current = await pb.collection(BOOKINGS_COLLECTION).getOne(bookingId) as Booking;
   const previousStatus = current.status as BookingStatus;
 
   if (previousStatus === status) {

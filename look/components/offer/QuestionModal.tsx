@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import pb from '@/logic/lib/pocketbase';
-import { sendOfferQuestion } from '@/logic/lib/questions';
+import { sendOfferQuestion } from '@/logic/lib/emails';
 
 interface QuestionModalProps {
   offerId: string;
