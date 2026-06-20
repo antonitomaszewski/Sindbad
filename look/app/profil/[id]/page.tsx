@@ -26,7 +26,7 @@ interface ProfilePageProps {
 export default function ProfilPage({ params }: ProfilePageProps) {
   const { id } = use(params);
   const searchParams = useSearchParams();
-  const { user, loading: userLoading, error: userError } = useUser(id);
+  const { user, loading: userLoading } = useUser(id);
   const [organizedTrips, setOrganizedTrips] = useState<Trip[]>([]);
   const [myBookings, setMyBookings] = useState<BookingWithOffer[]>([]);
   const [userContacts, setUserContacts] = useState<UserContact[]>([]);
@@ -81,7 +81,7 @@ export default function ProfilPage({ params }: ProfilePageProps) {
     return <LoadingState message="Ładowanie profilu..." />;
   }
 
-  if (userError || !user || hasAccess === false) {
+  if (!user || hasAccess === false) {
     return (
       <NotFoundState
         title="404"

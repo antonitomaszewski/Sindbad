@@ -203,6 +203,7 @@ export async function sendOfferQuestionEmails({
       recipientName: askerName || DEFAULT_ASKER_NAME,
       offerTitle: offer.title,
       offerDate: dateRange,
+      askerEmail,
       question,
       offerLink,
     }),

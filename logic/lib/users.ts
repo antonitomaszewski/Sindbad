@@ -22,7 +22,6 @@ export async function getUser(id: string): Promise<User | null> {
       certifications,
     };
   } catch (error) {
-    console.error('getUser error:', id, error);
     return null;
   }
 }

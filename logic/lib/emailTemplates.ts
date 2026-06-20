@@ -1,22 +1,17 @@
-// tutaj zadeklarowałem intefejsy, bo nie mają nic do czynienia w bazie
-// 
-interface BookingEmailData {
-  recipientName: string;
-  offerTitle: string;
-  offerDate: string;
-  organizerName?: string;
-  message?: string;
-  bookingLink?: string;
-}
+// szablony wysyłki emaili, z których korzystamy w emails.ts
+// różnią się w detalach treścią, układają się w logiczne pary
+// 1. nowa rezerwacja
+// 2. potwierdzenie wysłania rezerwacji
 
-interface QuestionEmailData {
-  recipientName: string;
-  offerTitle: string;
-  offerDate: string;
-  askerEmail: string;
-  question: string;
-  offerLink?: string;
-}
+// 3. rezerwacja została potwierdzona
+// 4. -||- odrzucona
+
+// 5. wysłanie pytania do organizaotra
+// 6. wysłanie potwierdzenie pytania 
+
+import {BookingEmailData, QuestionEmailData} from '../types/email';
+
+const footer = '<p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>';
 
 export function newBookingTemplate({
   recipientName,
@@ -39,7 +34,7 @@ export function newBookingTemplate({
       
       ${bookingLink ? `<a href="${bookingLink}" style="background: #2b8c9e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zarządzaj rezerwacją</a>` : ''}
       
-      <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
+      ${footer}
     </div>
   `;
 }
@@ -62,7 +57,7 @@ export function bookingConfirmationTemplate({
       
       <p>Organizator skontaktuje się z Tobą wkrótce aby potwierdzić rezerwację.</p>
       
-      <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
+      ${footer}
     </div>
   `;
 }
@@ -94,9 +89,9 @@ export function bookingConfirmedTemplate({
         <strong>Tytuł przelewu:</strong> Rezerwacja rejsu - ${offerTitle}
       </div>
 
-      <p style="color: #d32f2f; font-weight: bold;">⚠️ Rezerwacja będzie ważna do wpłaty środków na wskazane konto.</p>
+      <p style="color: #d32f2f; font-weight: bold;"> Rezerwacja będzie ważna do wpłaty środków na wskazane konto.</p>
       
-      <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
+      ${footer}
     </div>
   `;
 }
@@ -120,7 +115,7 @@ export function bookingRejectedTemplate({
       <p>Możesz przeglądać inne dostępne rejsy w naszej aplikacji:</p>
       <a href="${process.env.NEXT_PUBLIC_BASE_URL}/szukaj" style="background: #2b8c9e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Przeglądaj rejsy</a>
       
-      <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
+      ${footer}
     </div>
   `;
 }
@@ -149,7 +144,7 @@ export function questionToOrganizerTemplate({
 
       ${offerLink ? `<a href="${offerLink}" style="background: #2b8c9e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zobacz ofertę</a>` : ''}
 
-      <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
+      ${footer}
     </div>
   `;
 }
@@ -158,9 +153,10 @@ export function questionConfirmationTemplate({
   recipientName,
   offerTitle,
   offerDate,
+  askerEmail,
   question,
   offerLink,
-}: Omit<QuestionEmailData, 'askerEmail'>) {
+}: QuestionEmailData) {
   return `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
       <h2>Pytanie zostało wysłane ✓</h2>
@@ -176,7 +172,7 @@ export function questionConfirmationTemplate({
 
       ${offerLink ? `<a href="${offerLink}" style="background: #2b8c9e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Zobacz ofertę</a>` : ''}
 
-      <p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>
+      ${footer}
     </div>
   `;
 }
