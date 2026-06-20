@@ -9,7 +9,7 @@ import {
   getCurrentUserOfferComment,
   getOfferComments,
   isOfferFinished,
-  upsertCurrentUserOfferComment,
+  updateOrCreateComment,
 } from '@/logic/lib/comments';
 import { Card } from '@/look/components/ui/Card';
 import { CommentModal } from './CommentModal';
@@ -62,7 +62,7 @@ export function OfferCommentsSection({ offer }: { offer: Offer }) {
   }, [offer.id, finished]);
 
   const handleSave = async ({ rating, content }: { rating: number; content: string }) => {
-    await upsertCurrentUserOfferComment({
+    await updateOrCreateComment({
       offerId: offer.id,
       rating,
       content,

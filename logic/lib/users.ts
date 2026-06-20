@@ -385,3 +385,13 @@ export async function getAllOrganizers() {
     return [];
   }
 }
+
+
+export async function getCurrentUserId(){
+  const userId = pb.authStore.record?.id;
+
+  if (!userId) {
+    throw new Error('Zaloguj się, aby dodać komentarz');
+  }
+  return userId;
+}

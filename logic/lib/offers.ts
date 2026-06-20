@@ -30,8 +30,12 @@ export async function createOffer(data: Partial<Offer>): Promise<Offer> {
 }
 
 // funkcja do pobierania danej oferty, w wielu miejscach w logice uzywana
-export async function getOfferById(id: string): Promise<Offer | null> {
-  return await pb.collection('offers').getOne(id);
+export async function getOfferById(id: string): Promise<Offer> {
+  let offer = await pb.collection('offers').getOne(id) as Offer;
+  if (!offer) {
+    throw new Error('Oferta nie istnieje');
+  }
+  return offer;
 }
 
 // Pobierz rejsy organizatora

@@ -82,7 +82,8 @@ async function buildBookingData(
 
 // sprawdzamy czy załogant będzie na tym rejsie
 // uzywamy w celu sprawdzwnia czy mozna mu wyswietlic listę załogantów
-async function hasConfirmedBookingForOffer(offerId: string, userId: string): Promise<boolean> {
+// i prz ykomentarzach
+export async function hasConfirmedBookingForOffer(offerId: string, userId: string): Promise<boolean> {
   const list = await pb.collection(BOOKINGS_COLLECTION).getList(1, 1, {
     filter: `offer_id = "${offerId}" && user_id = "${userId}" && status = "confirmed"`,
   });
