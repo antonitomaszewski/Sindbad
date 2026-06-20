@@ -30,9 +30,6 @@ export function TripAlertCard({ alert, onDelete, onEdit, deleting = false }: Tri
               Powiadom mnie o podobnych rejsach
             </p>
           </div>
-          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${alert.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-            {alert.active ? 'Aktywny' : 'Nieaktywny'}
-          </span>
         </div>
 
         <div className="text-sm text-gray-700 space-y-1">

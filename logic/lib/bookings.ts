@@ -1,4 +1,5 @@
 // logika rezerwacji, kontaktów miedzy uzytkownikami
+// dosyć ważny moduł, bo to platforma do rezerwacji
 
 import pb from './pocketbase';
 import type {

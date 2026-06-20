@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { Certification } from '../../../../logic/lib/certifications';
+import type { Certification } from '../../../../logic/types/certification';
 
 interface Props {
   selectedIds: string[];

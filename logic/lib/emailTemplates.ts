@@ -9,7 +9,10 @@
 // 5. wysłanie pytania do organizaotra
 // 6. wysłanie potwierdzenie pytania 
 
+// oraz osobny - powiadomienie o rejsie który nas interere
+
 import {BookingEmailData, QuestionEmailData} from '../types/email';
+import { Offer } from '../types/offer';
 
 const footer = '<p style="color: #666; font-size: 12px; margin-top: 40px;">Sindbad - Giełda Sportów Wodnych</p>';
 
@@ -174,5 +177,24 @@ export function questionConfirmationTemplate({
 
       ${footer}
     </div>
+  `;
+}
+
+
+export function buildTripAlertEmail(offer: Offer): string {
+  const dateFrom = offer.date_from ? new Date(offer.date_from).toLocaleDateString('pl-PL') : '?';
+  const dateTo = offer.date_to ? new Date(offer.date_to).toLocaleDateString('pl-PL') : '?';
+  const offerUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/oferta/${offer.id}`;
+
+  return `
+    <h2>${offer.title}</h2>
+    <p><strong>Termin:</strong> ${dateFrom} - ${dateTo}</p>
+    <p><strong>Lokalizacja:</strong> ${offer.country || '?'}, ${offer.port || '?'}</p>
+    <p><strong>Cena:</strong> ${offer.price_per_person || 0} ${offer.currency || 'PLN'}/os</p>
+    <p>
+      <a href="${offerUrl}" style="display: inline-block; padding: 10px 20px; background: #0066cc; color: white; text-decoration: none; border-radius: 4px;">
+        Zobacz szczegóły
+      </a>
+    </p>
   `;
 }

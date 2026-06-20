@@ -394,3 +394,11 @@ export async function getCurrentUserId(){
   }
   return userId;
 }
+
+
+
+
+export async function getUserEmail(userId: string): Promise<string | null> {
+    const user = await pb.collection('users').getOne(userId);
+    return user.email || null;
+}

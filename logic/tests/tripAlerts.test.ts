@@ -67,7 +67,6 @@ describe('Trip Alerts', () => {
     const baseAlert: TripAlert = {
       id: 'test-1',
       user_id: 'test-user',
-      active: true,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -261,7 +260,6 @@ describe('Trip Alerts', () => {
       createdAlertIds.push(alert.id);
       expect(alert.user_id).toBe(userId1);
       expect(alert.country).toBe('Poland');
-      expect(alert.active).toBe(true);
       expect(formatDate(alert.date_from)).toBe('01.07.2026');
       expect(formatDate(alert.date_to)).toBe('01.08.2026');
     });
