@@ -1,3 +1,7 @@
+// lista linków: z nav i stopki
+// pomoc, kontakt, prywatnośc, prywatność nie są zaimplementowane, 
+// bo byłyby to zwykłe strony tekstowe
+// dostęp do linków zrobiony dla sensu ogólnego wyglądu strony 
 import { LinkItem } from '../types/common';
 
 export const MAIN_NAVIGATION: LinkItem[] = [

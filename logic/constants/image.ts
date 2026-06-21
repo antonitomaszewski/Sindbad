@@ -1,4 +1,5 @@
-// look/constants/image.ts
+// stałe do logiki zdjęć
+// uzywane w logic/lib/images
 export const IMAGE_MESSAGES = {
   GALLERY_TITLE: "Galeria zdjęć",
   LOADING: "Ładowanie zdjęć...",
@@ -12,8 +13,4 @@ export const IMAGE_CONFIG = {
   THUMBNAIL_SIZE: '300x200',
   MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
   ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-  GRID_COLUMNS: {
-    sm: 2,
-    lg: 3
-  }
 } as const;

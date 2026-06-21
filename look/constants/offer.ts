@@ -1,3 +1,5 @@
+// komunikaty, stałe do strony oferty
+// jak by coś się chciało zmienić to wystarczy tu, a nie w pliku .tsx
 export const OFFER_MESSAGES = {
   LOADING: "Ładowanie oferty...",
   NOT_FOUND: "Oferta nie została znaleziona",

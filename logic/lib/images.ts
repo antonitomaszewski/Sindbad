@@ -2,7 +2,7 @@
 // dotyczy obrazków z profiu użytkownika, oraz oferty
 import pb from './pocketbase';
 import { OfferImage, CreateOfferImageData } from '../types/image';
-import { IMAGE_CONFIG } from '../../look/constants/image';
+import { IMAGE_CONFIG } from '../constants/image';
 import { User } from '../types/user';
 
 // uzywane w 2 miejscach
@@ -58,7 +58,7 @@ export function getImageUrl(image: OfferImage, options?: { thumb?: string }): st
 }
 
 // analogicznie jak getImageUrl, tylko w niższych rozmiarach
-export function getImageThumbnailUrl(image: OfferImage, dimensions: string = '300x200'): string {
+export function getImageThumbnailUrl(image: OfferImage, dimensions: string = IMAGE_CONFIG.THUMBNAIL_SIZE): string {
   return getImageUrl(image, { thumb: dimensions });
 }
 

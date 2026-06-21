@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Card } from '@/look/components/ui/Card';
 import { useOfferImages } from '@/look/hooks/useOfferImages';
 import { getImageUrl, getImageThumbnailUrl } from '@/logic/lib/images';
-import { IMAGE_MESSAGES } from '@/look/constants/image';
+import { IMAGE_MESSAGES } from '@/logic/constants/image';
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
