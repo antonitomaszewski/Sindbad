@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUser, getUserCertifications } from '@/logic/lib/users';
+import { getUser } from '@/logic/lib/users';
 
 export function useUser(userId: string | null) {
   const [user, setUser] = useState<any>(null);

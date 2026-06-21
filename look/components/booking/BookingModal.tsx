@@ -1,7 +1,11 @@
+// modal rezerwacji oferty
+// wyświetla się jak na ofercie klikamy wyślij rezerwację
+// user moze byc zalogowany albo nie: dwie wersje
+// długość wiadomości to max 200 znaków
 'use client';
 import { useState } from 'react';
 import { createBooking } from '@/logic/lib/bookings';
-import pb from '@/logic/lib/pocketbase';
+import {isUserLoggedIn} from '@/logic/lib/users';
 
 const MAX_MESSAGE_LENGTH = 200;
 
@@ -10,6 +14,13 @@ interface BookingModalProps {
   onClose: () => void;
   onSuccess: () => void;
   canReserve?: boolean;
+}
+
+const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main ";
+const labelClass = "block text-sm font-medium text-gray-700 mb-2";
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return <label className={labelClass}>{children}</label>;
 }
 
 export default function BookingModal({ offerId, onClose, onSuccess, canReserve = true }: BookingModalProps) {
@@ -21,7 +32,7 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
 
-  const isLoggedIn = pb.authStore.isValid;
+  const isLoggedIn = isUserLoggedIn();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,46 +95,34 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLoggedIn && (
             <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Imię i nazwisko *
-                </label>
-                <input
-                  type="text"
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-                  placeholder="Jan Kowalski"
-                  required
-                />
-              </div>
+            <FieldLabel>Imię i nazwisko *</FieldLabel>
+            <input
+              type="text"
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
+              className={inputClass}
+              placeholder="Jan Kowalski"
+              required
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={guestEmail}
-                  onChange={(e) => setGuestEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-                  placeholder="jan@example.com"
-                />
-              </div>
-
-              <p className="text-xs text-gray-500">* Podaj email</p>
+          <FieldLabel>Email *</FieldLabel>
+          <input
+            type="email"
+            value={guestEmail}
+            onChange={(e) => setGuestEmail(e.target.value)}
+            className={inputClass}
+            placeholder="jan@example.com"
+            required
+          />
             </>
           )}
-
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Wiadomość dla organizatora (opcjonalnie)
-            </label>
+            <FieldLabel>Wiadomość dla organizatora (opcjonalnie)</FieldLabel>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
+              className={inputClass}
               placeholder="Np. Mam pytanie o..."
             />
             <p className={
@@ -151,7 +150,7 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
               disabled={loading}
               className="py-3 px-6 rounded-lg font-semibold bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Anuluj
+              Anuluj 
             </button>
           </div>
         </form>

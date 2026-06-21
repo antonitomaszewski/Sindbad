@@ -4,9 +4,6 @@ export type CalendarEvent = {
   start: string;
   end?: string;
   description?: string;
-  allDay: boolean;
-  backgroundColor: string;
-  borderColor: string;
 };
 
 export type EventModalProps = {

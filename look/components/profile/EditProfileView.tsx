@@ -9,7 +9,6 @@ import {
   isCurrentUserOAuth,
   updateUserProfile,
 } from '../../../logic/lib/users';
-import { updateUserCertifications } from '../../../logic/lib/certifications';
 import type { Certification } from '@/logic/types/certification';
 import { useFormValidation } from '../../../logic/hooks/useFormValidation';
 import {

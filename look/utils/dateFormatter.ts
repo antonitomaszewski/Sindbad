@@ -41,7 +41,3 @@ export function formatDate(dateString: string | null | undefined): string {
     return '';
   }
 }
-
-// function formatDate(value: Date | null): string | undefined {
-//   return value ? value.toISOString().split('T')[0] : undefined;
-// }

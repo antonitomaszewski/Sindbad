@@ -21,5 +21,8 @@ export const CALENDAR_CONFIG = {
   EVENT_COLORS: {
     BACKGROUND: 'var(--main)',
     BORDER: 'var(--main)'
-  }
+  },
+  EVENT_DEFAULTS: {
+    allDay: true,
+  },
 } as const;
