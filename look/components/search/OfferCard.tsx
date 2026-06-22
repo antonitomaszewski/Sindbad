@@ -1,3 +1,6 @@
+// kafelek oferty, pokazywany na stronie wyszukiwania
+// zdjęcie, podstawowe informacje i przycisk do wejścia w ofertę
+
 'use client';
 import Link from 'next/link';
 import {formatDate} from '@/look/utils/dateFormatter';

@@ -1,8 +1,8 @@
-'use client';
 // strona wyszukiwania
 // mamy tutaj  pobranie organizaotorów do dobrego filtrowania oraz dobrego podczepienia ich do ofert
 // przefiltrowanie ofert
 // 
+'use client';
 import { useState, useEffect } from 'react';
 import SearchResults from './SearchResults';
 import { searchOffers } from '../../../logic/lib/offers';

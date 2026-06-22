@@ -1,8 +1,8 @@
+// siatka ofert, wyniki wyszukiwania
+// używany na szukaj/
 'use client';
 import OfferCard from './OfferCard';
 import { Offer } from '../../../logic/types/offer';
-// plik z wyświetlaniem kafelków wyszukiwania
-// zazwyczaj 3xN
 
 interface SearchResultsProps {
   results: Offer[];
