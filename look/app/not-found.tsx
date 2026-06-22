@@ -1,3 +1,4 @@
+// Globalna strona 404.
 import { NotFoundState } from '../components/common/NotFoundState';
 
 export default function NotFound() {

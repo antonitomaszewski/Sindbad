@@ -1,3 +1,5 @@
+// Strona główna z opisem i statystykami.
+
 "use client";
 
 import { useEffect, useState } from 'react';

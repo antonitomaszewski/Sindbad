@@ -1,3 +1,5 @@
+// Strona edycji profilu.
+
 'use client';
 
 import { redirect } from 'next/navigation';

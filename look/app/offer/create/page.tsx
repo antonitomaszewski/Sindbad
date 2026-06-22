@@ -1,3 +1,5 @@
+// Strona tworzenia oferty.
+
 import CreateOfferForm from '../../../components/offer/CreateOfferForm';
 import { getAllCountries } from '../../../../logic/lib/countries';
 

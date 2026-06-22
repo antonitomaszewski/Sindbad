@@ -1,3 +1,5 @@
+// Strona szczegółów oferty.
+
 'use client';
 import { use, useEffect, useState } from 'react';
 import { useOffer } from '@/look/hooks/useOffer';
