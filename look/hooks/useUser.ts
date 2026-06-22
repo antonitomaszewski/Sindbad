@@ -1,3 +1,8 @@
+// pobieramy pojedynczego użytkownika, w wielu miejscach
+// organizatora na stronie ofery, alercie
+// profil użytkownika
+// edycja profilu
+// oferta-panel rezerwacji
 import { useState, useEffect } from 'react';
 import { getUser } from '@/logic/lib/users';
 
