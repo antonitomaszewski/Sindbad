@@ -32,7 +32,6 @@ export function OfferActions({ onReservation, onContact, offer, canReserve = tru
         <CreateTripAlertButton
           offer={offer}
           label={OFFER_LABELS.NOTIFY_SIMILAR}
-          showIcon={false}
           fullWidth
           className="border-2 border-gray text-gray hover:bg-gray hover:text-white font-semibold"
         />

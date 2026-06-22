@@ -1,3 +1,6 @@
+// używany w oferta/id
+// przycisk na dole, jeden z trzech, ten do tworzenia powiadomienia
+// oraz wyświetljący się modal:TripAlertForm, po przycisku
 'use client';
 
 import { useState } from 'react';
@@ -9,7 +12,6 @@ import { TripAlertForm } from './TripAlertForm';
 interface CreateTripAlertButtonProps {
   offer: Offer;
   label?: string;
-  showIcon?: boolean;
   className?: string;
   fullWidth?: boolean;
 }
@@ -17,7 +19,6 @@ interface CreateTripAlertButtonProps {
 export function CreateTripAlertButton({
   offer,
   label = 'Powiadom o podobnych rejsach',
-  showIcon = true,
   className = '',
   fullWidth = false,
 }: CreateTripAlertButtonProps) {
@@ -43,7 +44,7 @@ export function CreateTripAlertButton({
           onClick={handleOpen}
           className={`inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-50 ${fullWidth ? 'w-full' : ''} ${className}`}
         >
-          {showIcon ? `🔔 ${label}` : label}
+          {label}
         </button>
         {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
       </div>

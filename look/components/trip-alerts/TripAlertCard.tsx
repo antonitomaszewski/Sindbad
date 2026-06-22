@@ -1,3 +1,7 @@
+// kafelki TripAlertCard wyświetlane są na TripAlertList
+// na profil/id
+// tu pojedynczy kafelek
+// możemy je edytować i usuwać
 'use client';
 
 import { useUser } from '@/look/hooks/useUser';

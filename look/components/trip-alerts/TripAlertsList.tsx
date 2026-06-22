@@ -1,3 +1,5 @@
+// lista powiadomień utworzona na profilu użytkownika
+
 'use client';
 
 import { useEffect, useState } from 'react';
