@@ -1,9 +1,15 @@
+// wyświetlany na stronie profilu uzytkownika
+// widzimy tutaj nasze rezerwacje
+// /mozemy je filtrować po ich statusie
+// wszystkie / oczekuje / potwierdzona / odrzucona.
 "use client";
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { BookingWithOffer, BookingStatus } from '@/logic/types/booking';
 import { Card } from '@/look/components/ui/Card';
+import {statusColors} from '@/look/constants/booking';
+
 
 const statusLabels = {
   pending: 'Oczekuje',
@@ -11,11 +17,6 @@ const statusLabels = {
   rejected: 'Odrzucona',
 } as const;
 
-const statusColors = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  confirmed: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
-} as const;
 
 const statusOptions: Array<{ value: 'all' | BookingStatus; label: string }> = [
   { value: 'all', label: 'Wszystkie' },
@@ -23,6 +24,9 @@ const statusOptions: Array<{ value: 'all' | BookingStatus; label: string }> = [
   { value: 'confirmed', label: 'Potwierdzona' },
   { value: 'rejected', label: 'Odrzucona' },
 ];
+
+const title = 'Moje rezerwacje'
+const empty = 'Brak rezerwacji'
 
 export default function MyBookingsList({ bookings: initialBookings }: { bookings: BookingWithOffer[] }) {
   const [statusFilter, setStatusFilter] = useState<'all' | BookingStatus>('all');
@@ -38,8 +42,8 @@ export default function MyBookingsList({ bookings: initialBookings }: { bookings
   if (initialBookings.length === 0) {
     return (
       <Card className="mb-0">
-        <h3 className="text-lg font-medium mb-3">Moje rezerwacje</h3>
-        <p className="text-gray-600 text-sm">Brak rezerwacji.</p>
+        <h3 className="text-lg font-medium mb-3">{title}</h3>
+        <p className="text-gray-600 text-sm">{empty}</p>
       </Card>
     );
   }
@@ -47,7 +51,7 @@ export default function MyBookingsList({ bookings: initialBookings }: { bookings
   return (
     <Card className="mb-0">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-medium">Moje rezerwacje</h3>
+        <h3 className="text-lg font-medium">{title}</h3>
 
         <label className="flex items-center gap-2 text-sm text-gray-600">
           Status:
@@ -66,7 +70,7 @@ export default function MyBookingsList({ bookings: initialBookings }: { bookings
       </div>
 
       {filteredBookings.length === 0 ? (
-        <p className="text-gray-600 text-sm">Brak rezerwacji dla wybranego statusu.</p>
+        <p className="text-gray-600 text-sm">{empty}</p>
       ) : (
         <ul className="space-y-3">
           {filteredBookings.map((booking) => (

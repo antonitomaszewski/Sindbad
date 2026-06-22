@@ -9,8 +9,8 @@ export default function LogoutPage() {
 
   useEffect(() => {
     async function handleLogout() {
-      await logoutUser();
-      router.push('/'); // ← Zmienione z '/logowanie' na '/'
+      logoutUser();
+      router.push('/');
       router.refresh();
     }
 
