@@ -1,3 +1,5 @@
+// stopka
+
 import Container from '../ui/Container';
 import Logo from '../ui/Logo';
 import FooterLinkSection from '../ui/FooterLinkSection';

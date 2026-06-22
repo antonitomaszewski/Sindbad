@@ -1,3 +1,4 @@
+// część 1 formularza tworzenia oferty rejsu
 import FormField from '../ui/FormField';
 import Input from '../ui/Input';
 import Textarea from '../ui/Textarea';

@@ -1,3 +1,4 @@
+// główny komponent formularza tworzenia oferty
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';

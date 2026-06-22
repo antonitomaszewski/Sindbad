@@ -1,3 +1,6 @@
+// przyciski na dole strony oferty
+// rezerwacja / pytanie / powiadomienie
+
 import { Card } from '@/look/components/ui/Card';
 import { Button } from '@/look/components/ui/Button';
 import { OFFER_LABELS } from '@/look/constants/offer';

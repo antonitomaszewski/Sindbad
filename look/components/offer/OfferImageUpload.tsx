@@ -1,3 +1,6 @@
+// wrzucanie galerii zdjęć na stronie tworzenia oferty
+// będą wyświetlane w tej kolejnośći, w której je wrzuciliśmy
+
 import { useState } from 'react';
 
 interface Props {

@@ -1,3 +1,5 @@
+// modal do zadawania pytań  do rejsu, trochę jak booking modal
+// używany na oferta/[id]
 'use client';
 
 import { useState } from 'react';

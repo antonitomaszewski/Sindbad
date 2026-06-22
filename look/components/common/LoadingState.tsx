@@ -1,3 +1,4 @@
+// prosty komponent ekranu ładowania, pokazuje komunikat na środku
 interface LoadingStateProps {
   message: string;
 }

@@ -157,7 +157,6 @@ export default function OfertaPage({ params }: OfferPageProps) {
       <div className="max-w-4xl mx-auto p-8">
           <OfferHeader
             title={offer.title}
-            location={offer.location || ''}
             price={`${offer.price_per_person || 0} ${offer.currency || 'PLN'}`}
             dateFrom={offer.date_from || ''}
             dateTo={offer.date_to || ''}

@@ -1,3 +1,7 @@
+// pasek nawigacji
+// działa na telefonie i komputerze 
+// hidden md:flex oraz md:hidden
+
 'use client';
 import { useState, useEffect } from 'react';
 import NavLink from '../ui/NavLink';
@@ -8,6 +12,7 @@ import { MAIN_NAVIGATION } from '@/look/constants/navigation';
 import pb from '../../../logic/lib/pocketbase';
 import { logoutUser } from '../../../logic/lib/users';
 import { User } from '../../../logic/types/user';
+import {getCurrentUser} from '@/logic/lib/users';
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
@@ -15,18 +20,18 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    setUser(pb.authStore.record as User | null);
+    setUser(getCurrentUser());
     setMounted(true);
 
     const unsubscribe = pb.authStore.onChange(() => {
-      setUser(pb.authStore.record as User | null);
+      setUser(getCurrentUser());
     });
 
     return unsubscribe;
   }, []);
 
   async function handleLogout() {
-    await logoutUser();
+    logoutUser();
     setUser(null);
     window.location.href = '/';
   }

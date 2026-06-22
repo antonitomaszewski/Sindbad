@@ -1,3 +1,8 @@
+// komponent wybierania na mini mapce pozycji naszego rejsu
+// niezbyt wygodny, ale pozwala to potem lokalizować na mapie podczas wyszukiwania
+// mapka jest responsywna na kraj jaki ustwimy w formularzu
+// ALE nie bierze poprawki na wielkośc kraju (czyli na turcji zobaczymy tylko fragment, a na litwie: całe inflanty)
+// używany w oferta/nowa
 "use client";
 
 import { useEffect, useRef } from 'react';

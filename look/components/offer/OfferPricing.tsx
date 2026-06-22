@@ -1,3 +1,5 @@
+// uzywany na oferta/nowa
+// część formularza odpowiedzialna z wwybór ceny
 import { CURRENCIES } from '../../../logic/types/offer';
 
 interface Props {

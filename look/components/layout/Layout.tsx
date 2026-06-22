@@ -1,3 +1,4 @@
+// układ
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { DEFAULT_LOCALE } from "@/look/constants";

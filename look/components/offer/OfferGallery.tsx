@@ -2,6 +2,7 @@
 // ten komponent jest uzywany w linku oferta/[id]
 // po kliknięciu mamy obrazek
 // komponent jest responsywny jak przybliżamy to mamy mniejszą siatkę,  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
+// trzecia sekcja na ofercie
 import { useState } from 'react';
 import { Card } from '@/look/components/ui/Card';
 import { useOfferImages } from '@/look/hooks/useOfferImages';

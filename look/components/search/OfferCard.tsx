@@ -39,7 +39,7 @@ export default function OfferCard({ offer, coverUrl, organizerName }: OfferCardP
         <div className="text-sm text-gray-600 flex items-center gap-1">
           <LocationIcon />
           <span className="line-clamp-1">
-            {offer.port ?? offer.location ?? '—'} • {offer.country ? getCountryName(offer.country) : '—'}
+            {offer.port ?? '—'} • {offer.country ? getCountryName(offer.country) : '—'}
           </span>
         </div>
 

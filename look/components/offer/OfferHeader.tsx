@@ -1,3 +1,6 @@
+// nagłówek oferrty: mamy tu większość istotnych danych
+// kraj, termin, cena
+
 import { Card } from '@/look/components/ui/Card';
 import { OFFER_LABELS } from '@/look/constants/offer';
 import { formatDateRange, getDuration } from '@/look/utils/dateFormatter';
@@ -5,7 +8,6 @@ import { getCountryName } from '@/logic/constants/countries';
 
 interface OfferHeaderProps {
   title: string;
-  location: string;
   price: string;
   dateFrom: string;
   dateTo: string;
@@ -16,8 +18,7 @@ interface OfferHeaderProps {
 }
 
 export function OfferHeader({ 
-  title, 
-  location, 
+  title,
   price, 
   dateFrom, 
   dateTo, 
@@ -39,7 +40,6 @@ export function OfferHeader({
       <div className="flex justify-between items-start mb-4">
         <div>
           <h1 className="text-3xl font-bold text-main mb-2">{title}</h1>
-          <p className="text-gray">{location}</p>
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-main">{price}</div>

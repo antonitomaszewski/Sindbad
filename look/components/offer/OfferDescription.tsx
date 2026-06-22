@@ -1,3 +1,5 @@
+// wyświetla się na stronie oferta/[id]
+// druga sekcja: mamy tutaj opis oferty
 import { Card } from '@/look/components/ui/Card';
 import { OFFER_LABELS } from '@/look/constants/offer';
 

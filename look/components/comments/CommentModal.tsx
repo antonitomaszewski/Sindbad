@@ -1,3 +1,7 @@
+// to formularz dodawania edycji komentarza
+// używany na stronie oferty
+// wyświetlany w sekcji komentarzy, gdy klikniemy dodaj/edytuj komentarz
+
 'use client';
 
 import { useState } from 'react';
