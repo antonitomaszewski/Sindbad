@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-
+// nav, stopka
 export type LinkItem = {
   href: string;
   label: string;

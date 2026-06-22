@@ -1,3 +1,5 @@
+// parę funkcji do dat
+
 export function formatDateRange(startDate?: Date | string, endDate?: Date | string): string {
   if (!startDate) return '';
   
