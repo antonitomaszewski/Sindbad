@@ -1,3 +1,7 @@
+// główna (lewa) część profilu użytkownika
+// mamy tutaj informacje o nas, o rejsach w których braliśy udział, o osobach z którymi żeglowaliśmi
+// oraz o nadchodzących rezerwacjach
+
 import UserHeader from './UserHeader';
 import UserBio from './UserBio';
 import TripHistory from './TripHistory';

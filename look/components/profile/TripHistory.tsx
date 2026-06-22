@@ -1,4 +1,4 @@
-// ...existing code...
+// historia rejsów organizowanych przez użytkownika
 import Link from 'next/link';
 import { Card } from '@/look/components/ui/Card';
 import type { Trip } from '@/logic/types/offer';

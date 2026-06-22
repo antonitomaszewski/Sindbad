@@ -1,3 +1,5 @@
+// widok edycji profilu uzytkownika
+// formularz
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -200,7 +202,7 @@ export default function EditProfileView({
                 <div>
                   <input
                     type="email"
-                    value=""
+                    value={accountData.email}
                     onChange={(e) => setAccountData((prev) => ({ ...prev, email: e.target.value }))}
                     placeholder="Nowy email"
                     disabled={accountLoading}

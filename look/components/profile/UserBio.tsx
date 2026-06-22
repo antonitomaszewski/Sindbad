@@ -1,3 +1,6 @@
+// sekcja o mnie użykownika
+// uzywany na profil/id
+
 import { Card } from '@/look/components/ui/Card';
 
 export default function UserBio({ bio }: { bio?: string }) {

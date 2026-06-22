@@ -1,3 +1,5 @@
+// imię oraz zdjęcie na profilu użytkownika
+
 import type { User } from '../../../logic/types/user';
 import {getUserAvatar} from '../../../logic/lib/images';
 

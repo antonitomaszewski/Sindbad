@@ -1,3 +1,7 @@
+// sekcja żeglował z 
+// pokazuje kontakty z rejsów, a każdy kontakt jest rozwijalny i widzimy wtedy dokładnie gdzie
+// dane osoby razem żeglowały
+
 "use client";
 
 import { useMemo, useState } from 'react';

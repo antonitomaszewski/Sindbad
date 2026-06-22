@@ -1,0 +1,1 @@
+użyteczne funkcje obliczeniowe, do wyświetlania danych

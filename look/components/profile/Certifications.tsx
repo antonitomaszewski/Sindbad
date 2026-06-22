@@ -1,3 +1,6 @@
+// uzywany na profilu uzytkownika
+// z prawej strony mamy tabelkę z naszymi uprawnieniami
+
 import { Card } from '@/look/components/ui/Card';
 
 const COLOR_MAP: Record<string, string> = {
