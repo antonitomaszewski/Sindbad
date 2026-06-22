@@ -1,3 +1,6 @@
+// wybór certyfikatów
+// uzywany także w edycji profilu
+
 'use client';
 
 import { useState, useEffect } from 'react';

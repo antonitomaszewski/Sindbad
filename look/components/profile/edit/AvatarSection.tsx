@@ -1,8 +1,11 @@
+// edycja zdjęcia profilowego
+// wyświetlana na profil/id/edytuj
 'use client';
 
 import { useState } from 'react';
 import type { User } from '../../../../logic/types/user';
 import { deleteUserAvatar } from '../../../../logic/lib/users';
+import { getUserAvatar } from '@/logic/lib/images';
 import { validateAvatar } from '../../../../logic/lib/validation';
 
 interface Props {
@@ -14,6 +17,7 @@ interface Props {
 
 export default function AvatarSection({ user, formData, setFormData, loading }: Props) {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarDeleted, setAvatarDeleted] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [avatarError, setAvatarError] = useState('');
 
@@ -35,6 +39,7 @@ export default function AvatarSection({ user, formData, setFormData, loading }: 
       setAvatarPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
+    setAvatarDeleted(false);
   }
 
   async function handleDeleteAvatar() {
@@ -44,6 +49,7 @@ export default function AvatarSection({ user, formData, setFormData, loading }: 
     try {
       await deleteUserAvatar(user.id);
       setAvatarPreview(null);
+      setAvatarDeleted(true);
       setFormData({ ...formData, avatar: null });
       alert('Zdjęcie zostało usunięte');
     } catch (err: any) {
@@ -53,9 +59,7 @@ export default function AvatarSection({ user, formData, setFormData, loading }: 
     }
   }
 
-  const currentAvatar = avatarPreview || (user.avatar 
-    ? `http://localhost:8090/api/files/users/${user.id}/${user.avatar}` 
-    : null);
+  const currentAvatar = avatarPreview || (!avatarDeleted && user.avatar ? getUserAvatar(user) : null);
 
   const initials = (formData.name || user.email).charAt(0).toUpperCase();
 
