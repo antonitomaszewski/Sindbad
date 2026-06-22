@@ -1,3 +1,5 @@
+// pole tekstowe do opisu rejsu na 
+// oferta/nowa
 import { forwardRef } from 'react';
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
