@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./colors.css";
+/* bez tego w wisoku mapy kalendarz jest zasłonięty przez mapkę */
 
 .map-datepicker-popper {
 	z-index: 9999 !important;
