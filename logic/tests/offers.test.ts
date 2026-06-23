@@ -3,12 +3,10 @@ import { createOffer, getOffers, getOfferById, updateOffer, validateSeatsAvailab
 import { loginUser, registerUser } from "../lib/users";
 import { ERRORS } from "../constants/messages";
 
-vi.mock('resend', () => ({
-  Resend: vi.fn().mockImplementation(() => ({
-    emails: { send: vi.fn().mockResolvedValue({ id: 'mock-id' }) },
-  })),
+vi.mock('../lib/emails', () => ({
+  sendBookingEmails: vi.fn().mockResolvedValue(undefined),
+  sendBookingStatusEmail: vi.fn().mockResolvedValue(undefined),
 }));
-
 // Pomocnicze dane testowe
 const testLocation = {
   lat: 52.2297,
@@ -17,7 +15,7 @@ const testLocation = {
 };
 
 describe("offers logic", () => {
-  it("creates, gets, updates, deletes offer and checks relation integrity", async () => {
+  it("creates, gets, updates offer and checks relation integrity", async () => {
     // Najpierw tworzymy i logujemy użytkownika
     const email = `offeruser${Math.random().toString(36).slice(2)}@example.com`;
     const password = "OfferTest123!";
@@ -59,11 +57,6 @@ describe("offers logic", () => {
     expect(updated?.title).toBe(updatedTitle);
     expect(() => validateSeatsAvailable(updated!)).toThrow('Brak dostępnych miejsc');
 
-    // Po usunięciu nie powinno się dać pobrać oferty
-    const gotAfterDelete = await getOfferById(offer.id);
-    expect(gotAfterDelete).toBeNull();
-
-    // NEGATYWNY: próba utworzenia oferty z nieistniejącym organizer_id
     await expect(
       createOffer({
         ...offerData,

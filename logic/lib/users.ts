@@ -36,7 +36,7 @@ export async function getUser(id: string): Promise<User | null> {
 export async function getUserCertifications(userId: string): Promise<string[]> {
   const record: any = await pb.collection('users').getOne(userId, { expand: 'certifications' });
   const certifications = record.expand?.certifications;
-  return certifications.map((c: any) => c.name);
+  return certifications?.map((c: any) => c.name);
 }
 
 

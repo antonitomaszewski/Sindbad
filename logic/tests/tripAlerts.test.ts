@@ -12,7 +12,13 @@ import { registerUser, loginUser, logoutUser } from '../lib/users';
 import type { TripAlert } from '../types/tripAlert';
 import type { Offer } from '../types/offer';
 import pb from '../lib/pocketbase';
-import {formatDate} from '@/look/utils/dateFormatter';
+import { formatDate } from '../../look/utils/dateFormatter';
+
+vi.mock('../lib/emails', () => ({
+  sendBookingEmails: vi.fn().mockResolvedValue(undefined),
+  sendBookingStatusEmail: vi.fn().mockResolvedValue(undefined),
+}));
+
 
 describe('Trip Alerts', () => {
   let userId1: string;
@@ -360,11 +366,6 @@ describe('Trip Alerts', () => {
 
   describe('sendTripAlertNotifications', () => {
     it('sends notifications to matching alerts', async () => {
-      // Mock sendEmail to prevent actual email sending
-      vi.mock('../lib/emails', () => ({
-        sendEmail: vi.fn().mockResolvedValue(true),
-      }));
-
       const alert = await createTripAlert(userId1, {
         country: 'Poland',
         date_from: '2026-07-01',

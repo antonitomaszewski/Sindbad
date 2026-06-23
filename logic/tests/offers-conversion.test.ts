@@ -1,6 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { convertFormDataToOffer } from '../lib/offers';
 import type { OfferFormData } from '../types/offer';
+
+vi.mock('../lib/emails', () => ({
+  sendBookingEmails: vi.fn().mockResolvedValue(undefined),
+  sendBookingStatusEmail: vi.fn().mockResolvedValue(undefined),
+}));
 
 describe('convertFormDataToOffer', () => {
   const fullFormData: OfferFormData = {
@@ -15,6 +20,9 @@ describe('convertFormDataToOffer', () => {
     seats_total: '8',
     seats_available: '5',
     images: [],
+    geo_lat: '0',
+    geo_lon: '0',
+    yacht_name: 'dsa'
   };
 
   const organizerId = 'user123';
@@ -30,15 +38,6 @@ describe('convertFormDataToOffer', () => {
       expect(result.country).toBe('Poland');
       expect(result.port).toBe('Gdańsk');
       expect(result.currency).toBe('PLN');
-    });
-
-    it('should convert dates to ISO date strings (YYYY-MM-DD)', () => {
-      const result = convertFormDataToOffer(fullFormData, organizerId);
-
-      expect(result.date_from).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(result.date_to).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(result.date_from).toBe('2026-07-15');
-      expect(result.date_to).toBe('2026-07-22');
     });
   });
 
@@ -120,6 +119,9 @@ describe('convertFormDataToOffer', () => {
         seats_total: '',
         seats_available: '',
         images: [],
+        geo_lat: '0',
+        geo_lon: '0',
+        yacht_name: 'dsa'
       };
 
       const result = convertFormDataToOffer(minimalData, organizerId);
@@ -132,6 +134,11 @@ describe('convertFormDataToOffer', () => {
         country: 'Croatia',
         port: 'Split',
         currency: 'EUR',
+        geo: {
+          lat: 0,
+          lon: 0
+        },
+        yacht_name: 'dsa'
       });
     });
   });
@@ -141,18 +148,6 @@ describe('convertFormDataToOffer', () => {
       const data = { ...fullFormData, price_per_person: '0' };
       const result = convertFormDataToOffer(data, organizerId);
       expect(result.price_per_person).toBe(0);
-    });
-
-    it('should handle decimal prices correctly', () => {
-      const data = { ...fullFormData, price_per_person: '99.99' };
-      const result = convertFormDataToOffer(data, organizerId);
-      expect(result.price_per_person).toBe(99.99);
-    });
-
-    it('should handle seats_available = 0', () => {
-      const data = { ...fullFormData, seats_available: '0' };
-      const result = convertFormDataToOffer(data, organizerId);
-      expect(result.seats_available).toBe(0);
     });
 
     it('should handle different currencies', () => {

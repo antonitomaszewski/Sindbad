@@ -44,4 +44,3 @@ export default function TripHistory({
     </Card>
   );
 }
-// ...existing code...

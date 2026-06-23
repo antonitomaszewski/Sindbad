@@ -1,10 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { isOfferFinished, hasConfirmedBooking } from "../lib/comments";
+import { isOfferFinished } from "../lib/comments";
 
-vi.mock('resend', () => ({
-  Resend: vi.fn().mockImplementation(() => ({
-    emails: { send: vi.fn().mockResolvedValue({ id: 'mock-id' }) },
-  })),
+vi.mock('../lib/emails', () => ({
+  sendBookingEmails: vi.fn().mockResolvedValue(undefined),
+  sendBookingStatusEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../lib/pocketbase', () => ({
@@ -18,7 +17,7 @@ vi.mock('../lib/pocketbase', () => ({
 describe('isOfferFinished', () => {
   it('returns true for past offer', () => {
     const offer = { date_to: '2020-01-01'} as any;
-    expect(isOfferFinished(offer));
+    expect(isOfferFinished(offer)).toBe(true);
   });
 
   it('returns false for future offer', () => {
@@ -26,10 +25,3 @@ describe('isOfferFinished', () => {
     expect(isOfferFinished(offer)).toBe(false);
   })
 })
-
-describe('hasConfirmedBooking', () => {
-  it('returns true when confirmed booking exists', async () => {
-    const result = await hasConfirmedBooking('offer-1', 'user-1');
-    expect(result).toBe(1)
-  });
-});

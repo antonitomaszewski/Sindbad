@@ -5,12 +5,9 @@ import { vi, describe, it, expect, beforeAll, afterAll } from "vitest";
 import pb from '../lib/pocketbase';
 import { todayIso } from '../../look/utils/dateFormatter';
 
-vi.mock('resend', () => ({
-  Resend: vi.fn().mockImplementation(() => ({
-    emails: {
-      send: vi.fn().mockResolvedValue({ id: 'mock-id' }),
-    },
-  })),
+vi.mock('../lib/emails', () => ({
+  sendBookingEmails: vi.fn().mockResolvedValue(undefined),
+  sendBookingStatusEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe('Bookings', () => {
