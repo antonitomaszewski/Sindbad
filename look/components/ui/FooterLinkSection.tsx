@@ -1,3 +1,5 @@
+// stopka
+
 import NavLink from "./NavLink";
 import { LinkItem } from '@/look/types/common';
 

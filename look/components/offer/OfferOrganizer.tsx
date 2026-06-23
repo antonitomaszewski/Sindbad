@@ -1,3 +1,5 @@
+// używany na oferta/[id]
+// przycisk do organizatora i tyle
 import Link from 'next/link';
 import { Card } from '@/look/components/ui/Card';
 import { OFFER_LABELS, OFFER_MESSAGES } from '@/look/constants/offer';

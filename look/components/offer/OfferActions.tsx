@@ -1,6 +1,9 @@
+// przyciski na dole strony oferty
+// rezerwacja / pytanie / powiadomienie
+
 import { Card } from '@/look/components/ui/Card';
 import { Button } from '@/look/components/ui/Button';
-import { OFFER_LABELS, OFFER_MESSAGES } from '@/look/constants/offer';
+import { OFFER_LABELS } from '@/look/constants/offer';
 import { CreateTripAlertButton } from '@/look/components/trip-alerts/CreateTripAlertButton';
 import type { Offer } from '@/logic/types/offer';
 
@@ -29,7 +32,6 @@ export function OfferActions({ onReservation, onContact, offer, canReserve = tru
         <CreateTripAlertButton
           offer={offer}
           label={OFFER_LABELS.NOTIFY_SIMILAR}
-          showIcon={false}
           fullWidth
           className="border-2 border-gray text-gray hover:bg-gray hover:text-white font-semibold"
         />

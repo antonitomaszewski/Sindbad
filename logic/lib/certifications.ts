@@ -1,44 +1,25 @@
+// lekko bez sensu ze nie zrobiłem tego jak z krajami:
+// trzeba było nie tworzyć tabeli, tylko poprostu trzasnąc plik w constants/
+// mamy w bazie 5 różnych certyfikatów, ale juz nie zmieniałem takich rzeczy, tylko brnąłem dalej
+// natomiast jak dodawałem kraje, to miałem chwilowy pomysł, żeby właśnie były na bazie i naszczęście się z tego wycofałem
+
 import pb from './pocketbase';
+import type { Certification } from '../types/certification';
 
 const COLLECTION_CERTIFICATIONS = 'certifications';
 
-export interface Certification {
-  id: string;
-  name: string;
+export async function getAllCertifications(): Promise<Certification[]> {  
+  const records = await pb.collection(COLLECTION_CERTIFICATIONS).getFullList();
+  return records as unknown as Certification[];
 }
 
-export async function getAllCertifications(): Promise<Certification[]> {
-  console.log('getAllCertifications START');
-  console.log('pb.authStore.token:', pb.authStore.token ? 'EXISTS' : 'NULL');
-  console.log('pb.authStore.isValid:', pb.authStore.isValid);
-  
-  try {
-    const records = await pb.collection(COLLECTION_CERTIFICATIONS).getFullList({
-    });
-    
-    console.log('getAllCertifications SUCCESS - count:', records.length);
-    
-    return records.map(r => ({
-      id: r.id,
-      name: r.name,
-    }));
-  } catch (error) {
-    console.error('getAllCertifications ERROR:', error);
-    return [];
-  }
-}
-
+// mamy relację w pocketbase 1-many na certyfikatach
+// stąd możemy uzywać fields.certifications
 export async function getUserCertificationIds(userId: string): Promise<string[]> {
-  try {
-    const user = await pb.collection('users').getOne(userId, {
-      fields: 'certifications',
-    });
-    
-    return Array.isArray(user.certifications) ? user.certifications : [];
-  } catch (error) {
-    console.error('getUserCertificationIds error:', error);
-    return [];
-  }
+  const user = await pb.collection('users').getOne(userId, {
+    fields: 'certifications',
+  });
+  return user.certifications;
 }
 
 export async function updateUserCertifications(
@@ -50,7 +31,6 @@ export async function updateUserCertifications(
       certifications: certificationIds,
     });
   } catch (error: any) {
-    console.error('updateUserCertifications error:', error);
     throw new Error('Nie udało się zaktualizować certyfikatów');
   }
 }

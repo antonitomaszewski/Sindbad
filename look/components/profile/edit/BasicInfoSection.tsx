@@ -1,3 +1,6 @@
+// używany w profil/id/edytuj
+// mamy tu fiormularz do uzupełnienia z informacjami o nas
+
 'use client';
 
 import type { ValidationErrors } from '../../../../logic/types/form';

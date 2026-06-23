@@ -1,3 +1,4 @@
+// wyświetlany na stronie kalendarza, gdy wybierzemy daną ofertę
 import { EventModalProps } from '@/look/types/calendar';
 import { CALENDAR_TEXTS } from '@/look/constants/calendar';
 import { formatDateRange } from '@/look/utils/dateFormatter';

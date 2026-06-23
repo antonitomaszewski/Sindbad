@@ -1,3 +1,5 @@
+// kalendarz do wybierania czasu trwania rejsu podczas tworzenia oferty
+
 import { DateRangePicker } from '@/look/components/ui/DateRangePicker';
 
 interface Props {

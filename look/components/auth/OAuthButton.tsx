@@ -1,10 +1,7 @@
+// komponent logowania google oauth
 import { useState } from 'react';
-
-interface OAuthButtonProps {
-  provider: 'google';
-  onSuccess: () => void;
-  onError: (error: string) => void;
-}
+import {OAuthButtonProps} from '@/logic/types/auth';
+import { loginWithOAuth } from '@/logic/lib/users';
 
 const PROVIDER_CONFIG = {
   google: {
@@ -27,7 +24,6 @@ export default function OAuthButton({ provider, onSuccess, onError }: OAuthButto
   async function handleClick() {
     setLoading(true);
     try {
-      const { loginWithOAuth } = await import('../../../logic/lib/users');
       await loginWithOAuth(provider);
       onSuccess();
     } catch (err: any) {

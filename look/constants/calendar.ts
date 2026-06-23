@@ -1,4 +1,4 @@
-// look/constants/calendar.ts
+// stałe które uzywamy w widoku kalendarza
 export const CALENDAR_TEXTS = {
   PAGE_TITLE: "Kalendarz wydarzeń",
   LOADING_MESSAGE: "Ładowanie wydarzeń...",
@@ -21,5 +21,8 @@ export const CALENDAR_CONFIG = {
   EVENT_COLORS: {
     BACKGROUND: 'var(--main)',
     BORDER: 'var(--main)'
-  }
+  },
+  EVENT_DEFAULTS: {
+    allDay: true,
+  },
 } as const;

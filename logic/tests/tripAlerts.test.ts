@@ -7,12 +7,18 @@ import {
   findMatchingAlerts,
   sendTripAlertNotifications,
 } from '../lib/tripAlerts';
-import { createOffer, deleteOffer } from '../lib/offers';
+import { createOffer } from '../lib/offers';
 import { registerUser, loginUser, logoutUser } from '../lib/users';
 import type { TripAlert } from '../types/tripAlert';
 import type { Offer } from '../types/offer';
 import pb from '../lib/pocketbase';
-import {formatDate} from '../lib/dates';
+import { formatDate } from '../../look/utils/dateFormatter';
+
+vi.mock('../lib/emails', () => ({
+  sendBookingEmails: vi.fn().mockResolvedValue(undefined),
+  sendBookingStatusEmail: vi.fn().mockResolvedValue(undefined),
+}));
+
 
 describe('Trip Alerts', () => {
   let userId1: string;
@@ -67,7 +73,6 @@ describe('Trip Alerts', () => {
     const baseAlert: TripAlert = {
       id: 'test-1',
       user_id: 'test-user',
-      active: true,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -261,7 +266,6 @@ describe('Trip Alerts', () => {
       createdAlertIds.push(alert.id);
       expect(alert.user_id).toBe(userId1);
       expect(alert.country).toBe('Poland');
-      expect(alert.active).toBe(true);
       expect(formatDate(alert.date_from)).toBe('01.07.2026');
       expect(formatDate(alert.date_to)).toBe('01.08.2026');
     });
@@ -362,11 +366,6 @@ describe('Trip Alerts', () => {
 
   describe('sendTripAlertNotifications', () => {
     it('sends notifications to matching alerts', async () => {
-      // Mock sendEmail to prevent actual email sending
-      vi.mock('../lib/emails', () => ({
-        sendEmail: vi.fn().mockResolvedValue(true),
-      }));
-
       const alert = await createTripAlert(userId1, {
         country: 'Poland',
         date_from: '2026-07-01',

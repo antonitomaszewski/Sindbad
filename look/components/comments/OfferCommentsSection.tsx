@@ -1,3 +1,4 @@
+// widok opinii, pokazywany na stronie oferty 
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,7 +10,7 @@ import {
   getCurrentUserOfferComment,
   getOfferComments,
   isOfferFinished,
-  upsertCurrentUserOfferComment,
+  updateOrCreateComment,
 } from '@/logic/lib/comments';
 import { Card } from '@/look/components/ui/Card';
 import { CommentModal } from './CommentModal';
@@ -62,7 +63,7 @@ export function OfferCommentsSection({ offer }: { offer: Offer }) {
   }, [offer.id, finished]);
 
   const handleSave = async ({ rating, content }: { rating: number; content: string }) => {
-    await upsertCurrentUserOfferComment({
+    await updateOrCreateComment({
       offerId: offer.id,
       rating,
       content,
@@ -87,7 +88,6 @@ export function OfferCommentsSection({ offer }: { offer: Offer }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-xl font-bold text-main">Komentarze i opinie</h3>
-            <p className="text-sm text-gray-600">Komentarze są publiczne dla zakończonych rejsów.</p>
           </div>
           {canComment && (
             <button

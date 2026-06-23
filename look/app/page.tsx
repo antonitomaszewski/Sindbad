@@ -1,8 +1,16 @@
+// Strona główna z opisem i statystykami.
+
 "use client";
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import pb from '../../logic/lib/pocketbase';
+import {
+  getActiveOffersCount,
+  getFinishedOffersCount,
+  getUniqueOrganizersCount,
+} from '../../logic/lib/offers';
+import { getConfirmedBookingsCount } from '../../logic/lib/bookings';
+import { isUserLoggedIn, subscribeAuthStateChange } from '../../logic/lib/users';
 
 const steps = [
   {
@@ -23,6 +31,7 @@ type HomeStats = {
   activeOffers: number;
   organizers: number;
   confirmedBookings: number;
+  finishedOffers: number;
 };
 
 export default function HomePage() {
@@ -30,36 +39,22 @@ export default function HomePage() {
   const [stats, setStats] = useState<HomeStats | null>(null);
 
   useEffect(() => {
-    setIsLoggedIn(pb.authStore.isValid);
+    setIsLoggedIn(isUserLoggedIn());
 
-    const unsubscribe = pb.authStore.onChange(() => {
-      setIsLoggedIn(pb.authStore.isValid);
-    });
-
-    const today = new Date().toISOString().slice(0, 10);
+    const unsubscribe = subscribeAuthStateChange(setIsLoggedIn);
 
     Promise.all([
-      pb.collection('offers').getList(1, 1, {
-        filter: `date_to >= "${today}"`,
-      }),
-      (pb.collection('offers') as any).getFullList({
-        fields: 'organizer_id',
-      }),
-      pb.collection('bookings').getList(1, 1, {
-        filter: 'status = "confirmed"',
-      }),
+      getActiveOffersCount(),
+      getUniqueOrganizersCount(),
+      getConfirmedBookingsCount(),
+      getFinishedOffersCount(),
     ])
-      .then(([activeOffersResult, offers, confirmedBookingsResult]) => {
-        const organizerIds = new Set(
-          (offers as Array<{ organizer_id?: string }>)
-            .map((offer) => offer.organizer_id)
-            .filter((id): id is string => Boolean(id))
-        );
-
+      .then(([activeOffersResult, organizersCount, confirmedBookingsResult, finishedOffers]) => {
         setStats({
           activeOffers: activeOffersResult.totalItems,
-          organizers: organizerIds.size,
-          confirmedBookings: confirmedBookingsResult.totalItems,
+          organizers: organizersCount,
+          confirmedBookings: confirmedBookingsResult,
+          finishedOffers: finishedOffers,
         });
       })
       .catch(() => {
@@ -67,6 +62,7 @@ export default function HomePage() {
           activeOffers: 0,
           organizers: 0,
           confirmedBookings: 0,
+          finishedOffers: 0,
         });
       });
 
@@ -123,7 +119,7 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 lg:px-8">
         <h2 className="mb-6 text-2xl font-semibold text-slate-900">Zaufali nam</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-4">
           <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <p className="text-3xl font-bold text-slate-900">
               {stats ? stats.activeOffers : '...'}
@@ -141,6 +137,12 @@ export default function HomePage() {
               {stats ? stats.confirmedBookings : '...'}
             </p>
             <p className="mt-2 text-sm text-slate-600">Potwierdzone rezerwacje</p>
+          </article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-3xl font-bold text-slate-900">
+              {stats ? stats.finishedOffers : '...'}
+            </p>
+            <p className="mt-2 text-sm text-slate-600">Zakończone</p>
           </article>
         </div>
       </section>

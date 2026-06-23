@@ -1,10 +1,10 @@
 export interface Offer {
-  id: string;                 // Pocketbase id
-  organizer_id: string;       // id użytkownika-organizatora (relacja)
+  id: string;
+  organizer_id: string;
   title: string;
   description?: string;
-  date_from?: string;         // ISO date string, może być undefined jeśli pole opcjonalne
-  date_to?: string;           // ISO date string
+  date_from?: string;
+  date_to?: string;
   location?: string;
   geo?: { lat: number; lon: number };
   port?: string;
@@ -13,8 +13,9 @@ export interface Offer {
   currency?: string;
   seats_total?: number;
   seats_available?: number;
-  created: string;            // ISO date string
-  updated: string;            // ISO date string
+  created: string;
+  updated: string;
+  yacht_name?: string;
 }
 
 export interface OfferFormData {
@@ -31,6 +32,31 @@ export interface OfferFormData {
   seats_total: string;
   seats_available: string;
   images: File[];
+  yacht_name: string;
+}
+
+export type SearchOfferParams = {
+  country?: string;
+  port?: string;
+  priceMin?: string;
+  priceMax?: string;
+  onlyFree?: boolean;
+  organizerId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  onlyFuture?: boolean;
+};
+
+export interface OfferFilters {
+  country: string;
+  port: string;
+  priceMin: string;
+  priceMax: string;
+  onlyFree: boolean;
+  organizerId: string;
+  dateFrom: Date | null;
+  dateTo: Date | null;
+  onlyFuture: boolean;
 }
 
 export type Currency = 'PLN' | 'EUR' | 'USD';
@@ -40,3 +66,11 @@ export const CURRENCIES = [
   { code: 'EUR' as const, symbol: '€', name: 'Euro' },
   { code: 'USD' as const, symbol: '$', name: 'Dolar amerykański' },
 ] as const;
+
+// do wyświetlania (podajemy zawsze nazwę, daty i link)
+export type Trip = {
+  id: string;
+  title?: string;
+  date_from?: string;
+  date_to?: string;
+};

@@ -1,3 +1,4 @@
+// główny komponent formularza tworzenia oferty
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -32,6 +33,7 @@ const INITIAL_FORM_DATA: OfferFormData = {
   seats_total: '',
   seats_available: '',
   images: [],
+  yacht_name: '',
 };
 
 export default function CreateOfferForm({ countries }: Props) {
@@ -57,7 +59,6 @@ export default function CreateOfferForm({ countries }: Props) {
     const user = getCurrentUser();
     if (!user) {
       setGlobalError('Musisz być zalogowany aby dodać ofertę');
-      router.push('/logowanie');
       return;
     }
 
@@ -106,8 +107,10 @@ export default function CreateOfferForm({ countries }: Props) {
         <OfferBasicInfo
           title={formData.title}
           description={formData.description}
+          yacht_name={formData.yacht_name}
           onTitleChange={(value) => updateField('title', value)}
           onDescriptionChange={(value) => updateField('description', value)}
+          onYachtNameChange={(value) => updateField('yacht_name', value)}
           errors={errors}
         />
       </FormSection>

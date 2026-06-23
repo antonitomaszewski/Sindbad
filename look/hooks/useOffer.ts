@@ -1,3 +1,5 @@
+// używam do pobierania danej oferty
+// widok offer/[id]
 import { useState, useEffect } from 'react';
 import { getOfferById } from '@/logic/lib/offers';
 

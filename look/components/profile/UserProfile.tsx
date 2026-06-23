@@ -1,3 +1,7 @@
+// główna (lewa) część profilu użytkownika
+// mamy tutaj informacje o nas, o rejsach w których braliśy udział, o osobach z którymi żeglowaliśmi
+// oraz o nadchodzących rezerwacjach
+
 import UserHeader from './UserHeader';
 import UserBio from './UserBio';
 import TripHistory from './TripHistory';
@@ -13,7 +17,6 @@ import Link from 'next/link';
 export default function UserProfile({
   user,
   organizedTrips,
-  participatedTrips,
   isOwnProfile = false,
   myBookings = [],
   userContacts = [],
@@ -22,7 +25,6 @@ export default function UserProfile({
 }: {
   user: User;
   organizedTrips: { id: string; title?: string; date?: string }[];
-  participatedTrips: { id: string; title?: string; date?: string }[];
   isOwnProfile?: boolean;
   myBookings?: BookingWithOffer[];
   userContacts?: UserContact[];
@@ -47,7 +49,6 @@ export default function UserProfile({
           <SailedWithSection contacts={userContacts} commonContactIds={commonContactIds} />
 
           <TripHistory title="Rejsy organizowane" trips={organizedTrips} />
-          {/* <TripHistory title="Rejsy jako załogant" trips={participatedTrips} /> */}
           {isOwnProfile && <MyBookingsList bookings={myBookings} />}
         </div>
 
@@ -60,7 +61,7 @@ export default function UserProfile({
 
       {isOwnProfile && (
         <Link
-          href={`/profil/${user.id}/edytuj`} // Zmień z /profil/edycja
+          href={`/profil/${user.id}/edytuj`}
           className="px-5 py-2 bg-main text-white rounded-lg font-semibold hover-bg-main transition shadow-md hover:shadow-lg"
         >
           Edytuj profil

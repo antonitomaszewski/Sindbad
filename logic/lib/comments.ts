@@ -1,3 +1,8 @@
+// obsługa komentarzy:
+// sprawdzanie czy mozemy dodawac/edytowac
+// edycja i pobieranie komentarzy do wyswietlenia: 
+// na stronie oferty,
+// na profilu użytkownika 
 import pb from './pocketbase';
 import { getOfferById } from './offers';
 import type { Offer } from '../types/offer';
@@ -6,79 +11,49 @@ import type {
   OrganizerReviewRatingFilter,
   OrganizerReviewsSummary,
 } from '../types/comment';
+import { todayIso } from '../../look/utils/dateFormatter';
+import {hasConfirmedBookingForOffer} from './bookings';
+import {getCurrentUserId, getCurrentUser} from './users';
 
 const COMMENTS_COLLECTION = 'offer_comments';
 
-function mapRecordToComment(record: any): OfferComment {
-  const expandedUser = Array.isArray(record.expand?.user_id)
-    ? record.expand.user_id[0]
-    : record.expand?.user_id;
-  const expandedOffer = Array.isArray(record.expand?.offer_id)
-    ? record.expand.offer_id[0]
-    : record.expand?.offer_id;
-
-  return {
-    id: String(record.id),
-    offer_id: String(record.offer_id),
-    user_id: String(record.user_id),
-    rating: Number(record.rating || 0),
-    content: String(record.content || ''),
-    created: String(record.created),
-    updated: String(record.updated),
-    author_name: String(expandedUser?.name || expandedUser?.email || 'Użytkownik'),
-    offer_title: expandedOffer?.title ? String(expandedOffer.title) : undefined,
-  };
-}
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
+// możemy dodawać komentarze po zakończonym rejsie
 export function isOfferFinished(offer: Offer): boolean {
   const end = (offer.date_to || offer.date_from || '').slice(0, 10);
   return Boolean(end) && end < todayIso();
 }
 
-async function hasConfirmedBooking(offerId: string, userId: string): Promise<boolean> {
-  const list = await pb.collection('bookings').getList(1, 1, {
-    filter: `offer_id = "${offerId}" && user_id = "${userId}" && status = "confirmed"`,
-  });
-
-  return list.totalItems > 0;
-}
-
+// sprawdzamy czy możemy komentować:
+// 1. rejs musi być skończony
+// 2. chłop musiał być w załodze
 async function canUserComment(offer: Offer, userId: string): Promise<boolean> {
   if (!isOfferFinished(offer)) return false;
 
   // Organizator nie może komentować własnego rejsu
   if (offer.organizer_id === userId) return false;
 
-  return hasConfirmedBooking(offer.id, userId);
+  return hasConfirmedBookingForOffer(offer.id, userId);
 }
 
+
+// można dodawać i wyświetlac jedynie opinie po rejsie
+// wyświetlamy je po rejsie 
 export async function getOfferComments(offerId: string): Promise<OfferComment[]> {
   const offer = await getOfferById(offerId);
   if (!offer || !isOfferFinished(offer)) {
     return [];
   }
-
-  try {
-    const records = await pb.collection(COMMENTS_COLLECTION).getFullList({
+  const records = await pb.collection(COMMENTS_COLLECTION).getFullList({
       filter: `offer_id = "${offerId}"`,
-      expand: 'user_id,offer_id',
-      sort: '-created',
     });
-
-    return records.map(mapRecordToComment);
-  } catch (err) {
-    console.warn('getOfferComments error:', err);
-    return [];
-  }
+  return records as unknown as OfferComment[];
 }
-
+// używane na widoku oferrty do sprawdzenia czy mozemy dodać komentarz
+// w OfferCommentsSection 
 export async function canCurrentUserAddOfferComment(offerId: string): Promise<boolean> {
-  const userId = pb.authStore.record?.id;
-  if (!userId) return false;
+  const userId = await getCurrentUserId();
+  if (!userId)
+    return false;
 
   const offer = await getOfferById(offerId);
   if (!offer) return false;
@@ -86,28 +61,25 @@ export async function canCurrentUserAddOfferComment(offerId: string): Promise<bo
   return canUserComment(offer, userId);
 }
 
+// jesli już gościu dodałe komentarz - to go tutaj zwracamy
+// używane na widoku oferty, do wyświetlania komentarzy
 export async function getCurrentUserOfferComment(offerId: string): Promise<OfferComment | null> {
-  const userId = pb.authStore.record?.id;
+  const userId = await getCurrentUserId();
   if (!userId) return null;
 
   try {
-    const list = await pb.collection(COMMENTS_COLLECTION).getList(1, 1, {
-      filter: `offer_id = "${offerId}" && user_id = "${userId}"`,
-      expand: 'user_id,offer_id',
-    });
-
-    if (list.totalItems === 0 || !list.items[0]) {
-      return null;
-    }
-
-    return mapRecordToComment(list.items[0]);
-  } catch (err) {
-    console.warn('getCurrentUserOfferComment error:', err);
+    return await pb.collection(COMMENTS_COLLECTION).getFirstListItem(`offer_id = "${offerId}" && user_id = "${userId}"`);
+  } catch {
     return null;
   }
 }
 
-export async function upsertCurrentUserOfferComment({
+
+// jak ktoś już dodał komentarz - to go aktualizujemy
+// a jak nowy - to tworzymy
+// używane na stronie oferty w komponencie komentarzy
+// biorę offerId, bo pochodzi to właśnie z widoku oferty
+export async function updateOrCreateComment({
   offerId,
   rating,
   content,
@@ -116,25 +88,16 @@ export async function upsertCurrentUserOfferComment({
   rating: number;
   content: string;
 }): Promise<OfferComment> {
-  const userId = pb.authStore.record?.id;
-
-  if (!userId) {
-    throw new Error('Zaloguj się, aby dodać komentarz');
-  }
+  // zalogowany użytkownik dodaje komentarze
+  const userId = await getCurrentUserId();
+  const user = getCurrentUser();
 
   const offer = await getOfferById(offerId);
-  if (!offer) {
-    throw new Error('Oferta nie istnieje');
-  }
-
+  offer.title
+  
   const canComment = await canUserComment(offer, userId);
   if (!canComment) {
     throw new Error('Nie masz uprawnień do komentowania tego rejsu');
-  }
-
-  const normalizedContent = content.trim();
-  if (!normalizedContent) {
-    throw new Error('Podaj treść komentarza');
   }
 
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
@@ -144,23 +107,25 @@ export async function upsertCurrentUserOfferComment({
   const existing = await getCurrentUserOfferComment(offerId);
 
   const payload = {
-    offer_id: offerId,
-    user_id: userId,
     rating,
-    content: normalizedContent,
+    content: content.trim(),
+    offer_title: offer.title,
+    author_name: user?.name
   };
 
   const record = existing
     ? await pb.collection(COMMENTS_COLLECTION).update(existing.id, payload)
     : await pb.collection(COMMENTS_COLLECTION).create(payload);
 
-  const withExpand = await pb.collection(COMMENTS_COLLECTION).getOne(record.id, {
-    expand: 'user_id,offer_id',
-  });
+  const comments = await pb.collection(COMMENTS_COLLECTION).getOne(record.id);
 
-  return mapRecordToComment(withExpand);
+  return comments as unknown as OfferComment;
 }
 
+// wyświetlam to na stronie profilu użytkwnika
+// do wglądu w opinie z rejsów
+// organizatorId -> oferty -> komentarze
+// zwracamy komentarze + statystki
 export async function getOrganizerReviewsSummary({
   organizerId,
   ratingFilter,
@@ -174,14 +139,7 @@ export async function getOrganizerReviewsSummary({
       fields: 'id,date_from,date_to',
     });
 
-    const pastOfferIds = offers
-      .filter((o: any) => {
-        const end = String(o.date_to || o.date_from || '').slice(0, 10);
-        return Boolean(end) && end < todayIso();
-      })
-      .map((o: any) => String(o.id));
-
-    if (pastOfferIds.length === 0) {
+    if (offers.length === 0) {
       return {
         averageRating: 0,
         totalReviews: 0,
@@ -190,14 +148,11 @@ export async function getOrganizerReviewsSummary({
       };
     }
 
-    const offerFilter = pastOfferIds.map((id) => `offer_id = "${id}"`).join(' || ');
-    const records = await pb.collection(COMMENTS_COLLECTION).getFullList({
-      filter: offerFilter,
-      expand: 'user_id,offer_id',
-      sort: '-created',
+    const filter = offers.map((offer) => `offer_id = "${offer.id}"`).join(' || ');
+    const comments = await pb.collection(COMMENTS_COLLECTION).getFullList({
+      filter: filter
     });
 
-    const comments = records.map(mapRecordToComment);
     const totalReviews = comments.length;
     const sum = comments.reduce((acc, c) => acc + c.rating, 0);
     const averageRating = totalReviews ? Number((sum / totalReviews).toFixed(2)) : 0;
@@ -207,16 +162,13 @@ export async function getOrganizerReviewsSummary({
       ? comments
       : comments.filter((c) => c.rating === ratingFilter);
 
-    const ordered = [...filtered].sort((a, b) => b.created.localeCompare(a.created));
-
     return {
       averageRating,
       totalReviews,
       lowRatingsCount,
-      reviews: ordered,
+      reviews: filtered as unknown as OfferComment[],
     };
   } catch (err) {
-    console.warn('getOrganizerReviewsSummary error:', err);
     return {
       averageRating: 0,
       totalReviews: 0,

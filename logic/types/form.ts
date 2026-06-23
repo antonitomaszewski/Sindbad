@@ -1,7 +1,3 @@
-/**
- * Wspólne typy dla wszystkich formularzy w aplikacji
- */
-
 export interface ValidationErrors {
   [key: string]: string | undefined;
 }

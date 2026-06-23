@@ -1,3 +1,5 @@
+// strona nieodnaleziona, 404
+
 import Link from 'next/link';
 
 interface NotFoundStateProps {

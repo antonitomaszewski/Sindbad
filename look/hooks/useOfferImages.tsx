@@ -1,4 +1,6 @@
-// look/hooks/useOfferImages.ts
+// używam przy wyświetlaniu obrazków na stronie oferty
+// pobieram je, i ustawiam w zmiennej images
+
 import { useState, useEffect } from 'react';
 import { getOfferImages } from '@/logic/lib/images';
 import { OfferImage } from '@/logic/types/image';

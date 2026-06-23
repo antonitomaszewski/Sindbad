@@ -1,3 +1,7 @@
+// uzywany na oferta/id]
+// jeśli mamy do tej sekcji dostęp to widzimy wszystkich zapisanych członków
+// (włącznie z nami oczywiście)
+
 import Link from 'next/link';
 import { Card } from '@/look/components/ui/Card';
 import type { OfferParticipant } from '@/logic/types/booking';

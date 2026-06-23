@@ -1,9 +1,16 @@
+// panel rezerwacji, dla organizatora
+// może sobie klikać by zmienić status rezerwacji każdej z osób,
+// jak klika - wysyłamy mail
+// mozna zmienić status z zaakceptowanego na odrzucony.
+// to byłoby dziwne zachowanie ze strony organizatora, ale nie blokuje go
+ 
 'use client';
 import { useState, useEffect } from 'react';
 import { getOfferBookings, updateBookingStatus } from '@/logic/lib/bookings';
 import { useUser } from '@/look/hooks/useUser';
 import type { Booking } from '@/logic/types/booking';
 import Link from 'next/link';
+import {statusColors} from '@/look/constants/booking';
 
 interface BookingsPanelProps {
   offerId: string;
@@ -74,12 +81,6 @@ function BookingItem({ booking, onStatusChange }: BookingItemProps) {
   const { user } = useUser(booking.user_id || null);
   const isGuest = !booking.user_id;
 
-  const statusColors = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    confirmed: 'bg-green-100 text-green-800',
-    rejected: 'bg-red-100 text-red-800',
-  };
-
   return (
     <div className="bg-white rounded-lg p-4 border border-gray-200">
       <div className="flex justify-between items-start mb-3">
@@ -89,8 +90,6 @@ function BookingItem({ booking, onStatusChange }: BookingItemProps) {
               <p className="font-semibold text-gray-900">{booking.guest_name}</p>
               <p className="text-sm text-gray-600">
                 {booking.guest_email && `📧 ${booking.guest_email}`}
-                {booking.guest_email && booking.guest_phone && ' • '}
-                {booking.guest_phone && `📞 ${booking.guest_phone}`}
               </p>
             </div>
           ) : (

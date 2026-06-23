@@ -1,3 +1,6 @@
+// Wspólny komponent div.
+// Daje białe tło, zaokrąglenie, cień, obramowanie i odstępy.
+
 interface CardProps {
   children: React.ReactNode;
   className?: string;

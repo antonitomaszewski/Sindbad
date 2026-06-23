@@ -1,0 +1,1 @@
+stałe wyświetlane na widokach stron (a nie używane w ffunkcjach logicznych logic w przeciwieństwie do stałych z logic/lib/constants)

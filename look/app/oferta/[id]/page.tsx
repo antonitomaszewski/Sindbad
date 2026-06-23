@@ -1,3 +1,5 @@
+// Strona szczegółów oferty.
+
 'use client';
 import { use, useEffect, useState } from 'react';
 import { useOffer } from '@/look/hooks/useOffer';
@@ -16,18 +18,16 @@ import BookingModal from '@/look/components/booking/BookingModal';
 import QuestionModal from '@/look/components/offer/QuestionModal';
 import { BookingsPanel } from '@/look/components/booking/BookingsPanel';
 import { isCurrentUserOrganizer } from '@/logic/lib/offers';
+import { Button } from '@/look/components/ui/Button';
 import {
   canViewParticipants,
   getConfirmedParticipants,
 } from '@/logic/lib/bookings';
 import type { OfferParticipant } from '@/logic/types/booking';
+import { todayIso } from '@/look/utils/dateFormatter';
 
 interface OfferPageProps {
   params: Promise<{ id: string }>;
-}
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
 }
 
 function canBookOfferByDate(dateFrom?: string): boolean {
@@ -47,6 +47,7 @@ export default function OfertaPage({ params }: OfferPageProps) {
   const [showModal, setShowModal] = useState(false);
   const [showQuestionModal, setShowQuestionModal] = useState(false);
   const [questionSent, setQuestionSent] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [participants, setParticipants] = useState<OfferParticipant[]>([]);
   const [participantsLoading, setParticipantsLoading] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
@@ -67,6 +68,16 @@ export default function OfertaPage({ params }: OfferPageProps) {
     setQuestionSent(false);
     setShowQuestionModal(true);
   };
+
+  const handleCopied = async () => {
+    await navigator.clipboard.writeText(
+    window.location.href
+  );
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 1000);
+  }
 
   const handleQuestionSuccess = () => {
     setShowQuestionModal(false);
@@ -146,17 +157,19 @@ export default function OfertaPage({ params }: OfferPageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-8">
-        <OfferHeader
-          title={offer.title}
-          location={offer.location || ''}
-          price={`${offer.price_per_person || 0} ${offer.currency || 'PLN'}`}
-          dateFrom={offer.date_from || ''}
-          dateTo={offer.date_to || ''}
-          country={offer.country}
-          port={offer.port}
-          seatsAvailable={offer.seats_available}
-          seatsTotal={offer.seats_total}
-        />
+          <OfferHeader
+            title={offer.title}
+            price={`${offer.price_per_person || 0} ${offer.currency || 'PLN'}`}
+            dateFrom={offer.date_from || ''}
+            dateTo={offer.date_to || ''}
+            country={offer.country}
+            port={offer.port}
+            seatsAvailable={offer.seats_available}
+            yachtName={offer.yacht_name}
+          />
+          <Button onClick={handleCopied} variant="secondary" className="shrink-0 mt-1">
+            {copied ? 'Skopiowano!' : 'Kopiuj link'}
+          </Button>
 
         <OfferDescription description={offer.description} />
 

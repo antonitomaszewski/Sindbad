@@ -1,3 +1,5 @@
+// siatka ofert, wyniki wyszukiwania
+// używany na szukaj/
 'use client';
 import OfferCard from './OfferCard';
 import { Offer } from '../../../logic/types/offer';
@@ -27,6 +29,10 @@ export default function SearchResults({ results, loading, offerImages, organizer
   }
 
   return (
+    // działa także na telefon
+    // na małym ekranie 1 kolumn
+    // potem 2
+    // potem 3
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {results.map((offer) => (
         <OfferCard

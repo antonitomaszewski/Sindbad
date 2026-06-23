@@ -1,3 +1,7 @@
+// wyświetlanie opinii o danej osobie (rganizatorze)
+// ma filtr na wysokośc opinii
+// wyświetlany na profil/id
+
 'use client';
 
 import { useEffect, useState } from 'react';

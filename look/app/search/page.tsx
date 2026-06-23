@@ -1,3 +1,4 @@
+// Strona wyszukiwania ofert.
 import SearchPanel from '../../components/search/SearchPanel';
 
 export default function SearchPage() {

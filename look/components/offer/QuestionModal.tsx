@@ -1,8 +1,10 @@
+// modal do zadawania pytań  do rejsu, trochę jak booking modal
+// używany na oferta/[id]
 'use client';
 
 import { useState } from 'react';
 import pb from '@/logic/lib/pocketbase';
-import { sendOfferQuestion } from '@/logic/lib/questions';
+import { sendOfferQuestion } from '@/logic/lib/emails';
 
 interface QuestionModalProps {
   offerId: string;

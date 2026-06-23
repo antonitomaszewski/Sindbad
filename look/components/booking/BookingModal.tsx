@@ -1,7 +1,13 @@
+// modal rezerwacji oferty
+// wyświetla się jak na ofercie klikamy wyślij rezerwację
+// user moze byc zalogowany albo nie: dwie wersje
+// długość wiadomości to max 200 znaków
 'use client';
 import { useState } from 'react';
 import { createBooking } from '@/logic/lib/bookings';
-import pb from '@/logic/lib/pocketbase';
+import { isUserLoggedIn } from '@/logic/lib/users';
+
+const MAX_MESSAGE_LENGTH = 200;
 
 interface BookingModalProps {
   offerId: string;
@@ -10,23 +16,49 @@ interface BookingModalProps {
   canReserve?: boolean;
 }
 
+const inputClass = 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main';
+const labelClass = 'block text-sm font-medium text-gray-700 mb-2';
+const buttonClass = 'py-3 px-6 rounded-lg font-semibold disabled:opacity-50';
+const submitButtonClass = `flex-1 ${buttonClass} bg-main text-white hover:bg-green-dark`;
+const cancelButtonClass = `${buttonClass} bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50`;
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return <label className={labelClass}>{children}</label>;
+}
+
 export default function BookingModal({ offerId, onClose, onSuccess, canReserve = true }: BookingModalProps) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  // Pola dla gości
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
-  const [guestPhone, setGuestPhone] = useState('');
+  // const [guestPhone, setGuestPhone] = useState('');
+  const onClear = () => {setGuestName(''); setMessage(''); setGuestEmail('')};
 
-  const isLoggedIn = pb.authStore.isValid;
+  const isLoggedIn = isUserLoggedIn();
+  const remaining = MAX_MESSAGE_LENGTH - message.length;
+  const counterClass = remaining < 20 ? 'text-red-500' : 'text-gray-500';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!canReserve) {
       setError('Rezerwacja jest niedostępna dla tego rejsu');
+      return;
+    }
+
+    if (remaining < 0) {
+      setError('Zbyt długa wiadomość');
+      return;
+    }
+
+    if (!isLoggedIn && !guestName) {
+      setError('Podaj imię i nazwisko');
+      return;
+    }
+
+    if (!isLoggedIn && !guestEmail) {
+      setError('Podaj email');
       return;
     }
 
@@ -37,20 +69,9 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
       if (isLoggedIn) {
         await createBooking(offerId, message);
       } else {
-        if (!guestName) {
-          setError('Podaj imię i nazwisko');
-          setLoading(false);
-          return;
-        }
-        if (!guestEmail && !guestPhone) {
-          setError('Podaj email lub telefon');
-          setLoading(false);
-          return;
-        }
         await createBooking(offerId, message, {
           name: guestName,
-          email: guestEmail || undefined,
-          phone: guestPhone || undefined,
+          email: guestEmail,
         });
       }
       onSuccess();
@@ -76,61 +97,47 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLoggedIn && (
             <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Imię i nazwisko *
-                </label>
-                <input
-                  type="text"
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-                  placeholder="Jan Kowalski"
-                  required
-                />
-              </div>
+              <FieldLabel>Imię i nazwisko *</FieldLabel>
+              <input
+                type="text"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                className={inputClass}
+                placeholder="Jan Kowalski"
+                required
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={guestEmail}
-                  onChange={(e) => setGuestEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-                  placeholder="jan@example.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefon
-                </label>
-                <input
-                  type="tel"
-                  value={guestPhone}
-                  onChange={(e) => setGuestPhone(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
-                  placeholder="+48 123 456 789"
-                />
-              </div>
-
-              <p className="text-xs text-gray-500">* Podaj email lub telefon</p>
+              <FieldLabel>Email *</FieldLabel>
+              <input
+                type="email"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                className={inputClass}
+                placeholder="jan@example.com"
+                required
+              />
+              {/* <FieldLabel>Telefon</FieldLabel>
+              <input
+              type='tel'
+              value={guestPhone}
+              onChange={(e) => setGuestPhone(e.target.value)}
+              className={inputClass}
+              placeholder='+123456789'/> */}
             </>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Wiadomość dla organizatora (opcjonalnie)
-            </label>
+            <FieldLabel>Wiadomość dla organizatora (opcjonalnie)</FieldLabel>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main"
+              className={inputClass}
               placeholder="Np. Mam pytanie o..."
             />
+            <p className={counterClass}>
+              {message.length} / {MAX_MESSAGE_LENGTH}
+            </p>
           </div>
 
           {error && <div className="text-red-600 text-sm">{error}</div>}
@@ -139,15 +146,22 @@ export default function BookingModal({ offerId, onClose, onSuccess, canReserve =
             <button
               type="submit"
               disabled={loading || !canReserve}
-              className="flex-1 py-3 px-6 rounded-lg font-semibold bg-main text-white hover:bg-green-dark disabled:opacity-50"
+              className={submitButtonClass}
             >
               {loading ? 'Wysyłanie...' : canReserve ? 'Potwierdź' : 'Rezerwacja niedostępna'}
+            </button>
+            <button
+            type="button"
+            disabled={false}
+            className={cancelButtonClass}
+            onClick={onClear}>
+              Wyczyść
             </button>
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="py-3 px-6 rounded-lg font-semibold bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className={cancelButtonClass}
             >
               Anuluj
             </button>

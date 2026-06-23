@@ -1,3 +1,5 @@
+// widok edycji profilu uzytkownika
+// formularz
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,9 +10,8 @@ import {
   changeUserPassword,
   isCurrentUserOAuth,
   updateUserProfile,
-  updateProfileVisibility,
 } from '../../../logic/lib/users';
-import { updateUserCertifications, type Certification } from '../../../logic/lib/certifications';
+import type { Certification } from '@/logic/types/certification';
 import { useFormValidation } from '../../../logic/hooks/useFormValidation';
 import {
   validateProfileForm,
@@ -80,14 +81,13 @@ export default function EditProfileView({
     setLoading(true);
 
     try {
-      // 1. Zaktualizuj profil (name, bio, avatar)
-      await updateUserProfile(user.id, formData);
-      
-      // 2. Zaktualizuj certyfikaty
-      await updateUserCertifications(user.id, selectedCertIds);
-
-      // 3. Zaktualizuj widoczność profilu
-      await updateProfileVisibility(user.id, profileVisibility);
+      await updateUserProfile(user.id, {
+        name: formData.name,
+        bio: formData.bio,
+        avatar: formData.avatar,
+        profile_visibility: profileVisibility,
+        certifications: selectedCertIds,
+      });
 
       router.push(`/profil/${user.id}`);
       router.refresh();
@@ -202,7 +202,7 @@ export default function EditProfileView({
                 <div>
                   <input
                     type="email"
-                    value=""
+                    value={accountData.email}
                     onChange={(e) => setAccountData((prev) => ({ ...prev, email: e.target.value }))}
                     placeholder="Nowy email"
                     disabled={accountLoading}

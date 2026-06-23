@@ -1,57 +1,46 @@
+// logika uzytkownika w pb
+// autoryzacja, pobieranie danych, aktualizacje 
+// funkcje niżej są poopisywane każda z osobna
+
 import pb from './pocketbase';
 import type { User } from '../types/user';
-import { ERRORS } from './messages';
+import { ERRORS } from '../constants/messages';
 import type { OAuthProvider } from '../types/auth';
 
-/**
- * Pobierz użytkownika po ID z rozszerzeniem certyfikatów
- */
+// czy jest zalogowany użytkownik
+// zalogowany moze dodac oferte, robic rezerwację
+export function isUserLoggedIn(): boolean {
+  return pb.authStore.isValid;
+}
+
+// jak klikamy w dodaj ofertę, to zalogowanego użytkownika przekieruje na formularz
+// a niezalogowanego - na stronę logowania
+export function subscribeAuthStateChange(onAuthChange: (isLoggedIn: boolean) => void) {
+  return pb.authStore.onChange(() => {
+    onAuthChange(pb.authStore.isValid);
+  });
+}
+
+// pobieram usera wraz z certyfikatami, uzywany w paru miejscach
+// bo wywołuje to UseUser
 export async function getUser(id: string): Promise<User | null> {
-  try {
-    const record: any = await pb.collection('users').getOne(id);
+    const user = await pb.collection('users').getOne(id) as User;
     const certifications = await getUserCertifications(id);
     return {
-      ...(record as unknown as User),
-      certifications,
+    ...user,
+    certifications,
     };
-  } catch (error) {
-    console.error('getUser error:', id, error);
-    return null;
-  }
 }
 
-/**
- * Pobierz certyfikaty użytkownika (nazwy zamiast ID)
- */
+// pobieram certyfikaty, relacja 1-wiele na user-certifications
 export async function getUserCertifications(userId: string): Promise<string[]> {
-  try {
-    const record: any = await pb.collection('users').getOne(userId, { expand: 'certifications' });
-    const expanded = record.expand?.certifications;
-    
-    if (Array.isArray(expanded) && expanded.length) {
-      return expanded.map((c: any) => c.name ?? c.id).filter(Boolean);
-    }
-
-    // Fallback: pobierz certyfikaty po ID
-    const ids: string[] = Array.isArray(record.certifications) 
-      ? record.certifications.map(String) 
-      : [];
-    
-    if (ids.length === 0) return [];
-
-    const filter = ids.map((id) => `id = "${id}"`).join(' || ');
-    const certs: any[] = await pb.collection('certifications').getFullList({ filter } as any);
-    
-    return certs.map((c: any) => c.name ?? c.code ?? c.id).filter(Boolean);
-  } catch (err) {
-    console.warn('getUserCertifications error:', userId, err);
-    return [];
-  }
+  const record: any = await pb.collection('users').getOne(userId, { expand: 'certifications' });
+  const certifications = record.expand?.certifications;
+  return certifications?.map((c: any) => c.name);
 }
 
-/**
- * Zaloguj użytkownika email/hasło
- */
+
+// logowanie hasłem
 export async function loginUser(email: string, password: string) {
   try {
     const authData = await pb.collection('users').authWithPassword(email, password);
@@ -61,6 +50,8 @@ export async function loginUser(email: string, password: string) {
   }
 }
 
+// dla osób, które mają google oauth - nie działa zmiana emaila
+// Konto logowane przez OAuth. Zmiana emaila i hasła jest wyłączona.
 export async function isCurrentUserOAuth(): Promise<boolean> {
   try {
     const user = pb.authStore.record;
@@ -77,6 +68,7 @@ export async function isCurrentUserOAuth(): Promise<boolean> {
   }
 }
 
+// sprawdzanie hasła, przy jego zmianie
 async function verifyCurrentPassword(currentPassword: string) {
   const currentEmail = pb.authStore.record?.email;
 
@@ -94,7 +86,7 @@ async function verifyCurrentPassword(currentPassword: string) {
     throw new Error('Aktualne hasło jest nieprawidłowe');
   }
 }
-
+// analogicznie jak wyżej - sprawdzamy czy mozemy zmienić emaila, i update
 export async function changeUserEmail(
   userId: string,
   newEmail: string,
@@ -124,12 +116,21 @@ export async function changeUserEmail(
   }
 }
 
+// zmiana hasła, ta walidacja jest też w formularzu, tu chyba zbędna
+// ale dla spokoju zostawiłem
+// przy updacie hasla potrzeba podać old, new, newconfirm, oraz weryfikowca
 export async function changeUserPassword(
   userId: string,
   currentPassword: string,
   newPassword: string,
   newPasswordConfirm: string
 ) {
+  // await verifyCurrentPassword(currentPassword);
+  // return await pb.collection('users').update(userId, {
+  //     oldPassword: currentPassword,
+  //     password: newPassword,
+  //     passwordConfirm: newPasswordConfirm,
+  //   });
   if (!newPassword || newPassword.length < 8) {
     throw new Error('Nowe hasło musi mieć minimum 8 znaków');
   }
@@ -155,9 +156,7 @@ export async function changeUserPassword(
   }
 }
 
-/**
- * Zarejestruj nowego użytkownika
- */
+// rejestracja uzytkownika: email, hasło
 export async function registerUser(
   email: string, 
   password: string, 
@@ -170,58 +169,32 @@ export async function registerUser(
     
     const user = await pb.collection('users').create(data);
 
-    // Krok 3: wyślij mail weryfikacyjny po rejestracji.
+    // szablon do ustawienia w pb
     await pb.collection('users').requestVerification(email);
 
     return user as unknown as User;
   } catch (error: any) {
-    // Przekaż szczegółowy błąd z PocketBase (np. "User with email already exists").
-    const pbMessage = error?.response?.message;
-    const fallbackMessage = error?.message;
-    const likelyNetworkIssue =
-      !error?.response &&
-      (typeof fallbackMessage === 'string' &&
-        /fetch|network|cors|failed to fetch/i.test(fallbackMessage));
-
-    if (likelyNetworkIssue) {
-      throw new Error(
-        'Brak połączenia z bazą PocketBase. Sprawdź NEXT_PUBLIC_PB_URL w Vercel oraz CORS (Allowed origins) w PocketBase.'
-      );
-    }
-
-    throw new Error(pbMessage || fallbackMessage || ERRORS.REGISTRATION_FAILED);
+    throw error;
   }
 }
 
-/**
- * Zaloguj przez Google OAuth
- */
+// logowanie google oauth
 export async function loginWithOAuth(provider: OAuthProvider) {
-  try {
-    const authData = await pb.collection('users').authWithOAuth2({ 
-      provider,
-      createData: { emailVisibility: true }
-    });
-    
-    return authData;
-  } catch (error: any) {
-    throw new Error(error.message || `Logowanie przez ${provider} nie powiodło się`);
-  }
+  const authData = await pb.collection('users').authWithOAuth2({ 
+    provider,
+    createData: { emailVisibility: true }
+  });
+  
+  return authData;
 }
 
-// Backward compatibility
-export const loginWithGoogle = () => loginWithOAuth('google');
-
-/**
- * Wyloguj użytkownika (wyczyść sesję)
- */
-export async function logoutUser() {
+// https://pub.dev/documentation/pocketbase/latest/
+// prosta sprawa
+export function logoutUser() {
   pb.authStore.clear();
 }
 
-/**
- * Pobierz aktualnie zalogowanego użytkownika
- */
+// uzytkownik zalogowany trzymamy w pb.authStore.record
 export function getCurrentUser(): User | null {
   return pb.authStore.record as User | null;
 }
@@ -233,91 +206,56 @@ export function isCurrentServerUser(userOrId: User | string): boolean {
 }
 
 
-/**
- * Aktualizuj dane użytkownika
- */
-export async function updateUser(id: string, newData: Partial<User>) {
-  try {
-    const user = await pb.collection('users').update(id, newData);
-    return user as unknown as User;
-  } catch (error) {
-    throw new Error(ERRORS.UPDATE_FAILED);
-  }
-}
+//  aktualizacja klienta
+// export async function updateUser(id: string, newData: Partial<User>) {
+  // return await pb.collection('users').update(id, newData);
+// }
 
-/**
- * Aktualizuj profil użytkownika (name, bio, avatar)
- */
+//  aktualizacja klienta: dane bio, imie, avatar, certyfikaty, widocznosc profilu
 export async function updateUserProfile(
   userId: string,
   data: {
     name?: string;
     bio?: string;
     avatar?: File | null;
+    profile_visibility?: 'public' | 'private';
+    certifications?: string[];
   }
 ): Promise<User> {
   try {
     const formData = new FormData();
 
-    if (data.name !== undefined) {
+    if (data.name) {
       formData.append('name', data.name.trim());
     }
-
-    if (data.bio !== undefined) {
+    if (data.bio) {
       formData.append('bio', data.bio.trim() || '');
     }
-
     if (data.avatar) {
       formData.append('avatar', data.avatar);
+    }
+    if (data.profile_visibility) {
+      formData.append('profile_visibility', data.profile_visibility);
     }
 
     const record = await pb.collection('users').update(userId, formData);
 
-    return {
-      id: record.id,
-      password: record.password,
-      tokenKey: record.tokenKey,
-      email: record.email,
-      emailVisibility: record.emailVisibility,
-      verified: record.verified,
-      name: record.name,
-      avatar: record.avatar,
-      created: record.created,
-      updated: record.updated,
-      bio: record.bio,
-      certifications: record.certifications || [],
-    } as User;
+    // oraz na relacji certifications
+    if (data.certifications) {
+      const { updateUserCertifications } = await import('./certifications');
+      await updateUserCertifications(userId, data.certifications);
+    }
+
+    return record as unknown as User;
   } catch (error: any) {
-    console.error('Update profile error:', error);
     throw new Error('Nie udało się zaktualizować profilu');
   }
 }
 
-/**
- * Zaktualizuj widoczność profilu (public/private)
- */
-export async function updateProfileVisibility(
-  userId: string,
-  visibility: 'public' | 'private'
-): Promise<User> {
-  try {
-    const record = await pb.collection('users').update(userId, {
-      profile_visibility: visibility,
-    });
-
-    return record as unknown as User;
-  } catch (error: any) {
-    throw new Error('Nie udało się zmienić widoczności profilu');
-  }
-}
-
-/**
- * Sprawdź czy użytkownik ma dostęp do profilu
- * Profil jest dostępny jeśli:
- * - Jest publiczny (public)
- * - Użytkownik jest właścicielem profilu
- * - Użytkownik ma wspólne booking lub offers (uczestniczy w tym samym rejsie)
- */
+// profil możemy zobaczyć gdy:
+// 1. mamy wspólny rejs
+// mamy publicz ny profil
+// jesteśmy właścicielem profilu
 export async function canAccessProfile(
   profileUserId: string,
   currentUserId?: string
@@ -325,98 +263,58 @@ export async function canAccessProfile(
   const profile = await getUser(profileUserId);
 
   if (!profile) return false;
-
-  // Publiczny profil - wszyscy mają dostęp
   if (profile.profile_visibility === 'public') return true;
-
-  // Prywatny profil - wymagany zalogowany użytkownik
   if (!currentUserId) return false;
-
-  // Właściciel profilu
   if (profileUserId === currentUserId) return true;
-
-  // Sprawdź relację "żeglował z" symetrycznie (A->B lub B->A),
-  // żeby działało też dla prywatnych organizatorów bez własnych bookingów.
+// tu sprawdzamy relację żeglował z 
   const { getUserContacts } = await import('./bookings');
-  const [profileContacts, viewerContacts] = await Promise.all([
-    getUserContacts(profileUserId),
-    getUserContacts(currentUserId),
-  ]);
-
-  return (
-    profileContacts.some((contact) => contact.userId === currentUserId) ||
-    viewerContacts.some((contact) => contact.userId === profileUserId)
-  );
+  return (await getUserContacts(currentUserId)).some((contact) => contact.userId === profileUserId)
 }
 
-/**
- * Usuń avatar użytkownika
- */
+// usuwamy zdjęcie użytkownika
+// wykorzystywane w komponencie naedycji profilu
 export async function deleteUserAvatar(userId: string): Promise<User> {
-  try {
-    const record = await pb.collection('users').update(userId, {
+  return await pb.collection('users').update(userId, {
       avatar: null,
     });
-
-    return {
-      id: record.id,
-      password: record.password,
-      tokenKey: record.tokenKey,
-      email: record.email,
-      emailVisibility: record.emailVisibility,
-      verified: record.verified,
-      name: record.name,
-      avatar: record.avatar,
-      created: record.created,
-      updated: record.updated,
-      bio: record.bio,
-      certifications: record.certifications || [],
-    } as User;
-  } catch (error: any) {
-    console.error('Delete avatar error:', error);
-    throw new Error('Nie udało się usunąć avatara');
-  }
 }
 
-/**
- * Pobierz organizatorów (użytkownicy z ofertami)
- * Używane w filtrach wyszukiwania
- */
+// zwracamy listę wszystkich organizatorów
+// na widoku wyszukiwania
+// na panelu powiadomień
 export async function getAllOrganizers() {
+  let organizers = await pb.collection('offers').getFullList({
+    fields: 'organizer_id'
+  })
+  let uniqueOrganizerIds = [...new Set(organizers.map(x => x.organizer_id))];
+
   try {
-    const offers = await pb.collection('offers').getFullList({ 
-      fields: 'organizer_id',
-      requestKey: null,
-    });
-    
-    const uniqueOrganizerIds = [...new Set(
-      offers
-        .map((o: any) => o.organizer_id)
-        .filter((id): id is string => Boolean(id))
-    )];
-
-    if (uniqueOrganizerIds.length === 0) return [];
-
     const organizers = await Promise.all(
       uniqueOrganizerIds.map(async (id) => {
-        try {
           const user = await pb.collection('users').getOne(id);
           return {
             id: user.id,
-            name: user.name || user.email || 'Organizator',
-            email: user.email,
+            name: user.name || ''
           };
-        } catch {
-          return null;
-        }
       })
     );
 
     return organizers
-      .filter((o): o is { id: string; name: string; email: string } => o !== null)
-      .sort((a, b) => a.name.localeCompare(b.name, 'pl'));
   } catch (err) {
     console.error('getAllOrganizers error:', err);
     return [];
   }
+}
+// poprostu ID
+export async function getCurrentUserId(){
+  let id = getCurrentUser()?.id;
+  if (!id){
+    throw new Error("nie zalogowany");
+  }
+  return id;
+}
+// pobieram email użytkoniwka, do wysyłki email - powiadomienie o rejsie
+export async function getUserEmail(userId: string): Promise<string | null> {
+    const user = await pb.collection('users').getOne(userId);
+    return user.email || null;
 }

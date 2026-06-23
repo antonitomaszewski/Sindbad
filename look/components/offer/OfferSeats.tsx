@@ -1,3 +1,6 @@
+// używany na oferta/nowa
+// część formularza do wpisania liczby miejsc
+
 interface Props {
   seatsTotal: string;
   seatsAvailable: string;

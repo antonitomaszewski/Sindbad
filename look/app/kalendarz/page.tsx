@@ -1,3 +1,6 @@
+// do wyświetlania kalendarza korzystam z full calendar z reacta
+// po klikaniu na wydarzenie otwiera się modal
+// plLocale - ważne żeby mieć jeden czas dat w projekcie, by się nie rozjeżdzały (utc vs pl)
 "use client";
 
 import dynamic from 'next/dynamic';
@@ -17,11 +20,10 @@ export default function KalendarzPage() {
   const handleEventClick = (info: any) => {
     openModal(info.event);
   };
-
   if (loading) {
     return (
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-main mb-6">{CALENDAR_TEXTS.PAGE_TITLE}</h1>
+        <h1 className="text-3xl font-bold text-main mb-6 text-center">{CALENDAR_TEXTS.PAGE_TITLE}</h1>
         <div className="flex justify-center items-center h-64">
           <p className="text-gray">{CALENDAR_TEXTS.LOADING_MESSAGE}</p>
         </div>
@@ -31,8 +33,8 @@ export default function KalendarzPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold text-main mb-6">{CALENDAR_TEXTS.PAGE_TITLE}</h1>
-      <div className="bg-white rounded-lg shadow-sm border border-gray p-6">
+      <h1 className="text-3xl font-bold text-main mb-6 text-center">{CALENDAR_TEXTS.PAGE_TITLE}</h1>
+      <div className="bg-white rounded-2xl border border-gray p-8">
         <FullCalendar
           plugins={[dayGridPlugin]}
           locale={plLocale}
@@ -40,6 +42,9 @@ export default function KalendarzPage() {
           height={CALENDAR_CONFIG.HEIGHT}
           events={events}
           headerToolbar={CALENDAR_CONFIG.HEADER_TOOLBAR}
+          eventBackgroundColor={CALENDAR_CONFIG.EVENT_COLORS.BACKGROUND}
+          eventBorderColor={CALENDAR_CONFIG.EVENT_COLORS.BORDER}
+          defaultAllDay={CALENDAR_CONFIG.EVENT_DEFAULTS.allDay}
           eventClick={handleEventClick}
         />
       </div>

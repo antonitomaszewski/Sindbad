@@ -1,8 +1,10 @@
+// imię oraz zdjęcie na profilu użytkownika
+
 import type { User } from '../../../logic/types/user';
-import { buildFileUrl } from '../../../logic/lib/images';
+import {getUserAvatar} from '../../../logic/lib/images';
 
 export default function UserHeader({ user }: { user: User }) {
-  const avatarUrl = buildFileUrl('users', String(user.id), user.avatar ?? null) ?? undefined;
+  const avatarUrl = getUserAvatar(user);
 
   return (
     <header className="flex items-center gap-6">

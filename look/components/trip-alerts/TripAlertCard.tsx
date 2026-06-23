@@ -1,9 +1,13 @@
+// kafelki TripAlertCard wyświetlane są na TripAlertList
+// na profil/id
+// tu pojedynczy kafelek
+// możemy je edytować i usuwać
 'use client';
 
 import { useUser } from '@/look/hooks/useUser';
 import { Card } from '@/look/components/ui/Card';
 import { Button } from '@/look/components/ui/Button';
-import { formatDateRange } from '@/logic/lib/dates';
+import { formatDateRange } from '@/look/utils/dateFormatter';
 import { getCountryName } from '@/logic/constants/countries';
 import type { TripAlert } from '@/logic/types/tripAlert';
 
@@ -30,9 +34,6 @@ export function TripAlertCard({ alert, onDelete, onEdit, deleting = false }: Tri
               Powiadom mnie o podobnych rejsach
             </p>
           </div>
-          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${alert.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-            {alert.active ? 'Aktywny' : 'Nieaktywny'}
-          </span>
         </div>
 
         <div className="text-sm text-gray-700 space-y-1">

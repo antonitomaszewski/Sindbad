@@ -1,8 +1,12 @@
-import { describe, it, expect } from "vitest";
-import { createOffer, getOffers, getOfferById, updateOffer, deleteOffer } from "../lib/offers";
+import { describe, it, expect, vi } from "vitest";
+import { createOffer, getOffers, getOfferById, updateOffer, validateSeatsAvailable } from "../lib/offers";
 import { loginUser, registerUser } from "../lib/users";
-import { ERRORS } from "../lib/messages";
+import { ERRORS } from "../constants/messages";
 
+vi.mock('../lib/emails', () => ({
+  sendBookingEmails: vi.fn().mockResolvedValue(undefined),
+  sendBookingStatusEmail: vi.fn().mockResolvedValue(undefined),
+}));
 // Pomocnicze dane testowe
 const testLocation = {
   lat: 52.2297,
@@ -11,7 +15,7 @@ const testLocation = {
 };
 
 describe("offers logic", () => {
-  it("creates, gets, updates, deletes offer and checks relation integrity", async () => {
+  it("creates, gets, updates offer and checks relation integrity", async () => {
     // Najpierw tworzymy i logujemy użytkownika
     const email = `offeruser${Math.random().toString(36).slice(2)}@example.com`;
     const password = "OfferTest123!";
@@ -48,24 +52,16 @@ describe("offers logic", () => {
 
     // UPDATE
     const updatedTitle = "Zmieniona oferta";
-    const updated = await updateOffer(offer.id, { title: updatedTitle });
+    const updated = await updateOffer(offer.id, { title: updatedTitle, seats_available: 0});
     expect(updated).toBeDefined();
     expect(updated?.title).toBe(updatedTitle);
+    expect(() => validateSeatsAvailable(updated!)).toThrow('Brak dostępnych miejsc');
 
-    // DELETE
-    const deleted = await deleteOffer(offer.id);
-    expect(deleted).toBe(true);
-
-    // Po usunięciu nie powinno się dać pobrać oferty
-    const gotAfterDelete = await getOfferById(offer.id);
-    expect(gotAfterDelete).toBeNull();
-
-    // NEGATYWNY: próba utworzenia oferty z nieistniejącym organizer_id
     await expect(
       createOffer({
         ...offerData,
         organizer_id: "fake_id_123456"
       })
-    ).rejects.toThrow(ERRORS.CREATE_FAILED || "Failed to create record."); // dopasuj do swojego error handlingu
+    ).rejects.toThrow(ERRORS.CREATE_FAILED);
   });
 });

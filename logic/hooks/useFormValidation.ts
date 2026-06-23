@@ -1,3 +1,7 @@
+// szablon walidacji
+// używamy go w walidowaniu komponentów formularzy:
+// 1. tworzenie oferty
+// 2. edycja profilu uzytkownika
 import { useState } from 'react';
 import type { ValidationErrors } from '../types/form';
 

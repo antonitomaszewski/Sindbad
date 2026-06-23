@@ -1,3 +1,7 @@
+// sekcja żeglował z 
+// pokazuje kontakty z rejsów, a każdy kontakt jest rozwijalny i widzimy wtedy dokładnie gdzie
+// dane osoby razem żeglowały
+
 "use client";
 
 import { useMemo, useState } from 'react';
@@ -34,7 +38,7 @@ export function SailedWithSection({ contacts, commonContactIds = [] }: SailedWit
       </div>
 
       {hasCommonContacts && (
-        <label className="mb-3 inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+        <label className="mb-3 inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
           <input
             type="checkbox"
             checked={onlyCommon}
@@ -68,7 +72,7 @@ export function SailedWithSection({ contacts, commonContactIds = [] }: SailedWit
 
               {contact.trips.length > 0 && (
                 <details className="mt-2">
-                  <summary className="cursor-pointer text-xs text-gray-600 hover:text-gray-800 select-none">
+                  <summary className="cursor-pointer text-xs text-gray-600 hover:text-gray-800">
                     Pokaż wspólne rejsy
                   </summary>
                   <ul className="mt-2 space-y-1 pl-4 list-disc">

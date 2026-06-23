@@ -1,6 +1,7 @@
-export interface AuthResponse {
-  token: string;
-  record: any;
-}
+export type OAuthProvider = | 'google' ;
 
-export type OAuthProvider = 'google' | 'facebook' | 'github';
+export interface OAuthButtonProps {
+  provider: 'google';
+  onSuccess: () => void;
+  onError: (error: string) => void;
+}

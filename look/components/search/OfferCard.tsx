@@ -1,6 +1,9 @@
+// kafelek oferty, pokazywany na stronie wyszukiwania
+// zdjęcie, podstawowe informacje i przycisk do wejścia w ofertę
+
 'use client';
 import Link from 'next/link';
-import { formatDate } from '../../../logic/lib/dates';
+import {formatDate} from '@/look/utils/dateFormatter';
 import { Offer } from '../../../logic/types/offer';
 import { CalendarIcon, LocationIcon, UsersIcon, UserIcon } from './Icons';
 import { getCountryName } from '../../../logic/constants/countries';
@@ -39,7 +42,7 @@ export default function OfferCard({ offer, coverUrl, organizerName }: OfferCardP
         <div className="text-sm text-gray-600 flex items-center gap-1">
           <LocationIcon />
           <span className="line-clamp-1">
-            {offer.port ?? offer.location ?? '—'} • {offer.country ? getCountryName(offer.country) : '—'}
+            {offer.port ?? '—'} • {offer.country ? getCountryName(offer.country) : '—'}
           </span>
         </div>
 

@@ -1,7 +1,9 @@
+// stopka
+
 import Container from '../ui/Container';
 import Logo from '../ui/Logo';
 import FooterLinkSection from '../ui/FooterLinkSection';
-import { ACTIVITIES_LINKS, HELP_LINKS } from '@/look/constants/navigation';
+import { HELP_LINKS } from '@/look/constants/navigation';
 import { TEXTS } from '@/look/constants/texts';
 
 export default function Footer() {
@@ -18,7 +20,6 @@ export default function Footer() {
           </div>
 
           <div className="flex gap-12">
-            <FooterLinkSection title={TEXTS.ACTIVITIES_SECTION} links={ACTIVITIES_LINKS} />
             <FooterLinkSection title={TEXTS.HELP_SECTION} links={HELP_LINKS} />
           </div>
         </div>

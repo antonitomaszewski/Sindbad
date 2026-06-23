@@ -1,3 +1,5 @@
+// formularz powiadomienia (wyswietla się na oferta/id oraz profil/id)
+
 'use client';
 
 import { useEffect, useState } from 'react';

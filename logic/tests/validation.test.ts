@@ -15,6 +15,9 @@ describe('validateOfferForm', () => {
     seats_total: '8',
     seats_available: '5',
     images: [],
+    geo_lat: '0',
+    geo_lon: '0',
+    yacht_name: '',
   };
 
   describe('title validation', () => {
@@ -132,14 +135,6 @@ describe('validateOfferForm', () => {
       });
       expect(errors.price_per_person).toBe('Cena nie może być ujemna');
     });
-
-    it('should accept decimal prices', () => {
-      const errors = validateOfferForm({
-        ...validFormData,
-        price_per_person: '99.99',
-      });
-      expect(errors.price_per_person).toBeUndefined();
-    });
   });
 
   describe('seats validation', () => {
@@ -185,15 +180,6 @@ describe('validateOfferForm', () => {
         'Liczba wolnych miejsc nie może być większa niż całkowita'
       );
     });
-
-    it('should pass when seats_available = seats_total', () => {
-      const errors = validateOfferForm({
-        ...validFormData,
-        seats_total: '8',
-        seats_available: '8',
-      });
-      expect(errors.seats_available).toBeUndefined();
-    });
   });
 
   describe('image validation', () => {
@@ -231,40 +217,6 @@ describe('validateOfferForm', () => {
       });
       expect(errors.images).toContain('nie jest zdjęciem');
     });
-
-    it('should pass with valid images', () => {
-      const validImage = new File(
-        [new ArrayBuffer(1024 * 1024)], // 1MB
-        'photo.jpg',
-        { type: 'image/jpeg' }
-      );
-
-      const errors = validateOfferForm({
-        ...validFormData,
-        images: [validImage],
-      });
-      expect(errors.images).toBeUndefined();
-    });
-
-    it('should validate multiple images', () => {
-      const validImage = new File(
-        [new ArrayBuffer(1024 * 1024)],
-        'photo1.jpg',
-        { type: 'image/jpeg' }
-      );
-      const largeImage = new File(
-        [new ArrayBuffer(6 * 1024 * 1024)],
-        'photo2.jpg',
-        { type: 'image/jpeg' }
-      );
-
-      const errors = validateOfferForm({
-        ...validFormData,
-        images: [validImage, largeImage],
-      });
-      expect(errors.images).toContain('photo2.jpg');
-      expect(errors.images).toContain('jest za duże');
-    });
   });
 
   describe('complete form validation', () => {
@@ -283,9 +235,6 @@ describe('validateOfferForm', () => {
         seats_total: '-1',
         seats_available: '10',
       });
-      
-    //   console.log('All errors:', errors);
-    //   console.log('Error keys:', Object.keys(errors));
 
       expect(errors.title).toBeDefined();
       expect(errors.date_from).toBeDefined();

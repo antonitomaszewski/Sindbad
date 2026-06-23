@@ -1,18 +1,26 @@
+// funkcje do działania na ofertach rejsów
+// każda okraszona komentarzem
+// tworzenie ofert, aktualizacje rezerwacji na nich, pobieranie do filtrów wyszukiwania
+
 import pb from './pocketbase';
 import type { Offer, OfferFormData } from '../types/offer';
 import type { BookingStatus } from '../types/booking';
 import { sendTripAlertNotifications } from './tripAlerts';
+import { todayIso } from '../../look/utils/dateFormatter';
+import { format } from 'date-fns';
+import type {SearchOfferParams} from '../types/offer';
+import { getOfferImages, getImageUrl } from './images';
 
 export async function getOffers(): Promise<Offer[]> {
   const result = await pb.collection('offers').getFullList();
   return result as unknown as Offer[];
 }
 
+// tworzenie oferty w formularzu
+// przez to ze mamy alerty o rejsach nadchodzacych, to własnie wywołyujemy je tutaj
+// jak komus wpadnie rejs, na który miał ochotę - to dostanie maila
 export async function createOffer(data: Partial<Offer>): Promise<Offer> {
   const record = await pb.collection('offers').create(data);
-
-  // Wyślij powiadomienia o nowej ofercie pasującym alertom
-  // Fire-and-forget, nie czekamy na wynik
   const offer = record as unknown as Offer;
   sendTripAlertNotifications(offer).catch((err) => {
     console.warn('sendTripAlertNotifications failed:', err);
@@ -21,131 +29,99 @@ export async function createOffer(data: Partial<Offer>): Promise<Offer> {
   return offer;
 }
 
-export async function getOfferById(id: string): Promise<Offer | null> {
-  try {
-    const record = await pb.collection('offers').getOne(id);
-    return record as unknown as Offer;
-  } catch (error) {
-    return null;
+// funkcja do pobierania danej oferty, w wielu miejscach w logice uzywana
+export async function getOfferById(id: string): Promise<Offer> {
+  let offer = await pb.collection('offers').getOne(id) as Offer;
+  if (!offer) {
+    throw new Error('Oferta nie istnieje');
   }
-}
-
-// Helper do mapowania oferty na trip (dla kompatybilności z master)
-function mapOfferToTrip(t: any) {
-  return {
-    id: t.id,
-    title: t.title ?? t.name ?? 'Rejs',
-    date_from: t.date_from ?? undefined,
-    date_to: t.date_to ?? undefined,
-  } as { id: string; title?: string; date_from?: string, date_to?: string };
+  return offer;
 }
 
 // Pobierz rejsy organizatora
+// wyswietlamy je na UserProfile "Rejsy organizowane"
 export async function getTripsByOrganizer(organizerId: string) {
-  try {
-    const records: any[] = await (pb.collection('offers') as any).getFullList(
-      { filter: `organizer_id = "${organizerId}"`, sort: '-date_from' },
-      200
+    return await pb.collection('offers').getFullList(
+      { filter: `organizer_id = "${organizerId}"`}
     );
-    return records.map(mapOfferToTrip);
-  } catch (err) {
-    console.error('getTripsByOrganizer error', err);
-    return [];
-  }
 }
 
-// Pobierz rejsy uczestnika
-export async function getTripsByParticipant(userId: string) {
+// funkcja do wyswietlania wszystkich zakończonych rejsow na stronie głównej
+// getList(1,1, to paginacja pocketbase, jedna strona, 1 rekord na stronie)
+export async function getFinishedOffersCount() {
+  const record = pb.collection('offers').getList(1, 1, {filter: `date_to < "${todayIso()}"`})
+  return (await record).totalItems;
+}
+
+export async function getActiveOffersCount() {
+  return pb.collection('offers').getList(1, 1, {
+    filter: `date_to >= "${todayIso()}"`,
+  });
+}
+
+export async function getUniqueOrganizersCount(): Promise<number> {
+  const offers = await pb.collection('offers').getFullList({
+    fields: 'organizer_id',
+    requestKey: null,
+  });
+
+  const organizerIds = new Set(
+    (offers as Array<{ organizer_id?: string }>)
+      .map((offer) => offer.organizer_id)
+      .filter((id): id is string => Boolean(id))
+  );
+
+  return organizerIds.size;
+}
+
+// pobieram wszystkie oferty i filtruję je wedle tego co tam uzytkownik wyklikał 
+export async function searchOffers(params: SearchOfferParams = {}) {
   try {
-    const serverRecords: any[] = await (pb.collection('offers') as any).getFullList(
-      { filter: `participants = "${userId}"`, sort: '-date_from' },
-      200
-    );
-    if (serverRecords.length) {
-      return serverRecords.map(mapOfferToTrip);
+    const filters: string[] = [];
+
+    if (params.onlyFuture) {
+      filters.push(`date_from >= "${todayIso()}"`);
     }
 
-    // Fallback: pobierz wszystkie i filtruj lokalnie
-    const all: any[] = await (pb.collection('offers') as any).getFullList({}, 200);
-    const filtered = all.filter((t: any) => {
-      if (Array.isArray(t.participants)) return t.participants.map(String).includes(String(userId));
-      if (Array.isArray(t.expand?.participants)) return t.expand.participants.map((p: any) => String(p.id)).includes(String(userId));
-      return false;
-    });
-    return filtered.map(mapOfferToTrip);
-  } catch (err) {
-    console.error('getTripsByParticipant error', err);
-    return [];
-  }
-}
+    if (params.dateFrom) {
+      filters.push(`date_from >= "${params.dateFrom}"`);
+    }
 
-/**
- * Sprawdź czy użytkownik uczestniczy w ofercie organizowanej przez drugiego użytkownika
- * (lub vice versa)
- */
-export async function haveCommonOffers(userId1: string, userId2: string): Promise<boolean> {
-  try {
-    // Oferowań organizowana przez userId2, w których userId1 uczestniczy
-    const offersFromUser2: any[] = await (pb.collection('offers') as any).getFullList(
-      { filter: `organizer_id = "${userId2}"` },
-      200
-    );
+    if (params.dateTo) {
+      filters.push(`date_to <= "${params.dateTo}"`);
+    }
 
-    const user2OfferIds = new Set(offersFromUser2.map((o) => o.id));
+    if (params.country) {
+      filters.push(`country = "${params.country}"`);
+    }
 
-    // Sprawdź czy userId1 ma booking w którejś z ofert organizowanej przez userId2
-    const bookingsUser1 = await (pb.collection('bookings') as any).getFullList(
-      { filter: `user_id = "${userId1}"` },
-      200
-    );
+    if (params.port) {
+      filters.push(`port ~ "${params.port}"`);
+    }
 
-    const hasBookingInUser2Offers = bookingsUser1.some((b: any) => user2OfferIds.has(b.offer_id));
+    if (params.priceMin) {
+      filters.push(`price_per_person >= ${Number(params.priceMin)}`);
+    }
 
-    if (hasBookingInUser2Offers) return true;
+    if (params.priceMax) {
+      filters.push(`price_per_person <= ${Number(params.priceMax)}`);
+    }
 
-    // Sprawdź odwrotnie: czy userId2 ma booking w ofercie organizowanej przez userId1
-    const offersFromUser1: any[] = await (pb.collection('offers') as any).getFullList(
-      { filter: `organizer_id = "${userId1}"` },
-      200
-    );
+    if (params.onlyFree) {
+      filters.push('(seats_available = null || seats_available > 0)');
+    }
 
-    const user1OfferIds = new Set(offersFromUser1.map((o) => o.id));
-    const bookingsUser2 = await (pb.collection('bookings') as any).getFullList(
-      { filter: `user_id = "${userId2}"` },
-      200
-    );
+    if (params.organizerId) {
+      filters.push(`organizer_id = "${params.organizerId}"`);
+    }
 
-    const hasBookingInUser1Offers = bookingsUser2.some((b: any) => user1OfferIds.has(b.offer_id));
+    const queryFilter = filters.join(' && ');
 
-    return hasBookingInUser1Offers;
-  } catch (err) {
-    console.warn('haveCommonOffers error:', err);
-    return false;
-  }
-}
-
-// Wyszukaj oferty (nowa funkcja z brancha szukaj)
-export async function searchOffers(params: { 
-  q?: string; 
-  dateFrom?: string; 
-  dateTo?: string; 
-  onlyFuture?: boolean;
-}) {
-  const parts: string[] = [];
-  
-  if (params.q) {
-    parts.push(`(title ~= "${params.q}" || description ~= "${params.q}")`);
-  }
-
-  const filter = parts.length ? parts.join(' && ') : undefined;
-
-  try {
-    const records: any[] = await (pb.collection('offers') as any).getFullList({ 
-      filter, 
+    const records: any[] = await (pb.collection('offers') as any).getFullList({
+      filter: queryFilter || undefined,
       sort: '-date_from',
-      requestKey: 'search-offers',
     });
-    
+
     let results = records.map((t) => ({
       id: t.id,
       organizer_id: t.organizer_id,
@@ -165,29 +141,6 @@ export async function searchOffers(params: {
       updated: t.updated,
     }));
 
-    // Filtruj daty lokalnie (unikamy problemów UTC)
-    if (params.dateFrom) {
-      results = results.filter((o: any) => {
-        if (!o.date_from) return false;
-        return o.date_from.slice(0, 10) >= params.dateFrom!;
-      });
-    }
-    
-    if (params.dateTo) {
-      results = results.filter((o: any) => {
-        if (!o.date_to) return false;
-        return o.date_to.slice(0, 10) <= params.dateTo!;
-      });
-    }
-
-    if (params.onlyFuture) {
-      const now = new Date().toISOString().slice(0, 10);
-      results = results.filter((o: any) => {
-        if (!o.date_from) return false;
-        return o.date_from.slice(0, 10) >= now;
-      });
-    }
-
     return results;
   } catch (err) {
     console.error('searchOffers error', err);
@@ -195,7 +148,9 @@ export async function searchOffers(params: {
   }
 }
 
-// Edytuj ofertę
+// Edytuj ofertę - jedyne co zmieniamy w trakcie trwania oferty, to jej liczba miejsc
+// wykonywana przy zmianach w rezerwacjach
+// nie ma panelu zmian w ofertcie dla organizatora
 export async function updateOffer(id: string, data: Partial<Offer>): Promise<Offer | null> {
   try {
     const record = await pb.collection('offers').update(id, data);
@@ -205,19 +160,13 @@ export async function updateOffer(id: string, data: Partial<Offer>): Promise<Off
   }
 }
 
-// Usuń ofertę
-export async function deleteOffer(id: string): Promise<boolean> {
-  try {
-    await pb.collection('offers').delete(id);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-/**
- * Konwertuj dane formularza do formatu API
- */
+// tutaj był problem z cofaniem się daty o jeden dzień
+// bo przechodziłem na utc, a potem na PL.
+// i godzina się cofała
+// fotmatowanie z ta biblioteką jest lepsze
+// po kolei przechodze przez wszystkie dane z formularza,
+// waliduję współrzędne jakby ktoś se chciał wpisać 10k
+// używane przy tworzeniu ofert
 export function convertFormDataToOffer(
   formData: OfferFormData,
   organizerId: string
@@ -225,14 +174,16 @@ export function convertFormDataToOffer(
   const offer: any = {
     organizer_id: organizerId,
     title: formData.title.trim(),
-    date_from: formData.date_from!.toISOString().split('T')[0],
-    date_to: formData.date_to!.toISOString().split('T')[0],
+    date_from: format(formData.date_from!, 'yyyy-MM-dd'),
+    date_to: format(formData.date_to!, 'yyyy-MM-dd'),
     country: formData.country,
     port: formData.port.trim(),
     currency: formData.currency,
   };
 
-  // Opcjonalne pola
+  if (formData.yacht_name?.trim()){
+    offer.yacht_name = formData.yacht_name.trim();
+  }
   if (formData.description?.trim()) {
     offer.description = formData.description.trim();
   }
@@ -262,88 +213,68 @@ export function convertFormDataToOffer(
   return offer;
 }
 
+// czy zalogowany jest organizatorem danej oferty
+// uzywamy by wyświetlać panel organizatora
 export function isCurrentUserOrganizer(offer: Offer): boolean {
   return pb.authStore.record?.id === offer.organizer_id;
 }
 
+// sprawdzamy czy mamy dostępne miejsca - by dokonać rezerwacji, uzywamy przy zmianach statusów
 export function validateSeatsAvailable(offer: Offer) {
   if (offer.seats_available !== undefined && offer.seats_available <= 0) {
     throw new Error('Brak dostępnych miejsc');
   }
 }
 
+
+// prz zmianie statusu zmieniamy liczbę dostępnych miejsc
+// czyli +/- 1 bo na takich przypadkach operujemy
+// jeśli był confirmed lub jest confirmed
 export async function updateAvailableSeats({
   offer,
   previousStatus,
-  newStatus,
-  bookingUserId,
+  newStatus
 }: {
   offer: Offer;
   previousStatus: BookingStatus;
   newStatus: BookingStatus;
   bookingUserId?: string;
 }) {
-  console.log('[offers][updateAvailableSeats] start', {
-    offerId: offer.id,
-    previousStatus,
-    newStatus,
-    bookingUserId,
-    seatsAvailableBefore: offer.seats_available,
-    participantsBefore: Array.isArray((offer as any).participants)
-      ? (offer as any).participants
-      : [],
-  });
-
   const updateData: any = {};
 
   if (
     newStatus === 'confirmed' &&
     previousStatus !== 'confirmed' && offer.seats_available
   ) {
-    updateData.seats_available = Math.max(0, offer.seats_available - 1);
+    updateData.seats_available = offer.seats_available - 1;
   }
 
-  if (bookingUserId) {
-    const currentParticipants = new Set<string>(
-      Array.isArray((offer as any).participants)
-        ? (offer as any).participants.map((id: any) => String(id)).filter(Boolean)
-        : []
-    );
+  if (
+    previousStatus === 'confirmed' &&
+    newStatus !== 'confirmed' && offer.seats_available
+  ) {
+    updateData.seats_available = offer.seats_available + 1;
+  }
 
-    if (newStatus === 'confirmed' && previousStatus !== 'confirmed') {
-      currentParticipants.add(bookingUserId);
-      updateData.participants = Array.from(currentParticipants);
-      console.log('[offers][updateAvailableSeats] add-participant', {
-        offerId: offer.id,
-        bookingUserId,
-        participantsAfter: updateData.participants,
-      });
+  await updateOffer(offer.id, updateData);
+}
+
+
+// pobieram obrazki rejsów, w panelu wyszukiwania potrzebne
+export async function loadOfferImages(offers: Offer[]): Promise<Map<string, string>> {
+  const imageMap = new Map<string, string>();
+
+  for (const offer of offers) {
+    try {
+      const images = await getOfferImages(offer.id);
+      if (images.length > 0) {
+        const url = getImageUrl(images[0]);
+        if (url) imageMap.set(offer.id, url);
+      }
+    } catch (err) {
+      console.warn('Failed to load image for offer', offer.id);
     }
-
-    if (previousStatus === 'confirmed' && newStatus !== 'confirmed') {
-      currentParticipants.delete(bookingUserId);
-      updateData.participants = Array.from(currentParticipants);
-      console.log('[offers][updateAvailableSeats] remove-participant', {
-        offerId: offer.id,
-        bookingUserId,
-        participantsAfter: updateData.participants,
-      });
-    }
   }
 
-  if (Object.keys(updateData).length > 0) {
-    console.log('[offers][updateAvailableSeats] applying-update', {
-      offerId: offer.id,
-      updateData,
-    });
-    await updateOffer(offer.id, updateData);
-    console.log('[offers][updateAvailableSeats] update-applied', {
-      offerId: offer.id,
-    });
-    return;
-  }
-
-  console.log('[offers][updateAvailableSeats] no-update-needed', {
-    offerId: offer.id,
-  });
+  return imageMap;
 }
