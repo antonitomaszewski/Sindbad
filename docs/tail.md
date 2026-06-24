@@ -19,6 +19,9 @@ justify-(center/between/end) (przesuwa dzieci, gdy mamy flex)
 text-(center/right/left) (centrowanie tekstu)
 (md/sm-)col-span-(N) (rozpietość kolumn - jak bardzo element się rozpicha)
 
+items(center) dzieci w osi Y
+justify(center) dzieci w osi X
+
 2. siatki
 (sm/md/lg:)grid-cols-N
 
@@ -67,7 +70,7 @@ translate + translation-all
 9. pozycjonowanie
 
 relative
-absolute (dokładna pozycja względem rodzica)
+absolute (dokładna pozycja względem rodzica) (absolute działa względem ostatniego rodzica z relative)
 fixed (navbar, layout - niezależnie od scrolla)
 sticky (przykleja po scrllu)
 
@@ -99,4 +102,31 @@ sm/md/lg:
 13. klasy projektowe
 dodatkowe zmienne z colors.css
 
+
+htmlfor łączy label z input przez id
+htmlFor="name"
+input.id="name"
+klikam na opis - focus przechodzi na textarea
+
+
+
+div
+span
+p
+button
+link
+input
+textarea
+label
+form
+section
+article
+header
+footer
+nav
+main
+ul
+li
+img
+h1
 

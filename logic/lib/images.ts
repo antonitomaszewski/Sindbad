@@ -64,7 +64,8 @@ export function getImageThumbnailUrl(image: OfferImage, dimensions: string = IMA
 
 // pobieram obrazek Usera
 export function getUserAvatar(user: User){
-  return pb.files.getURL(user, user.avatar || '');
+  
+  return pb.files.getURL(user, user?.avatar || '');
 }
 
 // Upload wielu zdjęć do oferty podczas jej tworzenia (jako osobne rekordy w kolekcji images)
