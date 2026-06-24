@@ -146,6 +146,14 @@ export default function HomePage() {
           </article>
         </div>
       </section>
+
+
+      <section className='mx-auto max-w-5xl lg:px-8 px-4 pb-16'>
+        <h2 className='mb-6 text-2xl font-semibold'>uytrewq</h2>
+        <div className="">
+
+        </div>
+      </section>
     </main>
   );
 }

@@ -104,13 +104,13 @@ export async function getConfirmedBookingsCount() {
 // uzytkownik był: jako załogant (1) i jako organizator (2)
 // an8g9rlfw371lia eg 3 załogant, 1 organizator
 export async function getUserOffers(userId: string, _filter:string=""): Promise<string[]>{
-  let userOffers = await pb.collection(BOOKINGS_COLLECTION).getFullList(
+  const userOffers = await pb.collection(BOOKINGS_COLLECTION).getFullList(
     {
       filter: `user_id = "${userId}" && status = "confirmed" ${_filter}`,
       fields: "offer_id",
     }
   );
-  let organized = await getTripsByOrganizer(userId);
+  const organized = await getTripsByOrganizer(userId);
   return [...userOffers.map((record) => record.offer_id), ...organized.map(record => record.id)];
 }
 

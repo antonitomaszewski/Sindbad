@@ -30,8 +30,8 @@ describe('Trip Alerts', () => {
   const password = 'testpass123';
   const testGeo = { lat: 54.352, lon: 18.6466 };
 
-  let createdAlertIds: string[] = [];
-  let createdOfferIds: string[] = [];
+  const createdAlertIds: string[] = [];
+  const createdOfferIds: string[] = [];
 
   beforeAll(async () => {
     // Zarejestruj testowych użytkowników

@@ -156,3 +156,8 @@ na telefonie powiadomienie o podobnych rejsach wychodzi poza kartke
 
 1. jedna konwencja : autor ...
 1 os liczby pojedynczej ... w niniejszej pracy dowodzimy 
+
+
+
+npx eslint .
+npx eslint . --fix

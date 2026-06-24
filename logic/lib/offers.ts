@@ -31,7 +31,7 @@ export async function createOffer(data: Partial<Offer>): Promise<Offer> {
 
 // funkcja do pobierania danej oferty, w wielu miejscach w logice uzywana
 export async function getOfferById(id: string): Promise<Offer> {
-  let offer = await pb.collection('offers').getOne(id) as Offer;
+  const offer = await pb.collection('offers').getOne(id) as Offer;
   if (!offer) {
     throw new Error('Oferta nie istnieje');
   }
@@ -122,7 +122,7 @@ export async function searchOffers(params: SearchOfferParams = {}) {
       sort: '-date_from',
     });
 
-    let results = records.map((t) => ({
+    const results = records.map((t) => ({
       id: t.id,
       organizer_id: t.organizer_id,
       title: t.title ?? 'Rejs',

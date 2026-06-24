@@ -17,7 +17,7 @@ describe('Bookings', () => {
   const testPassword = 'testpass123';
   let testUserId: string;
   const testOfferId = 'vljld1woofzcv8s';
-  let createdBookingIds: string[] = [];
+  const createdBookingIds: string[] = [];
 
   beforeAll(async () => {
     const user = await registerUser(testEmail, testPassword, testPassword, 'Test User');

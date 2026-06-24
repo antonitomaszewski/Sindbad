@@ -27,7 +27,7 @@ justify(center) dzieci w osi X
 
 3. spacing
 p(x/y/t/b/l/r)-N
-m(t/b)-N
+m(l/t/b)-N
 padding jest wewnętrzny = od siebie , a margin zewnętrzny, gap - oddalenie elementów od siebie
 więc p ma wpływ na wielkośc elementu, a margin - na wielkość zewnętrznego elementu  
 gap-N (odległości na boki)

@@ -283,10 +283,10 @@ export async function deleteUserAvatar(userId: string): Promise<User> {
 // na widoku wyszukiwania
 // na panelu powiadomień
 export async function getAllOrganizers() {
-  let organizers = await pb.collection('offers').getFullList({
+  const organizers = await pb.collection('offers').getFullList({
     fields: 'organizer_id'
   })
-  let uniqueOrganizerIds = [...new Set(organizers.map(x => x.organizer_id))];
+  const uniqueOrganizerIds = [...new Set(organizers.map(x => x.organizer_id))];
 
   try {
     const organizers = await Promise.all(
@@ -307,7 +307,7 @@ export async function getAllOrganizers() {
 }
 // poprostu ID
 export async function getCurrentUserId(){
-  let id = getCurrentUser()?.id;
+  const id = getCurrentUser()?.id;
   if (!id){
     throw new Error("nie zalogowany");
   }

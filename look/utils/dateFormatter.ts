@@ -17,7 +17,7 @@ export function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function getDuration(startDate: Date | string, endDate: Date | string): String{
+export function getDuration(startDate: Date | string, endDate: Date | string): string{
   const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
   const end = endDate ? (typeof endDate === 'string' ? new Date(endDate) : endDate) : null;
 
