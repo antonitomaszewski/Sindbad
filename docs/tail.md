@@ -110,19 +110,22 @@ klikam na opis - focus przechodzi na textarea
 
 
 
-div
-span
-p
+div, span, p
 button
 link
+
 input
 textarea
+
 label
+
 form
 section
 article
+
 header
 footer
+
 nav
 main
 ul

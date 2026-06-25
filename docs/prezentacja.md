@@ -21,14 +21,26 @@ w przypadku klubów wysokogórskich mamy łatwość znalezienia partnerów wspin
 
 i teraz przechodzę, że stąd się zrodził pomysł, by utworzyć ...
 
+grupki whatsapp, na telefon sms, 
+nieduza grupa
+wroclawski zwiazek nie jest jak wspinaczkowy 
+
 4. cel i zakres (z pdfa, tu trochę o wymaganiach - co chcemy uzyskać)
+bez: platnosci, komunikatora, powiadomien, kalendarz sync z google
 
-5. techniczne
 
-6. praktyczne
+6. techniczne
+   supabase - postgres, nie potrzebuje takiego dużego
+   chciałbym pokazać pocketbase
 
-7. opowiadam na żywo
+7. praktyczne
+   1. problmy: mapka i kalendarz
+   2. pocketbase ma token
+   3. statusy są zmienialne - czy to dobrze? nie wiem, ale tak zrobiłem
+   4. 
 
-8. wnioski
+8. demo użytkownik, demo organizator
 
-9. zakończenie
+9.  wnioski
+
+10. zakończenie
